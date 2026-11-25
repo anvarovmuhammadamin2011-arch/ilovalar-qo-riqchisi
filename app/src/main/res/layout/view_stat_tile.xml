@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:parentTag="com.google.android.material.card.MaterialCardView">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/curbox_space_l">
+
+        <FrameLayout
+            android:id="@+id/tile_icon_bg"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_curbox_circle">
+
+            <ImageView
+                android:id="@+id/tile_icon"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_gravity="center"
+                android:importantForAccessibility="no" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/tile_value"
+            style="@style/TextAppearance.Curbox.Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/curbox_space_m"
+            android:ellipsize="end"
+            android:maxLines="1"
+            tools:text="4" />
+
+        <TextView
+            android:id="@+id/tile_caption"
+            style="@style/TextAppearance.Curbox.Caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            tools:text="Blocked apps" />
+    </LinearLayout>
+</merge>

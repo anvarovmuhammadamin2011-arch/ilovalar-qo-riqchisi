@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:colorBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/curbox_screen_padding">
+
+        <!-- A. Greeting -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_greeting"
+                    style="@style/TextAppearance.Curbox.Title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1" />
+
+                <TextView
+                    android:id="@+id/tv_date"
+                    style="@style/TextAppearance.Curbox.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp" />
+            </LinearLayout>
+
+            <neth.iecal.curbox.ui.components.ConnectionChip
+                android:id="@+id/connection_chip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/curbox_space_s" />
+        </LinearLayout>
+
+        <!-- B. Today's phone time -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/curbox_space_l">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:padding="@dimen/curbox_screen_padding">
+
+                <neth.iecal.curbox.ui.components.UsageRingView
+                    android:id="@+id/ring"
+                    android:layout_width="210dp"
+                    android:layout_height="210dp" />
+
+                <TextView
+                    style="@style/TextAppearance.Curbox.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/curbox_space_m"
+                    android:text="@string/user_home_ring_hint" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- C. Quick status -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/curbox_card_gap"
+            android:baselineAligned="false"
+            android:orientation="horizontal">
+
+            <neth.iecal.curbox.ui.components.StatTileView
+                android:id="@+id/tile_blocked_apps"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                app:tileCaption="@string/user_home_blocked_apps"
+                app:tileIcon="@drawable/ic_curbox_block"
+                app:tileTint="@color/curbox_error"
+                app:tileValue="0" />
+
+            <neth.iecal.curbox.ui.components.StatTileView
+                android:id="@+id/tile_blocked_sites"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                app:tileCaption="@string/user_home_blocked_sites"
+                app:tileIcon="@drawable/ic_curbox_globe"
+                app:tileValue="0" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/curbox_card_gap"
+            android:baselineAligned="false"
+            android:orientation="horizontal">
+
+            <neth.iecal.curbox.ui.components.StatTileView
+                android:id="@+id/tile_schedules"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                app:tileCaption="@string/user_home_schedules"
+                app:tileIcon="@drawable/ic_curbox_event"
+                app:tileTint="@color/curbox_secondary"
+                app:tileValue="@string/user_home_none" />
+
+            <neth.iecal.curbox.ui.components.StatTileView
+                android:id="@+id/tile_protection"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                app:tileCaption="@string/user_home_protection"
+                app:tileIcon="@drawable/ic_admin_shield" />
+        </LinearLayout>
+
+        <!-- D. Today's top apps -->
+        <neth.iecal.curbox.ui.components.SectionHeader
+            android:id="@+id/section_top_apps"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/curbox_space_xl"
+            app:sectionAction="@string/section_see_all"
+            app:sectionTitle="@string/user_home_top_apps" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:id="@+id/top_apps_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="@dimen/curbox_space_l" />
+
+                <neth.iecal.curbox.ui.components.EmptyStateView
+                    android:id="@+id/top_apps_empty"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:emptyIcon="@drawable/ic_curbox_bar_chart"
+                    app:emptyMessage="@string/user_home_no_usage_message"
+                    app:emptyTitle="@string/user_home_no_usage_title" />
+            </FrameLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- E. Active restrictions -->
+        <neth.iecal.curbox.ui.components.SectionHeader
+            android:id="@+id/section_restrictions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/curbox_space_xl"
+            app:sectionAction="@string/section_see_all"
+            app:sectionTitle="@string/user_home_restrictions" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:id="@+id/restrictions_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="@dimen/curbox_space_l" />
+
+                <neth.iecal.curbox.ui.components.EmptyStateView
+                    android:id="@+id/restrictions_empty"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:emptyIcon="@drawable/ic_curbox_check"
+                    app:emptyMessage="@string/user_home_no_restrictions_message"
+                    app:emptyTitle="@string/user_home_no_restrictions_title" />
+            </FrameLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- F. Next reset -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/curbox_space_xl">
+
+            <neth.iecal.curbox.ui.components.AppRowView
+                android:id="@+id/row_reset"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="@dimen/curbox_space_l"
+                app:rowIcon="@drawable/ic_curbox_clock"
+                app:rowIconInCircle="true"
+                app:rowTitle="@string/user_home_reset_title" />
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

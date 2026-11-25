@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:orientation="horizontal"
+    tools:parentTag="android.widget.LinearLayout">
+
+    <TextView
+        android:id="@+id/section_title"
+        style="@style/TextAppearance.Curbox.Section"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        tools:text="Today's top apps" />
+
+    <TextView
+        android:id="@+id/section_action"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:gravity="center"
+        android:minWidth="@dimen/curbox_min_touch"
+        android:minHeight="@dimen/curbox_min_touch"
+        android:paddingHorizontal="@dimen/curbox_space_s"
+        android:textColor="@color/curbox_primary"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        tools:text="See all"
+        tools:visibility="visible" />
+</merge>

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Curbox for PC</title>
+<link rel="icon" href="/favicon.ico">
+<style>
+  :root {
+    --bg: #F6F7FB; --card: #FFFFFF; --text: #20243A; --muted: #858BA3; --line: #E6E8F0;
+    --brand: #5B6EE1; --brand-soft: #E7EAFC; --ok: #25A56A; --warn: #A86100; --warn-soft: #FDF1DE;
+    --err: #E05260; --err-soft: #FBE7E9; --ok-soft: #E2F4EB;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12141C; --card: #1B1E29; --text: #ECEEF6; --muted: #9AA0B8; --line: #2A2E3D;
+      --brand: #8B9CF5; --brand-soft: #2B3266; --ok: #3CC387; --warn: #F5BC63; --warn-soft: #3A2F1B;
+      --err: #EE6B78; --err-soft: #3A1E24; --ok-soft: #173326;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 15px/1.5 "Segoe UI", system-ui, sans-serif; background: var(--bg); color: var(--text); }
+  .wrap { max-width: 520px; margin: 0 auto; padding: 40px 20px; }
+  .brand { text-align: center; margin-bottom: 28px; }
+  .brand img { width: 84px; height: 84px; border-radius: 22px; }
+  .brand h1 { font-size: 24px; margin: 14px 0 2px; }
+  .muted { color: var(--muted); }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 20px; margin-bottom: 12px; }
+  .choice { display: flex; gap: 14px; align-items: center; cursor: pointer; text-align: left; width: 100%; font: inherit; color: inherit; }
+  .choice:hover { border-color: var(--brand); }
+  .circle { width: 48px; height: 48px; border-radius: 50%; background: var(--brand-soft); color: var(--brand); display: grid; place-items: center; font-weight: 700; flex: none; font-size: 20px; }
+  .choice b { display: block; font-size: 17px; }
+  h2 { font-size: 16px; margin: 0 0 10px; }
+  label { display: block; font-size: 13px; color: var(--muted); margin: 10px 0 4px; }
+  input { font: inherit; width: 100%; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--line); background: var(--bg); color: var(--text); }
+  input:focus { outline: 2px solid var(--brand); border-color: transparent; }
+  button.primary { font: inherit; font-weight: 700; width: 100%; border: 0; border-radius: 16px; padding: 15px; margin-top: 16px; cursor: pointer; background: var(--brand); color: #fff; }
+  button.primary:disabled { opacity: .55; cursor: default; }
+  button.link { font: inherit; background: none; border: 0; color: var(--brand); cursor: pointer; padding: 8px 0; font-weight: 700; }
+  ul.consent { margin: 8px 0 0; padding-left: 20px; }
+  .note { border-radius: 14px; padding: 12px 14px; margin-bottom: 12px; }
+  .note.warn { background: var(--warn-soft); color: var(--warn); }
+  .note.err { background: var(--err-soft); color: var(--err); }
+  .error { color: var(--err); min-height: 1.3em; margin-top: 8px; }
+  .chip { display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px; border-radius: 99px; font-weight: 700; font-size: 13px; }
+  .chip::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+  .chip.ok { background: var(--ok-soft); color: var(--ok); }
+  .chip.warn { background: var(--warn-soft); color: var(--warn); }
+  .chip.err { background: var(--err-soft); color: var(--err); }
+  .row { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .row:last-child { border-bottom: 0; }
+  .pill { color: var(--err); background: var(--err-soft); border-radius: 99px; padding: 2px 10px; font-size: 13px; font-weight: 700; }
+  .spinner { width: 40px; height: 40px; border-radius: 50%; border: 4px solid var(--brand-soft); border-top-color: var(--brand); margin: 8px auto 16px; animation: spin 1s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .center { text-align: center; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">
+    <img src="/logo.png" alt="">
+    <h1>Curbox for PC</h1>
+    <div class="muted">Your digital balance</div>
+  </div>
+
+  <!-- Choose a role -->
+  <section id="choose" class="hidden">
+    <p class="muted center">Who uses this computer?</p>
+    <button class="card choice" id="chooseAdmin">
+      <span class="circle">A</span>
+      <span><b>Admin</b><span class="muted">This computer manages phones and computers.</span></span>
+    </button>
+    <button class="card choice" id="chooseUser">
+      <span class="circle">U</span>
+      <span><b>User</b><span class="muted">An admin manages this computer.</span></span>
+    </button>
+  </section>
+
+  <!-- Sign in -->
+  <section id="signin" class="hidden">
+    <div id="setupNote" class="note warn hidden"></div>
+    <div id="notInstalled" class="note err hidden">Open the installed Curbox for PC to protect this computer.</div>
+    <div class="card">
+      <h2>Sign in as a user</h2>
+      <div class="muted">Ask your admin for your login and password. Both computers must use the same WiFi.</div>
+      <label for="address">Admin computer address</label>
+      <input id="address" placeholder="Like 192.168.1.94:8787" autocomplete="off">
+      <label for="username">Login</label>
+      <input id="username" autocomplete="username">
+      <label for="password">Password</label>
+      <input id="password" type="password" autocomplete="current-password">
+    </div>
+    <div class="card">
+      <h2>If you continue</h2>
+      <ul class="consent">
+        <li>Your admin can see the programs installed on this computer.</li>
+        <li>Your admin can block programs and websites here.</li>
+        <li>Only your admin can remove this link.</li>
+        <li>Windows asks you for permission once.</li>
+      </ul>
+    </div>
+    <div id="signinError" class="error"></div>
+    <button class="primary" id="signinBtn">Sign in and protect this computer</button>
+  </section>
+
+  <!-- Waiting for Windows permission, failure, done -->
+  <section id="installing" class="hidden card center">
+    <div class="spinner"></div>
+    <h2>Almost done</h2>
+    <div class="muted">Windows asks for permission now. Click Yes to finish.</div>
+  </section>
+
+  <section id="installFailed" class="hidden">
+    <div class="note err">Windows permission was not given, so protection is not on yet.</div>
+    <button class="primary" id="retryBtn">Try again</button>
+  </section>
+
+  <section id="done" class="hidden card center">
+    <h2>This computer is now protected</h2>
+    <div class="muted">Opening the status page.</div>
+  </section>
+
+  <!-- Agent status -->
+  <section id="agent" class="hidden">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+        <div>
+          <h2 style="margin:0" id="aUser"></h2>
+          <div class="muted">Managed by your admin</div>
+        </div>
+        <span id="aChip" class="chip"></span>
+      </div>
+      <div id="aStateText" class="muted" style="margin-top:10px"></div>
+    </div>
+    <div class="card">
+      <div class="row"><span class="muted">This computer</span><span id="aComputer"></span></div>
+      <div class="row"><span class="muted">Admin computer</span><span id="aServer"></span></div>
+      <div class="row"><span class="muted">Last checked</span><span id="aLast"></span></div>
+    </div>
+    <div class="card">
+      <h2>Blocked programs</h2>
+      <div id="aPrograms"></div>
+    </div>
+    <div class="card">
+      <h2>Blocked websites</h2>
+      <div id="aSites"></div>
+    </div>
+    <p class="muted center">Only your admin can change these rules.</p>
+  </section>
+</div>
+
+<script>
+"use strict";
+const $ = (id) => document.getElementById(id);
+let current = "";
+let agentUrl = "";
+let busy = false;
+
+async function call(path, body) {
+  const options = body === undefined ? {} : {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body)
+  };
+  const res = await fetch(path, options);
+  let data = {};
+  try { data = await res.json(); } catch (e) { /* empty */ }
+  return { status: res.status, data };
+}
+
+function show(id) {
+  if (current === id) return;
+  current = id;
+  for (const s of ["choose", "signin", "installing", "installFailed", "done", "agent"]) {
+    $(s).classList.toggle("hidden", s !== id);
+  }
+}
+
+function el(tag, className, text) {
+  const n = document.createElement(tag);
+  if (className) n.className = className;
+  if (text !== undefined) n.textContent = text;
+  return n;
+}
+
+async function refresh() {
+  let state;
+  try { state = (await call("/local/state")).data; } catch (e) { return; }
+  if (state.screen === "agent") { renderAgent(state); return; }
+  agentUrl = state.agentUrl || agentUrl;
+  switch (state.status) {
+    case "choose": show("choose"); break;
+    case "signin":
+    case "install":
+      if (current !== "signin") {
+        $("address").value = $("address").value || state.address || "";
+        $("setupNote").textContent = state.note || "";
+        $("setupNote").classList.toggle("hidden", !state.note);
+        $("notInstalled").classList.toggle("hidden", !!state.installed);
+      }
+      show("signin");
+      break;
+    case "installing": show("installing"); break;
+    case "install_failed": show("installFailed"); break;
+    case "done":
+      show("done");
+      setTimeout(() => { if (agentUrl) location.href = agentUrl; }, 2500);
+      break;
+  }
+}
+
+$("chooseAdmin").onclick = async () => {
+  const { status, data } = await call("/local/choose", { role: "admin" });
+  if (status === 200 && data.next) setTimeout(() => { location.href = data.next; }, 1200);
+};
+$("chooseUser").onclick = async () => { await call("/local/choose", { role: "user" }); refresh(); };
+
+async function signIn() {
+  if (busy) return;
+  busy = true;
+  $("signinBtn").disabled = true;
+  $("signinError").textContent = "";
+  const { status, data } = await call("/local/signin", {
+    address: $("address").value, username: $("username").value, password: $("password").value
+  });
+  if (status === 200) {
+    $("password").value = "";
+    const install = await call("/local/install", {});
+    if (install.status !== 200) {
+      $("signinError").textContent = install.data.error === "not_installed"
+        ? "Open the installed Curbox for PC to protect this computer."
+        : "Could not start the protection. Try again.";
+    }
+  } else {
+    const messages = {
+      bad_address: "Type the admin computer address, like 192.168.1.94:8787.",
+      missing: "Type your login and password.",
+      wrong_login: "Wrong login or password.",
+      unreachable: "Could not reach the admin computer. Check the address and make sure both use the same WiFi."
+    };
+    $("signinError").textContent = messages[data.error] || "Something went wrong. Try again.";
+  }
+  busy = false;
+  $("signinBtn").disabled = false;
+  refresh();
+}
+$("signinBtn").onclick = signIn;
+$("password").onkeydown = (e) => { if (e.key === "Enter") signIn(); };
+$("retryBtn").onclick = async () => { await call("/local/install", {}); refresh(); };
+
+function renderAgent(s) {
+  show("agent");
+  $("aUser").textContent = s.username || "Not linked";
+  $("aComputer").textContent = s.computerName || "";
+  $("aServer").textContent = s.server || "None";
+  $("aLast").textContent = s.lastSyncMs ? new Date(s.lastSyncMs).toLocaleTimeString() : "Not yet";
+
+  const states = {
+    connected: ["ok", "Connected", "Your admin's rules are up to date."],
+    offline: ["warn", "Offline", "The admin computer is out of reach. The last rules still apply."],
+    removed: ["err", "Removed", "Your admin removed this computer, so its blocks are lifted. Open Curbox for PC from the Start menu to sign in again."],
+    not_linked: ["err", "Not linked", "Open Curbox for PC from the Start menu to sign in."],
+    starting: ["warn", "Starting", "Checking with your admin."]
+  };
+  const [kind, label, text] = states[s.state] || states.starting;
+  $("aChip").className = "chip " + kind;
+  $("aChip").textContent = label;
+  $("aStateText").textContent = text;
+
+  fillList($("aPrograms"), s.blockedPrograms || [], "No blocked programs.");
+  fillList($("aSites"), s.blockedSites || [], "No blocked websites.");
+}
+
+function fillList(box, items, emptyText) {
+  box.replaceChildren();
+  if (items.length === 0) { box.appendChild(el("div", "muted", emptyText)); return; }
+  for (const item of items) {
+    const row = el("div", "row");
+    row.append(el("span", "", item), el("span", "pill", "Blocked"));
+    box.appendChild(row);
+  }
+}
+
+refresh();
+setInterval(refresh, 3000);
+</script>
+</body>
+</html>

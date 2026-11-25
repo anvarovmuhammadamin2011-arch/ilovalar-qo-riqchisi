@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:paddingHorizontal="@dimen/curbox_screen_padding"
+    android:paddingTop="@dimen/curbox_space_s"
+    android:paddingBottom="@dimen/curbox_space_xl">
+
+    <FrameLayout
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:background="@drawable/bg_curbox_circle"
+        android:backgroundTint="@color/curbox_primary_container">
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_computer"
+            app:tint="@color/curbox_primary" />
+    </FrameLayout>
+
+    <TextView
+        style="@style/TextAppearance.Curbox.Section"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/curbox_space_l"
+        android:gravity="center"
+        android:text="@string/role_admin_sheet_title" />
+
+    <TextView
+        style="@style/TextAppearance.Curbox.Body"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/curbox_space_s"
+        android:gravity="center"
+        android:text="@string/role_admin_sheet_message"
+        android:textColor="@color/curbox_text_secondary" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_open_here"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/curbox_space_xl"
+        android:text="@string/role_admin_sheet_open" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_not_now"
+        style="@style/Widget.Curbox.Button.Text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/curbox_space_xs"
+        android:text="@string/role_admin_sheet_cancel" />
+</LinearLayout>

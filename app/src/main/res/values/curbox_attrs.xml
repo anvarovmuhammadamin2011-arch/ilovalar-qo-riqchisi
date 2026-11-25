@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- XML attributes of the Curbox user design system components (ui/components). -->
+<resources>
+    <declare-styleable name="StatTileView">
+        <attr name="tileIcon" format="reference" />
+        <attr name="tileValue" format="string" />
+        <attr name="tileCaption" format="string" />
+        <attr name="tileTint" format="color" />
+    </declare-styleable>
+
+    <declare-styleable name="StatusPill">
+        <attr name="pillState" format="enum">
+            <enum name="allowed" value="0" />
+            <enum name="blocked" value="1" />
+            <enum name="time_limited" value="2" />
+            <enum name="scheduled" value="3" />
+        </attr>
+    </declare-styleable>
+
+    <declare-styleable name="SectionHeader">
+        <attr name="sectionTitle" format="string" />
+        <attr name="sectionAction" format="string" />
+    </declare-styleable>
+
+    <declare-styleable name="AppRowView">
+        <attr name="rowIcon" format="reference" />
+        <attr name="rowIconInCircle" format="boolean" />
+        <attr name="rowTitle" format="string" />
+        <attr name="rowSubtitle" format="string" />
+        <attr name="rowShowChevron" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="UsageRingView">
+        <!-- 0 to 1. Leave it out, or use a negative value, for "no limit". -->
+        <attr name="ringProgress" format="float" />
+        <attr name="ringCenterText" format="string" />
+        <attr name="ringCaption" format="string" />
+        <attr name="ringThickness" format="dimension" />
+    </declare-styleable>
+
+    <declare-styleable name="EmptyStateView">
+        <attr name="emptyIcon" format="reference" />
+        <attr name="emptyTitle" format="string" />
+        <attr name="emptyMessage" format="string" />
+        <attr name="emptyAction" format="string" />
+    </declare-styleable>
+
+    <declare-styleable name="ConnectionChip">
+        <attr name="connectionState" format="enum">
+            <enum name="connected" value="0" />
+            <enum name="syncing" value="1" />
+            <enum name="offline" value="2" />
+            <enum name="waiting" value="3" />
+            <enum name="error" value="4" />
+        </attr>
+    </declare-styleable>
+</resources>

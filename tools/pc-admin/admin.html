@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Curbox for PC</title>
+<link rel="icon" href="/favicon.ico">
+<style>
+  :root {
+    --bg: #f4f6fb; --card: #ffffff; --text: #1b2333; --muted: #64708a;
+    --line: #e3e7f0; --brand: #013388; --brand-soft: #e6ecf8;
+    --ok: #1f9d55; --off: #a0a8b8; --danger: #c0392b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #10141c; --card: #181e2a; --text: #e8ecf4; --muted: #9aa5bb;
+      --line: #2a3242; --brand: #6f9bff; --brand-soft: #1e2a44;
+      --ok: #3ecf7e; --off: #5c6577; --danger: #ff6b5b;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 15px/1.45 "Segoe UI", system-ui, sans-serif; background: var(--bg); color: var(--text); }
+  header { display: flex; align-items: center; gap: 12px; padding: 14px 24px; background: var(--card); border-bottom: 1px solid var(--line); }
+  header img { width: 40px; height: 40px; border-radius: 10px; }
+  header h1 { font-size: 18px; margin: 0; flex: 1; }
+  button { font: inherit; border: 0; border-radius: 10px; padding: 9px 16px; cursor: pointer; background: var(--brand); color: #fff; }
+  button.ghost { background: transparent; color: var(--brand); border: 1px solid var(--line); }
+  button.danger { background: transparent; color: var(--danger); border: 1px solid var(--line); }
+  button.small { padding: 5px 10px; font-size: 13px; }
+  button:disabled { opacity: .5; cursor: default; }
+  input { font: inherit; width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--text); }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 20px; }
+  .center { max-width: 380px; margin: 10vh auto; display: grid; gap: 12px; text-align: center; }
+  .center img { width: 96px; height: 96px; border-radius: 22px; margin: 0 auto; }
+  .muted { color: var(--muted); }
+  .error { color: var(--danger); min-height: 1.2em; }
+  .note { color: var(--ok); min-height: 1.2em; }
+  main { display: grid; grid-template-columns: 340px 1fr; gap: 20px; padding: 20px 24px; align-items: start; }
+  @media (max-width: 860px) { main { grid-template-columns: 1fr; } }
+  .addr { font-family: Consolas, monospace; font-size: 18px; font-weight: 600; color: var(--brand); background: var(--brand-soft); padding: 6px 10px; border-radius: 8px; display: inline-block; margin: 4px 0; }
+  h2 { font-size: 15px; margin: 0 0 10px; }
+  ol { margin: 8px 0 0; padding-left: 20px; }
+  .device, .user { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 12px; }
+  .device { cursor: pointer; }
+  .device:hover { background: var(--brand-soft); }
+  .device.selected { background: var(--brand-soft); outline: 1px solid var(--brand); }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--off); flex: none; }
+  .dot.on { background: var(--ok); }
+  .grow { flex: 1; min-width: 0; }
+  .title { font-weight: 600; }
+  .sub { color: var(--muted); font-size: 13px; }
+  .stack { display: grid; gap: 16px; }
+  .row { display: flex; gap: 8px; align-items: center; }
+  .applist { max-height: 55vh; overflow: auto; border-top: 1px solid var(--line); margin-top: 10px; }
+  .app { display: flex; align-items: center; gap: 10px; padding: 9px 4px; border-bottom: 1px solid var(--line); }
+  .app .pkg { color: var(--muted); font-size: 12px; }
+  .switch { position: relative; width: 44px; height: 24px; flex: none; }
+  .switch input { display: none; }
+  .switch span { position: absolute; inset: 0; background: var(--off); border-radius: 24px; transition: .2s; cursor: pointer; }
+  .switch span::after { content: ""; position: absolute; width: 18px; height: 18px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: .2s; }
+  .switch input:checked + span { background: var(--danger); }
+  .switch input:checked + span::after { transform: translateX(20px); }
+  .chip { display: inline-flex; align-items: center; gap: 6px; background: var(--brand-soft); padding: 5px 6px 5px 12px; border-radius: 20px; margin: 4px 4px 0 0; }
+  .chip button { padding: 2px 8px; border-radius: 12px; background: transparent; color: var(--danger); }
+  .hidden { display: none !important; }
+  .empty { padding: 30px 10px; text-align: center; }
+  details summary { cursor: pointer; color: var(--brand); margin-top: 6px; }
+  .form { display: grid; gap: 8px; margin-top: 10px; }
+</style>
+</head>
+<body>
+
+<!-- Login -->
+<section id="login" class="center card hidden">
+  <img src="/logo.png" alt="">
+  <h2>Curbox for PC</h2>
+  <input id="loginUser" placeholder="Login" autocomplete="username">
+  <input id="loginPass" type="password" placeholder="Password" autocomplete="current-password">
+  <div id="loginError" class="error"></div>
+  <button id="loginBtn">Log in</button>
+</section>
+
+<!-- Dashboard -->
+<div id="dash" class="hidden">
+  <header>
+    <img src="/logo.png" alt="">
+    <h1>Curbox for PC</h1>
+    <button id="logoutBtn" class="ghost">Log out</button>
+  </header>
+  <main>
+    <div class="stack">
+      <div class="card">
+        <h2>Connect a phone or computer</h2>
+        <div id="addresses"></div>
+        <ol class="muted">
+          <li>Phone: open Curbox and tap <b>User</b>.</li>
+          <li>Computer: install Curbox for PC and pick <b>User</b>.</li>
+          <li>Type the address above, then a login from the list below.</li>
+        </ol>
+        <p class="muted">Every device must use the same WiFi as this computer.</p>
+      </div>
+
+      <div class="card">
+        <h2>Phones</h2>
+        <div id="deviceList"></div>
+      </div>
+
+      <div class="card">
+        <h2>Users</h2>
+        <div id="userList"></div>
+        <details>
+          <summary>Add a user</summary>
+          <div class="form">
+            <input id="newUser" placeholder="Login, like anvarov">
+            <input id="newUserPass" type="password" placeholder="Password">
+            <div id="userError" class="error"></div>
+            <button id="addUserBtn">Add user</button>
+          </div>
+        </details>
+      </div>
+
+      <div class="card">
+        <h2>Admin account</h2>
+        <div class="muted">Login: <b id="adminName"></b></div>
+        <details>
+          <summary>Change admin password</summary>
+          <div class="form">
+            <input id="curPass" type="password" placeholder="Current password">
+            <input id="nextPass" type="password" placeholder="New password">
+            <div id="passError" class="error"></div>
+            <div id="passNote" class="note"></div>
+            <button id="changePassBtn">Save new password</button>
+          </div>
+        </details>
+      </div>
+    </div>
+
+    <div class="card" id="detail">
+      <div id="noDevice" class="empty muted">Pick a phone on the left to see its apps.</div>
+      <div id="deviceDetail" class="hidden stack">
+        <div class="row">
+          <div class="grow">
+            <h2 id="dName" style="margin:0"></h2>
+            <div id="dStatus" class="muted"></div>
+          </div>
+          <button id="removeBtn" class="danger">Remove phone</button>
+        </div>
+
+        <div>
+          <h2>Blocked websites</h2>
+          <p id="siteHint" class="muted hidden" style="margin-top:-4px">On a computer the whole website is blocked. Paths like youtube.com/shorts only work on phones.</p>
+          <div class="row">
+            <input id="siteInput" placeholder="Website, like youtube.com">
+            <button id="addSiteBtn">Block</button>
+          </div>
+          <div id="siteList"></div>
+        </div>
+
+        <div>
+          <h2 id="appsHeading">Apps on this phone</h2>
+          <input id="appSearch" placeholder="Search apps">
+          <div class="applist" id="appList"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+"use strict";
+const $ = (id) => document.getElementById(id);
+let overview = null;
+let selectedId = null;
+let lastAppsKey = "";
+let pollTimer = null;
+
+async function api(path, body) {
+  const options = body === undefined
+    ? { method: "GET" }
+    : { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) };
+  const res = await fetch(path, options);
+  let data = {};
+  try { data = await res.json(); } catch (e) { /* empty body */ }
+  return { status: res.status, data };
+}
+
+function el(tag, className, text) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+
+function show(id) {
+  for (const s of ["login", "dash"]) $(s).classList.toggle("hidden", s !== id);
+}
+
+async function start() {
+  const { data } = await api("/api/admin/state");
+  if (!data.loggedIn) { show("login"); $("loginUser").focus(); return; }
+  show("dash");
+  await refresh();
+  clearInterval(pollTimer);
+  pollTimer = setInterval(refresh, 5000);
+}
+
+async function doLogin() {
+  $("loginBtn").disabled = true;
+  const { status } = await api("/api/admin/login", { username: $("loginUser").value, password: $("loginPass").value });
+  $("loginBtn").disabled = false;
+  if (status === 200) { $("loginPass").value = ""; $("loginError").textContent = ""; start(); }
+  else $("loginError").textContent = "Wrong login or password.";
+}
+$("loginBtn").onclick = doLogin;
+$("loginPass").onkeydown = (e) => { if (e.key === "Enter") doLogin(); };
+$("loginUser").onkeydown = (e) => { if (e.key === "Enter") $("loginPass").focus(); };
+
+$("logoutBtn").onclick = async () => {
+  clearInterval(pollTimer);
+  await api("/api/admin/logout", {});
+  start();
+};
+
+async function refresh() {
+  const { status, data } = await api("/api/admin/overview");
+  if (status === 401) { clearInterval(pollTimer); start(); return; }
+  if (status !== 200) return;
+  overview = data;
+  $("adminName").textContent = data.adminUser;
+  const addr = $("addresses");
+  addr.replaceChildren();
+  if (data.addresses.length === 0) addr.textContent = "This computer is not on a network.";
+  for (const a of data.addresses) {
+    const line = el("div");
+    line.appendChild(el("span", "addr", a));
+    addr.appendChild(line);
+  }
+  renderUsers();
+  renderDevices();
+  renderDetail();
+}
+
+function timeAgo(ms) {
+  if (!ms) return "never";
+  const s = Math.round((Date.now() - ms) / 1000);
+  if (s < 60) return "just now";
+  if (s < 3600) return Math.round(s / 60) + " min ago";
+  if (s < 86400) return Math.round(s / 3600) + " h ago";
+  return new Date(ms).toLocaleString();
+}
+
+function renderUsers() {
+  const list = $("userList");
+  list.replaceChildren();
+  if (overview.users.length === 0) list.appendChild(el("div", "muted", "No users yet."));
+  for (const u of overview.users) {
+    const phones = overview.devices.filter((d) => d.user === u.username).length;
+    const row = el("div", "user");
+    const info = el("div", "grow");
+    info.append(el("div", "title", u.username), el("div", "sub", phones === 1 ? "1 phone" : phones + " phones"));
+    const pass = el("button", "ghost small", "New password");
+    pass.onclick = async () => {
+      const value = prompt("New password for " + u.username + " (at least 4 characters):");
+      if (value === null) return;
+      const { status } = await api("/api/admin/users/password", { username: u.username, password: value });
+      alert(status === 200 ? "Password changed." : "Could not change it. Use at least 4 characters.");
+    };
+    const del = el("button", "danger small", "Delete");
+    del.onclick = async () => {
+      if (!confirm("Delete " + u.username + "? Their phones stop following your blocks.")) return;
+      await api("/api/admin/users/delete", { username: u.username });
+      refresh();
+    };
+    row.append(info, pass, del);
+    list.appendChild(row);
+  }
+}
+
+$("addUserBtn").onclick = async () => {
+  const username = $("newUser").value.trim().toLowerCase();
+  const password = $("newUserPass").value;
+  const { status, data } = await api("/api/admin/users/add", { username, password });
+  if (status === 200) {
+    $("newUser").value = ""; $("newUserPass").value = ""; $("userError").textContent = "";
+    refresh();
+    return;
+  }
+  const messages = {
+    bad_username: "Use 3 to 32 letters, numbers, dots or underscores.",
+    too_short: "Use at least 4 characters for the password.",
+    exists: "This login is already taken."
+  };
+  $("userError").textContent = messages[data.error] || "Could not add the user.";
+};
+
+$("changePassBtn").onclick = async () => {
+  $("passError").textContent = ""; $("passNote").textContent = "";
+  const { status } = await api("/api/admin/password", { currentPassword: $("curPass").value, newPassword: $("nextPass").value });
+  if (status === 200) { $("curPass").value = ""; $("nextPass").value = ""; $("passNote").textContent = "Saved."; }
+  else if (status === 403) $("passError").textContent = "The current password is wrong.";
+  else $("passError").textContent = "Use at least 4 characters.";
+};
+
+function renderDevices() {
+  const list = $("deviceList");
+  list.replaceChildren();
+  if (overview.devices.length === 0) list.appendChild(el("div", "muted", "No devices yet."));
+  for (const d of overview.devices) {
+    const row = el("div", "device" + (d.id === selectedId ? " selected" : ""));
+    const info = el("div", "grow");
+    info.append(el("div", "title", d.user), el("div", "sub", (isPc(d) ? "Computer: " : "Phone: ") + d.name));
+    row.append(el("span", "dot" + (d.online ? " on" : "")), info, el("span", "muted", d.online ? "Online" : "Offline"));
+    row.onclick = () => { selectedId = d.id; lastAppsKey = ""; renderDevices(); renderDetail(); };
+    list.appendChild(row);
+  }
+}
+
+function isPc(d) {
+  return d.platform === "windows";
+}
+
+function currentDevice() {
+  return overview && overview.devices.find((d) => d.id === selectedId);
+}
+
+function renderDetail() {
+  const d = currentDevice();
+  $("noDevice").classList.toggle("hidden", !!d);
+  $("deviceDetail").classList.toggle("hidden", !d);
+  if (!d) return;
+  $("dName").textContent = d.user + "  ·  " + d.name;
+  $("appsHeading").textContent = isPc(d) ? "Programs on this computer" : "Apps on this phone";
+  $("siteHint").classList.toggle("hidden", !isPc(d));
+  $("dStatus").textContent = (d.online ? "Online" : "Offline, last seen " + timeAgo(d.lastSeen)) +
+    (d.appVersion ? "  ·  Curbox " + d.appVersion : "");
+  renderSites(d);
+  const key = JSON.stringify([d.id, d.apps, d.blockedApps, $("appSearch").value]);
+  if (key !== lastAppsKey) { lastAppsKey = key; renderApps(d); }
+}
+
+function renderSites(d) {
+  const list = $("siteList");
+  list.replaceChildren();
+  if (d.blockedSites.length === 0) list.appendChild(el("div", "muted", "No blocked websites."));
+  for (const site of d.blockedSites) {
+    const chip = el("span", "chip");
+    const x = el("button", "", "Remove");
+    x.onclick = () => saveRules(d, d.blockedApps, d.blockedSites.filter((s) => s !== site));
+    chip.append(el("span", "", site), x);
+    list.appendChild(chip);
+  }
+}
+
+function renderApps(d) {
+  const list = $("appList");
+  list.replaceChildren();
+  if (d.apps.length === 0) {
+    list.appendChild(el("div", "empty muted", isPc(d) ? "The program list shows up a minute after the computer connects." : "The app list shows up a few seconds after the phone connects."));
+    return;
+  }
+  const q = $("appSearch").value.trim().toLowerCase();
+  const blocked = new Set(d.blockedApps);
+  const apps = d.apps
+    .filter((a) => !q || a.l.toLowerCase().includes(q) || a.p.toLowerCase().includes(q))
+    .sort((a, b) => (blocked.has(b.p) - blocked.has(a.p)) || a.l.localeCompare(b.l));
+  for (const a of apps) {
+    const row = el("div", "app");
+    const info = el("div", "grow");
+    info.append(el("div", "", a.l), el("div", "pkg", a.p));
+    const sw = el("label", "switch");
+    sw.title = "Block this app";
+    const box = el("input");
+    box.type = "checkbox";
+    box.checked = blocked.has(a.p);
+    box.onchange = () => {
+      const next = new Set(d.blockedApps);
+      if (box.checked) next.add(a.p); else next.delete(a.p);
+      saveRules(d, [...next], d.blockedSites);
+    };
+    sw.append(box, el("span"));
+    row.append(info, sw);
+    list.appendChild(row);
+  }
+}
+
+async function saveRules(d, apps, sites) {
+  d.blockedApps = apps;
+  d.blockedSites = sites;
+  await api("/api/admin/rules", { deviceId: d.id, blockedApps: apps, blockedSites: sites });
+  await refresh();
+}
+
+function addSite() {
+  const d = currentDevice();
+  const value = $("siteInput").value.trim();
+  if (!d || !value) return;
+  $("siteInput").value = "";
+  saveRules(d, d.blockedApps, [...d.blockedSites, value]);
+}
+$("addSiteBtn").onclick = addSite;
+$("siteInput").onkeydown = (e) => { if (e.key === "Enter") addSite(); };
+$("appSearch").oninput = () => renderDetail();
+
+$("removeBtn").onclick = async () => {
+  const d = currentDevice();
+  if (!d) return;
+  if (!confirm("Remove " + d.name + "? It stops following your blocks.")) return;
+  await api("/api/admin/remove", { deviceId: d.id });
+  selectedId = null;
+  refresh();
+};
+
+start();
+</script>
+</body>
+</html>

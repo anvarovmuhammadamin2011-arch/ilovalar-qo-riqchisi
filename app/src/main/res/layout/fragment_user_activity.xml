@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:colorBackground"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/curbox_screen_padding">
+
+        <TextView
+            style="@style/TextAppearance.Curbox.Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/user_activity_title" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/filter_chips"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/curbox_space_m"
+            app:selectionRequired="true"
+            app:singleSelection="true">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_today"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="@string/user_range_today" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_yesterday"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/user_activity_yesterday" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_week"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/user_activity_week" />
+        </com.google.android.material.chip.ChipGroup>
+
+        <LinearLayout
+            android:id="@+id/timeline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+        <FrameLayout
+            android:id="@+id/empty_block"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:visibility="gone">
+
+            <neth.iecal.curbox.ui.components.EmptyStateView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                app:emptyIcon="@drawable/ic_curbox_history"
+                app:emptyMessage="@string/user_activity_empty_message"
+                app:emptyTitle="@string/user_activity_empty_title" />
+        </FrameLayout>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

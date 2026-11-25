@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:colorBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/curbox_screen_padding">
+
+        <TextView
+            style="@style/TextAppearance.Curbox.Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/user_profile_title" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/curbox_space_l">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="@dimen/curbox_screen_padding">
+
+                <TextView
+                    android:id="@+id/tv_avatar"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:background="@drawable/bg_curbox_circle"
+                    android:backgroundTint="@color/curbox_primary_container"
+                    android:gravity="center"
+                    android:importantForAccessibility="no"
+                    android:textColor="@color/curbox_on_primary_container"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/curbox_space_l"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_username"
+                        style="@style/TextAppearance.Curbox.Section"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        style="@style/TextAppearance.Curbox.Caption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/user_profile_managed" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/curbox_card_gap">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="@dimen/curbox_space_l">
+
+                <neth.iecal.curbox.ui.components.AppRowView
+                    android:id="@+id/row_computer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:rowIcon="@drawable/ic_computer"
+                    app:rowIconInCircle="true"
+                    app:rowTitle="@string/user_profile_computer" />
+
+                <neth.iecal.curbox.ui.components.AppRowView
+                    android:id="@+id/row_device"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:rowIcon="@drawable/ic_person_round"
+                    app:rowIconInCircle="true"
+                    app:rowTitle="@string/user_profile_device" />
+
+                <neth.iecal.curbox.ui.components.AppRowView
+                    android:id="@+id/row_protection"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:rowIcon="@drawable/ic_admin_shield"
+                    app:rowIconInCircle="true"
+                    app:rowTitle="@string/user_profile_protection" />
+
+                <neth.iecal.curbox.ui.components.AppRowView
+                    android:id="@+id/row_version"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:rowIcon="@drawable/ic_curbox_check"
+                    app:rowIconInCircle="true"
+                    app:rowTitle="@string/user_profile_version" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

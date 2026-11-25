@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Debug builds only. Open with:
+     adb shell am start -n neth.iecal.curbox.debug/neth.iecal.curbox.ui.debug.ComponentGalleryActivity -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <activity
+            android:name="neth.iecal.curbox.ui.debug.ComponentGalleryActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Curbox.User" />
+    </application>
+</manifest>

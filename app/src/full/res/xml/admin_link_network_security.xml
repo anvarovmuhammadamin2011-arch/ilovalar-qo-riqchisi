@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Curbox Admin runs on a computer on the local WiFi and is reached by its IP
+     address over plain HTTP, which has no domain to scope this to. -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true" />
+</network-security-config>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Offline except for the local WiFi link to Curbox Admin (tools/pc-admin). -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application android:networkSecurityConfig="@xml/admin_link_network_security">
+
+        <activity
+            android:name=".ui.activity.RoleSelectActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Curbox.User" />
+
+        <activity
+            android:name=".ui.activity.AdminLinkActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Curbox.User"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".ui.activity.UserMainActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Curbox.User" />
+
+        <activity
+            android:name=".ui.activity.AdminPanelActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:exported="false" />
+    </application>
+</manifest>

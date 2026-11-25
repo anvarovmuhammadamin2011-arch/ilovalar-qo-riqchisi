@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Debug only preview of every design system component. Text here is for developers. -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/gallery_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:colorBackground"
+    tools:ignore="HardcodedText">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/curbox_screen_padding">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/TextAppearance.Curbox.Title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Component gallery" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_toggle_dark"
+                style="@style/Widget.Curbox.Button.Text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Light / Dark" />
+        </LinearLayout>
+
+        <TextView
+            style="@style/TextAppearance.Curbox.Display"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/curbox_space_l"
+            android:text="1h 35m" />
+
+        <TextView
+            style="@style/TextAppearance.Curbox.Section"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Section text" />
+
+        <TextView
+            style="@style/TextAppearance.Curbox.Body"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Body text for normal reading." />
+
+        <TextView
+            style="@style/TextAppearance.Curbox.Caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Caption text, secondary color." />
+
+        <!-- Connection chips -->
+        <LinearLayout
+            android:id="@+id/chips"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/curbox_space_xl"
+            android:orientation="vertical" />
+
+        <!-- Rings -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/curbox_space_xl"
+            android:orientation="horizontal">
+
+            <neth.iecal.curbox.ui.components.UsageRingView
+                android:id="@+id/ring_limit"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                app:ringCaption="of 60m today"
+                app:ringCenterText="35m"
+                app:ringProgress="0.58" />
+
+            <neth.iecal.curbox.ui.components.UsageRingView
+                android:id="@+id/ring_no_limit"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/curbox_space_l"
+                android:layout_weight="1"
+                app:ringCaption="No daily limit set"
+                app:ringCenterText="1h 12m" />
+        </LinearLayout>
+
+        <!-- Tiles -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/curbox_space_xl"
+            android:orientation="horizontal">
+
+            <neth.iecal.curbox.ui.components.StatTileView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                app:tileCaption="Blocked apps"
+                app:tileIcon="@drawable/ic_curbox_block"
+                app:tileTint="@color/curbox_error"
+                app:tileValue="4" />
+
+            <neth.iecal.curbox.ui.components.StatTileView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                app:tileCaption="Blocked websites"
+                app:tileIcon="@drawable/ic_curbox_globe"
+                app:tileValue="12" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/curbox_card_gap"
+            android:orientation="horizontal">
+
+            <neth.iecal.curbox.ui.components.StatTileView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                app:tileCaption="Active schedules"
+                app:tileIcon="@drawable/ic_curbox_event"
+                app:tileTint="@color/curbox_secondary"
+                app:tileValue="None" />
+
+            <neth.iecal.curbox.ui.components.StatTileView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                app:tileCaption="Protection"
+                app:tileIcon="@drawable/ic_admin_shield"
+                app:tileTint="@color/curbox_success"
+                app:tileValue="On" />
+        </LinearLayout>
+
+        <!-- Rows -->
+        <neth.iecal.curbox.ui.components.SectionHeader
+            android:id="@+id/section"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/curbox_space_xl"
+            app:sectionAction="See all"
+            app:sectionTitle="Active restrictions" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/rows"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="@dimen/curbox_space_l" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Empty state -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/curbox_space_xl">
+
+            <neth.iecal.curbox.ui.components.EmptyStateView
+                android:id="@+id/empty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:emptyAction="Try again"
+                app:emptyMessage="Your phone time shows up here after you use some apps."
+                app:emptyTitle="No usage yet" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Inputs and buttons -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/curbox_space_xl"
+            android:hint="Login"
+            app:startIconDrawable="@drawable/ic_person_round">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/curbox_space_m"
+            android:text="Primary button" />
+
+        <com.google.android.material.button.MaterialButton
+            style="@style/Widget.Curbox.Button.Text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/curbox_space_xl"
+            android:text="Text button" />
+    </LinearLayout>
+</ScrollView>

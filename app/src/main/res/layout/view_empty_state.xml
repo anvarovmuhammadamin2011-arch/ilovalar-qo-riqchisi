@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:gravity="center_horizontal"
+    tools:orientation="vertical"
+    tools:parentTag="android.widget.LinearLayout">
+
+    <FrameLayout
+        android:id="@+id/empty_icon_bg"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:background="@drawable/bg_curbox_circle">
+
+        <ImageView
+            android:id="@+id/empty_icon"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:importantForAccessibility="no" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/empty_title"
+        style="@style/TextAppearance.Curbox.Section"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/curbox_space_l"
+        android:gravity="center"
+        tools:text="No usage yet" />
+
+    <TextView
+        android:id="@+id/empty_message"
+        style="@style/TextAppearance.Curbox.Caption"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/curbox_space_xs"
+        android:gravity="center"
+        android:maxWidth="300dp"
+        android:visibility="gone"
+        tools:text="Your phone time shows up here after you use some apps."
+        tools:visibility="visible" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/empty_action"
+        style="@style/Widget.Curbox.Button.Text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/curbox_space_s"
+        android:visibility="gone"
+        tools:text="Try again"
+        tools:visibility="visible" />
+</merge>

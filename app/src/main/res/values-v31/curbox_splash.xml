@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Android 12+ system splash: school logo on its blue, over the design system background. -->
+    <style name="Theme.Curbox.Launch" parent="Theme.Curbox">
+        <item name="android:windowSplashScreenBackground">@color/curbox_background</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@mipmap/logo_foreground</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">@color/ic_launcher_background</item>
+    </style>
+</resources>

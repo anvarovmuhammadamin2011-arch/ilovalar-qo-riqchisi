@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/link_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:colorBackground"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="@dimen/curbox_screen_padding"
+        android:paddingTop="40dp"
+        android:paddingBottom="@dimen/curbox_space_xl">
+
+        <FrameLayout
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/bg_curbox_circle"
+            android:backgroundTint="@color/curbox_primary_container">
+
+            <ImageView
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:layout_gravity="center"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_person_round"
+                app:tint="@color/curbox_primary" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/tv_title"
+            style="@style/TextAppearance.Curbox.Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/curbox_space_l"
+            android:gravity="center"
+            android:text="@string/admin_link_title" />
+
+        <TextView
+            android:id="@+id/tv_desc"
+            style="@style/TextAppearance.Curbox.Body"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:gravity="center"
+            android:text="@string/admin_link_desc"
+            android:textColor="@color/curbox_text_secondary" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/form_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/curbox_space_xl">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/curbox_screen_padding">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/input_layout_address"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/curbox_space_m"
+                    android:hint="@string/admin_link_address_hint"
+                    app:startIconDrawable="@drawable/ic_computer">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/input_address"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textUri" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <neth.iecal.curbox.ui.components.ConnectionChip
+                    android:id="@+id/connection_chip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/curbox_space_m"
+                    android:visibility="gone" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/input_layout_username"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/curbox_space_m"
+                    android:hint="@string/admin_link_username_hint"
+                    app:startIconDrawable="@drawable/ic_person_round">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/input_username"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textNoSuggestions|textVisiblePassword"
+                        android:maxLength="32" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/input_layout_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/curbox_space_s"
+                    android:hint="@string/admin_link_password_hint"
+                    app:endIconMode="password_toggle"
+                    app:startIconDrawable="@drawable/baseline_lock_24">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/input_password"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:imeOptions="actionDone"
+                        android:inputType="textPassword" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.checkbox.MaterialCheckBox
+                    android:id="@+id/check_remember"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minHeight="@dimen/curbox_min_touch"
+                    android:text="@string/admin_link_remember"
+                    android:textColor="@color/curbox_text" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_connect"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/curbox_space_s"
+                    android:text="@string/admin_link_connect" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+</ScrollView>

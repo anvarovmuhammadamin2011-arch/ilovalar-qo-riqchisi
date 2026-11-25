@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_user_home"
+        android:icon="@drawable/ic_curbox_home"
+        android:title="@string/user_tab_home" />
+    <item
+        android:id="@+id/nav_user_usage"
+        android:icon="@drawable/ic_curbox_bar_chart"
+        android:title="@string/user_tab_usage" />
+    <item
+        android:id="@+id/nav_user_restrictions"
+        android:icon="@drawable/ic_curbox_block"
+        android:title="@string/user_tab_restrictions" />
+    <item
+        android:id="@+id/nav_user_activity"
+        android:icon="@drawable/ic_curbox_history"
+        android:title="@string/user_tab_activity" />
+    <item
+        android:id="@+id/nav_user_profile"
+        android:icon="@drawable/ic_person_round"
+        android:title="@string/user_tab_profile" />
+</menu>

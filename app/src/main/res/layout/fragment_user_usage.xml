@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:colorBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/curbox_screen_padding">
+
+        <TextView
+            style="@style/TextAppearance.Curbox.Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/user_usage_title" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/range_chips"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/curbox_space_m"
+            app:selectionRequired="true"
+            app:singleSelection="true">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_today"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="@string/user_range_today" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_week"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/user_range_week" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_month"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/user_range_month" />
+        </com.google.android.material.chip.ChipGroup>
+
+        <!-- Summary -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/curbox_space_m">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/curbox_screen_padding">
+
+                <TextView
+                    android:id="@+id/tv_total_label"
+                    style="@style/TextAppearance.Curbox.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:id="@+id/tv_total"
+                    style="@style/TextAppearance.Curbox.Display"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:id="@+id/tv_average"
+                    style="@style/TextAppearance.Curbox.Body"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/tv_change"
+                    style="@style/TextAppearance.Curbox.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Bar chart -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/chart_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/curbox_card_gap">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/curbox_screen_padding">
+
+                <TextView
+                    android:id="@+id/tv_chart_title"
+                    style="@style/TextAppearance.Curbox.Section"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:id="@+id/tv_chart_selected"
+                    style="@style/TextAppearance.Curbox.Body"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/curbox_primary"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+
+                <neth.iecal.curbox.ui.views.AnalyticsBarChartView
+                    android:id="@+id/bar_chart"
+                    android:layout_width="match_parent"
+                    android:layout_height="170dp"
+                    android:layout_marginTop="@dimen/curbox_space_m" />
+
+                <TextView
+                    style="@style/TextAppearance.Curbox.Caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/curbox_space_s"
+                    android:text="@string/user_usage_chart_hint" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Donut of top apps -->
+        <neth.iecal.curbox.ui.components.SectionHeader
+            android:id="@+id/section_breakdown"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/curbox_space_xl"
+            app:sectionTitle="@string/user_usage_top_apps" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/breakdown_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="@dimen/curbox_space_l"
+                android:paddingTop="@dimen/curbox_screen_padding">
+
+                <com.github.mikephil.charting.charts.PieChart
+                    android:id="@+id/pie_chart"
+                    android:layout_width="190dp"
+                    android:layout_height="190dp"
+                    android:layout_gravity="center_horizontal" />
+
+                <LinearLayout
+                    android:id="@+id/breakdown_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/curbox_space_s"
+                    android:orientation="vertical" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- All apps -->
+        <neth.iecal.curbox.ui.components.SectionHeader
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/curbox_space_xl"
+            app:sectionTitle="@string/user_usage_apps" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:id="@+id/apps_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="@dimen/curbox_space_l" />
+
+                <neth.iecal.curbox.ui.components.EmptyStateView
+                    android:id="@+id/apps_empty"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:emptyIcon="@drawable/ic_curbox_bar_chart"
+                    app:emptyMessage="@string/user_home_no_usage_message"
+                    app:emptyTitle="@string/user_home_no_usage_title" />
+            </FrameLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Websites, only when there is data -->
+        <LinearLayout
+            android:id="@+id/websites_block"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <neth.iecal.curbox.ui.components.SectionHeader
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/curbox_space_xl"
+                app:sectionTitle="@string/user_usage_websites" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:id="@+id/websites_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="@dimen/curbox_space_l" />
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

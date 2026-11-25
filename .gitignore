@@ -1,0 +1,25 @@
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+build/
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+/test-code*
+.idea/
+agents.md
+AGENT.md
+/local
+# Curbox Admin runtime data: admin password hash and phone tokens
+/tools/pc-admin/curbox-admin-data.json*
+/tools/pc-admin/build/
+/tools/pc-admin/dist/

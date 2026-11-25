@@ -1,0 +1,76 @@
+package neth.iecal.curbox.ui.fragments.user
+
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import neth.iecal.curbox.BuildConfig
+import neth.iecal.curbox.R
+import neth.iecal.curbox.databinding.FragmentUserProfileBinding
+import neth.iecal.curbox.services.AppBlockerService
+import neth.iecal.curbox.utils.DataStoreManager
+import neth.iecal.curbox.utils.PermissionUtils
+import java.util.Locale
+
+/** Who is signed in on this phone and how it is managed. More settings come in a later part. */
+class UserProfileFragment : Fragment() {
+
+    private var _binding: FragmentUserProfileBinding? = null
+    private val binding get() = _binding!!
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        _binding = FragmentUserProfileBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.rowVersion.subtitle = BuildConfig.VERSION_NAME
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                DataStoreManager(requireContext()).settings
+                    .map { it.adminLinkConfig }
+                    .distinctUntilChanged()
+                    .collect { config ->
+                        val b = _binding ?: return@collect
+                        b.tvUsername.text = config.username
+                        b.tvAvatar.text = config.username.take(1).uppercase(Locale.getDefault())
+                        b.rowComputer.subtitle = config.serverUrl.removePrefix("http://")
+                        b.rowDevice.subtitle = config.deviceName
+                    }
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        refreshProtection()
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (!hidden && isResumed) refreshProtection()
+    }
+
+    private fun refreshProtection() {
+        val on = PermissionUtils.isAccessibilityServiceEnabled(requireContext(), AppBlockerService::class.java)
+        binding.rowProtection.subtitle = getString(if (on) R.string.user_home_on else R.string.user_home_off)
+        binding.rowProtection.setSymbol(
+            R.drawable.ic_admin_shield,
+            ContextCompat.getColor(requireContext(), if (on) R.color.curbox_success else R.color.curbox_error)
+        )
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+}

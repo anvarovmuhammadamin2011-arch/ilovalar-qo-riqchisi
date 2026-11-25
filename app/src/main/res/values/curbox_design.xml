@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Curbox user design system: theme, text, shapes and widget styles.
+  Colors live in values/colors.xml and values-night/colors.xml (curbox_*).
+  Activities on this theme implement ui.components.FixedBrandColors so Material
+  dynamic colors do not replace the palette.
+-->
+<resources>
+
+    <!-- Spacing: 4dp grid. -->
+    <dimen name="curbox_space_xs">4dp</dimen>
+    <dimen name="curbox_space_s">8dp</dimen>
+    <dimen name="curbox_space_m">12dp</dimen>
+    <dimen name="curbox_space_l">16dp</dimen>
+    <dimen name="curbox_space_xl">24dp</dimen>
+    <dimen name="curbox_screen_padding">20dp</dimen>
+    <dimen name="curbox_card_gap">12dp</dimen>
+
+    <!-- Shapes. -->
+    <dimen name="curbox_radius_card">20dp</dimen>
+    <dimen name="curbox_radius_tile">18dp</dimen>
+    <dimen name="curbox_radius_button">16dp</dimen>
+    <dimen name="curbox_radius_input">14dp</dimen>
+    <dimen name="curbox_min_touch">48dp</dimen>
+
+    <style name="Theme.Curbox.User" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/curbox_primary</item>
+        <item name="colorOnPrimary">@color/curbox_on_primary</item>
+        <item name="colorPrimaryContainer">@color/curbox_primary_container</item>
+        <item name="colorOnPrimaryContainer">@color/curbox_on_primary_container</item>
+        <item name="colorSecondary">@color/curbox_secondary</item>
+        <item name="colorOnSecondary">@color/curbox_on_primary</item>
+        <item name="colorSecondaryContainer">@color/curbox_primary_container</item>
+        <item name="colorOnSecondaryContainer">@color/curbox_on_primary_container</item>
+        <item name="colorError">@color/curbox_error</item>
+        <item name="colorOnError">@color/curbox_on_primary</item>
+        <item name="android:colorBackground">@color/curbox_background</item>
+        <item name="colorOnBackground">@color/curbox_text</item>
+        <item name="colorSurface">@color/curbox_surface</item>
+        <item name="colorOnSurface">@color/curbox_text</item>
+        <item name="colorSurfaceVariant">@color/curbox_surface_variant</item>
+        <item name="colorOnSurfaceVariant">@color/curbox_text_secondary</item>
+        <item name="colorOutline">@color/curbox_outline</item>
+        <item name="colorOutlineVariant">@color/curbox_outline</item>
+        <item name="colorSurfaceContainerLowest">@color/curbox_surface</item>
+        <item name="colorSurfaceContainerLow">@color/curbox_surface</item>
+        <item name="colorSurfaceContainer">@color/curbox_surface</item>
+        <item name="colorSurfaceContainerHigh">@color/curbox_surface</item>
+        <item name="colorSurfaceContainerHighest">@color/curbox_surface_variant</item>
+
+        <item name="android:fontFamily">@font/inter</item>
+        <item name="fontFamily">@font/inter</item>
+
+        <item name="materialCardViewStyle">@style/Widget.Curbox.Card</item>
+        <item name="materialButtonStyle">@style/Widget.Curbox.Button</item>
+        <item name="textInputStyle">@style/Widget.Curbox.TextInput</item>
+    </style>
+
+    <!--
+      Launcher activity theme. Same look as Theme.Curbox; values-v31 adds the
+      Android 12+ system splash (logo on the brand blue circle).
+    -->
+    <style name="Theme.Curbox.Launch" parent="Theme.Curbox" />
+
+    <!-- Text. Inter ships one weight, so bold styles rely on textStyle. -->
+    <style name="TextAppearance.Curbox.Display" parent="TextAppearance.Material3.DisplaySmall">
+        <item name="android:textSize">40sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/curbox_text</item>
+        <item name="android:letterSpacing">-0.02</item>
+        <item name="fontFamily">@font/inter</item>
+        <item name="android:fontFamily">@font/inter</item>
+    </style>
+
+    <style name="TextAppearance.Curbox.Title" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:textSize">22sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/curbox_text</item>
+        <item name="fontFamily">@font/inter</item>
+        <item name="android:fontFamily">@font/inter</item>
+    </style>
+
+    <style name="TextAppearance.Curbox.Section" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/curbox_text</item>
+        <item name="fontFamily">@font/inter</item>
+        <item name="android:fontFamily">@font/inter</item>
+    </style>
+
+    <style name="TextAppearance.Curbox.Body" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">@color/curbox_text</item>
+        <item name="android:lineSpacingMultiplier">1.15</item>
+        <item name="fontFamily">@font/inter</item>
+        <item name="android:fontFamily">@font/inter</item>
+    </style>
+
+    <style name="TextAppearance.Curbox.Caption" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">@color/curbox_text_secondary</item>
+        <item name="fontFamily">@font/inter</item>
+        <item name="android:fontFamily">@font/inter</item>
+    </style>
+
+    <!-- Cards: flat, hairline outline in light, none in dark. -->
+    <style name="Widget.Curbox.Card" parent="Widget.Material3.CardView.Outlined">
+        <item name="cardCornerRadius">@dimen/curbox_radius_card</item>
+        <item name="cardBackgroundColor">@color/curbox_surface</item>
+        <item name="strokeColor">@color/curbox_card_stroke</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="cardElevation">0dp</item>
+    </style>
+
+    <style name="Widget.Curbox.Card.Tile">
+        <item name="cardCornerRadius">@dimen/curbox_radius_tile</item>
+    </style>
+
+    <style name="Widget.Curbox.Button" parent="Widget.Material3.Button">
+        <item name="cornerRadius">@dimen/curbox_radius_button</item>
+        <item name="android:minHeight">56dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="Widget.Curbox.Button.Text" parent="Widget.Material3.Button.TextButton">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Widget.Curbox.TextInput" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxCornerRadiusTopStart">@dimen/curbox_radius_input</item>
+        <item name="boxCornerRadiusTopEnd">@dimen/curbox_radius_input</item>
+        <item name="boxCornerRadiusBottomStart">@dimen/curbox_radius_input</item>
+        <item name="boxCornerRadiusBottomEnd">@dimen/curbox_radius_input</item>
+        <item name="boxStrokeColor">@color/curbox_primary</item>
+        <item name="startIconTint">@color/curbox_text_secondary</item>
+        <item name="endIconTint">@color/curbox_text_secondary</item>
+    </style>
+
+</resources>
