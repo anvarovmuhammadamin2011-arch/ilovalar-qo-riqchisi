@@ -1168,6 +1168,19 @@ public class CurboxAdmin {
             nameMatches = username.equals(adminUser);
             stored = adminHash;
         }
+        if (!nameMatches) {
+            // A user typed their own login here. With the right password, say where it belongs.
+            String userHash;
+            synchronized (LOCK) {
+                Map<String, Object> user = findIn(users, "username", username);
+                userHash = user == null ? "" : str(user, "passwordHash");
+            }
+            if (!userHash.isEmpty() && verifyPassword(password, userHash)) {
+                logActivity(limit(username, 40), "admin_login", "", "user_account", null);
+                sendJson(ex, 403, error("user_account"));
+                return;
+            }
+        }
         if (!nameMatches || !verifyPassword(password, stored)) {
             recordFailure(lockKey);
             logActivity(limit(username, 40), "admin_login", "", "failed", null);

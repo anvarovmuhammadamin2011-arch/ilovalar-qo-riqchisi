@@ -622,6 +622,8 @@ const UZ = {
   "Show bigger": "Kattaroq koʻrsatish",
   "Rename": "Nomini oʻzgartirish",
   "Send message": "Xabar yuborish",
+  "This is a user login. Tap Link this computer to connect this computer with it.": "Bu foydalanuvchi logini. Shu kompyuterni u bilan ulash uchun Bu kompyuterni ulash tugmasini bosing.",
+  "This is a user login, not the admin. To link a computer, open MBSI PC on it and tap I am a user: link this computer. On a phone, sign in in the MBSI nazoratchi app.": "Bu admin emas, foydalanuvchi logini. Kompyuterni ulash uchun unda MBSI PC dasturini oching va Men foydalanuvchiman: bu kompyuterni ulash tugmasini bosing. Telefonda esa MBSI nazoratchi ilovasida kiring.",
   "Old copies of the same phone": "Bitta telefonning eski nusxalari",
   "Reinstalling the app linked the same phone again. Keep only the copy that works now.": "Ilova qayta oʻrnatilganda bitta telefon yana ulangan. Faqat hozir ishlayotgan nusxani qoldiring.",
   "Remove old copies": "Eski nusxalarni olib tashlash", "Copies:": "Nusxalar:", "keeps the one seen": "qoladigani oxirgi marta koʻrilgan:", "old": "eski",
@@ -926,6 +928,19 @@ async function doLogin() {
   if (status === 200) {
     $("loginPass").value = "";
     start();
+    return;
+  }
+  if (data.error === "user_account") {
+    // In the MBSI PC app the same login links this computer, so take the user straight there.
+    if (["localhost", "127.0.0.1"].includes(location.hostname)) {
+      $("userLogin").value = $("loginUser").value;
+      $("userPass").value = $("loginPass").value;
+      $("loginPass").value = "";
+      showUserCard(true);
+      $("userError").textContent = tr("This is a user login. Tap Link this computer to connect this computer with it.");
+      return;
+    }
+    $("loginError").textContent = tr("This is a user login, not the admin. To link a computer, open MBSI PC on it and tap I am a user: link this computer. On a phone, sign in in the MBSI nazoratchi app.");
     return;
   }
   $("loginError").textContent = status === 429
