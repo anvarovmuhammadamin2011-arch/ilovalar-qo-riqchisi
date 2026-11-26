@@ -237,6 +237,12 @@
     <string name="admin_block_schedule_title">Hozir mavjud emas</string>
     <string name="admin_block_app_message">Admin bu ilovani cheklagan.</string>
     <string name="admin_block_site_message">Admin bu saytni cheklagan.</string>
+    <string name="admin_block_scold_2">Yana kirdingmi? Bu hali ham yopiq. Yop va foydali ish bilan shugʻullan.</string>
+    <string name="admin_block_scold_3">Uchinchi marta! Telefonni qoʻy, kitob oʻqi.</string>
+    <string name="admin_block_scold_4">Odammisan oʻzi? Aytildiku: kirma!</string>
+    <string name="admin_block_scold_5">Bas qil! Har bir urinish faqat vaqtingni yeydi. Borib uy vazifangni qil.</string>
+    <string name="admin_block_scold_title">Toʻxta!</string>
+    <string name="admin_block_tries_today">Bugungi urinishlar: %1$d</string>
     <string name="admin_block_limit_message">Bugungi telefon vaqtingizning hammasi ishlatildi. Qoʻngʻiroq va favqulodda chaqiruvlar ishlayveradi.</string>
     <string name="admin_block_schedule_message">Admin bu narsa mavjud boʻlmaydigan vaqtni belgilagan.</string>
     <string name="admin_block_schedule_detail">%1$s, %2$s gacha</string>

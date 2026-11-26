@@ -1377,6 +1377,12 @@
     <string name="admin_block_schedule_title">Not available right now</string>
     <string name="admin_block_app_message">Your admin restricted this app.</string>
     <string name="admin_block_site_message">Your admin restricted this website.</string>
+    <string name="admin_block_scold_2">Again? It is still blocked. Close it and do something useful.</string>
+    <string name="admin_block_scold_3">Third try! Put the phone down and open a book.</string>
+    <string name="admin_block_scold_4">Are you even human? You were told: do not enter!</string>
+    <string name="admin_block_scold_5">Enough! Every try only eats your time. Go do your homework.</string>
+    <string name="admin_block_scold_title">Stop!</string>
+    <string name="admin_block_tries_today">Tries today: %1$d</string>
     <string name="admin_block_limit_message">You used all of today\'s phone time. Calls and emergency calls still work.</string>
     <string name="admin_block_schedule_message">Your admin set a time when this is not available.</string>
     <string name="admin_block_schedule_detail">%1$s, until %2$s</string>

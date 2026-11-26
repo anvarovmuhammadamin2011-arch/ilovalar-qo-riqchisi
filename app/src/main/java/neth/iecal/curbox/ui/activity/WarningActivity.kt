@@ -185,7 +185,7 @@ class WarningActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         if (intent.getIntExtra("mode", 0) == Constants.WARNING_SCREEN_MODE_ADMIN_BLOCK) {
             adminMode = true
-            showAdminBlock()
+            showAdminBlock(countTry = savedInstanceState == null)
             return
         }
         mathRetryEndsAtMs = savedInstanceState?.getLong(KEY_MATH_RETRY_ENDS_AT_MS) ?: 0L
@@ -927,7 +927,7 @@ class WarningActivity : AppCompatActivity() {
      * The admin block screen. Extras: "admin_kind" (app, site, limit or schedule),
      * "launch_package", "admin_site", "admin_schedule_name", "admin_schedule_end".
      */
-    private fun showAdminBlock() {
+    private fun showAdminBlock(countTry: Boolean) {
         val view = ActivityAdminBlockBinding.inflate(layoutInflater)
         setContentView(view.root)
         val kind = intent.getStringExtra("admin_kind") ?: "app"
@@ -980,8 +980,23 @@ class WarningActivity : AppCompatActivity() {
             }
             else -> ""
         }
-        view.tvDetail.text = detail
-        view.tvDetail.visibility = if (detail.isEmpty()) View.GONE else View.VISIBLE
+        // Each new try today gets a firmer message, so repeated tries feel pointless.
+        val tries = recordTry(site.ifEmpty { pkg }, countTry)
+        if (tries >= 2) {
+            view.tvMessage.setText(
+                when (tries) {
+                    2 -> R.string.admin_block_scold_2
+                    3 -> R.string.admin_block_scold_3
+                    4 -> R.string.admin_block_scold_4
+                    else -> R.string.admin_block_scold_5
+                }
+            )
+            if (tries >= 4) view.tvTitle.setText(R.string.admin_block_scold_title)
+        }
+        val triesLine = if (tries >= 2) getString(R.string.admin_block_tries_today, tries) else ""
+        val fullDetail = listOf(detail, triesLine).filter { it.isNotEmpty() }.joinToString("\n")
+        view.tvDetail.text = fullDetail
+        view.tvDetail.visibility = if (fullDetail.isEmpty()) View.GONE else View.VISIBLE
 
         view.btnHome.setOnClickListener { goHome() }
         if (neth.iecal.curbox.BuildConfig.SUPPORTS_ADMIN_LINK) {
@@ -1006,17 +1021,68 @@ class WarningActivity : AppCompatActivity() {
      * The six digit code is checked here against the admin's PBKDF2 verifier, so it works
      * offline too. Five wrong tries lock this screen for 15 minutes.
      */
+    /** Tries to open the same blocked app or site today, counting one try once. */
+    private fun recordTry(target: String, count: Boolean): Int {
+        val prefs = getSharedPreferences("admin_block_tries", Context.MODE_PRIVATE)
+        val today = java.time.LocalDate.now().toString()
+        if (prefs.getString("day", "") != today) prefs.edit().clear().putString("day", today).apply()
+        var tries = prefs.getInt("n:$target", 0)
+        val now = System.currentTimeMillis()
+        // One try can bring this screen up twice in a row; only a try after a pause counts.
+        if (count && now - prefs.getLong("t:$target", 0L) > TRY_GAP_MS) {
+            tries++
+            prefs.edit().putInt("n:$target", tries).putLong("t:$target", now).apply()
+        }
+        return tries.coerceAtLeast(1)
+    }
+
     private fun showUninstallCode(view: ActivityAdminBlockBinding) {
         view.tvTitle.setText(R.string.uninstall_code_title)
         view.tvMessage.setText(R.string.uninstall_code_message)
         view.targetRow.visibility = View.GONE
         view.btnDetails.visibility = View.GONE
         view.codeBox.visibility = View.VISIBLE
+        // The code button is the main action here; going home is the quiet way out.
+        view.btnHome.backgroundTintList = android.content.res.ColorStateList.valueOf(getColor(R.color.curbox_surface_variant))
+        view.btnHome.setTextColor(getColor(R.color.curbox_text))
         view.btnHome.setOnClickListener { goHome() }
         view.btnRemove.setOnClickListener { checkUninstallCode(view) }
+        renderCode(view, "")
+        view.inputCode.doAfterTextChanged { text ->
+            val code = text?.toString().orEmpty()
+            renderCode(view, code)
+            if (code.isNotEmpty()) showCodeError(view, null)
+            if (code.length == 6 && view.btnRemove.isEnabled) checkUninstallCode(view)
+        }
+        view.codeCells.setOnClickListener { focusCode(view) }
+        view.inputCode.post { focusCode(view) }
         onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
             override fun handleOnBackPressed() = goHome()
         })
+    }
+
+    private fun renderCode(view: ActivityAdminBlockBinding, code: String) {
+        val cells = listOf(view.codeCell1, view.codeCell2, view.codeCell3, view.codeCell4, view.codeCell5, view.codeCell6)
+        cells.forEachIndexed { i, cell ->
+            cell.text = if (i < code.length) "\u2022" else ""
+            cell.isActivated = i == minOf(code.length, cells.size - 1)
+        }
+    }
+
+    private fun focusCode(view: ActivityAdminBlockBinding) {
+        view.inputCode.requestFocus()
+        getSystemService(android.view.inputmethod.InputMethodManager::class.java)
+            ?.showSoftInput(view.inputCode, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT)
+    }
+
+    private fun showCodeError(view: ActivityAdminBlockBinding, message: String?) {
+        view.tvCodeError.text = message.orEmpty()
+        view.tvCodeError.visibility = if (message == null) View.GONE else View.VISIBLE
+        if (message != null) {
+            android.animation.ObjectAnimator.ofFloat(view.codeCells, View.TRANSLATION_X, 0f, 18f, -18f, 12f, -12f, 6f, 0f)
+                .setDuration(350L)
+                .start()
+        }
     }
 
     private fun checkUninstallCode(view: ActivityAdminBlockBinding) {
@@ -1024,15 +1090,15 @@ class WarningActivity : AppCompatActivity() {
         val now = System.currentTimeMillis()
         val lockedUntil = prefs.getLong("lockedUntil", 0L)
         if (lockedUntil > now) {
-            view.layoutCode.error = getString(R.string.protection_release_locked, ((lockedUntil - now) / 60_000L + 1).toInt())
+            showCodeError(view, getString(R.string.protection_release_locked, ((lockedUntil - now) / 60_000L + 1).toInt()))
             return
         }
         val code = view.inputCode.text?.toString().orEmpty()
         if (!code.matches(Regex("[0-9]{6}"))) {
-            view.layoutCode.error = getString(R.string.protection_release_need_six)
+            showCodeError(view, getString(R.string.protection_release_need_six))
             return
         }
-        view.layoutCode.error = null
+        showCodeError(view, null)
         view.btnRemove.isEnabled = false
         lifecycleScope.launch {
             val settings = DataStoreManager(this@WarningActivity).settings.first()
@@ -1041,7 +1107,7 @@ class WarningActivity : AppCompatActivity() {
                 withContext(Dispatchers.Default) { neth.iecal.curbox.utils.AntiUninstallManager.verifyPassword(code, stored) }
             view.btnRemove.isEnabled = true
             if (stored.isEmpty()) {
-                view.layoutCode.error = getString(R.string.protection_release_no_code)
+                showCodeError(view, getString(R.string.protection_release_no_code))
                 return@launch
             }
             if (!ok) {
@@ -1049,10 +1115,10 @@ class WarningActivity : AppCompatActivity() {
                 view.inputCode.text?.clear()
                 if (failures >= 5) {
                     prefs.edit().putInt("failures", 0).putLong("lockedUntil", now + 15 * 60_000L).apply()
-                    view.layoutCode.error = getString(R.string.protection_release_locked, 15)
+                    showCodeError(view, getString(R.string.protection_release_locked, 15))
                 } else {
                     prefs.edit().putInt("failures", failures).apply()
-                    view.layoutCode.error = getString(R.string.protection_release_wrong, 5 - failures)
+                    showCodeError(view, getString(R.string.protection_release_wrong, 5 - failures))
                 }
                 return@launch
             }
@@ -1147,6 +1213,7 @@ class WarningActivity : AppCompatActivity() {
 
     private companion object {
         const val KEY_MATH_RETRY_ENDS_AT_MS = "math_retry_ends_at_ms"
+        const val TRY_GAP_MS = 5_000L
         const val URGE_SURF_PREFS = "urge_surf"
         const val KEY_UNLOCK_STREAK = "unlock_streak"
         const val MATH_RETRY_DELAY_MS = 15_000L
