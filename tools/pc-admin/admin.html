@@ -622,6 +622,11 @@ const UZ = {
   "Show bigger": "Kattaroq koʻrsatish",
   "Rename": "Nomini oʻzgartirish",
   "Send message": "Xabar yuborish",
+  "Old copies of the same phone": "Bitta telefonning eski nusxalari",
+  "Reinstalling the app linked the same phone again. Keep only the copy that works now.": "Ilova qayta oʻrnatilganda bitta telefon yana ulangan. Faqat hozir ishlayotgan nusxani qoldiring.",
+  "Remove old copies": "Eski nusxalarni olib tashlash", "Copies:": "Nusxalar:", "keeps the one seen": "qoladigani oxirgi marta koʻrilgan:", "old": "eski",
+  "For each phone the copy seen last stays, with the blocked apps and websites of all its copies.": "Har bir telefon uchun oxirgi koʻrilgan nusxa qoladi, barcha nusxalardagi bloklangan ilova va saytlar unga oʻtadi.",
+  "Old copies removed.": "Eski nusxalar olib tashlandi.", "Remove old copies?": "Eski nusxalar olib tashlansinmi?", "Old copies:": "Eski nusxalar:",
   "Focus time": "Fokus vaqti", "Start focus time": "Fokus vaqtini boshlash", "Stop focus": "Fokusni toʻxtatish", "Start": "Boshlash",
   "Focus time works on phones only.": "Fokus vaqti faqat telefonlarda ishlaydi.", "All phones": "Barcha telefonlar",
   "Until it ends, the phone opens only calls, the clock and emergency screens. Other apps and their notifications stay closed.": "Tugaguncha telefonda faqat qoʻngʻiroq, soat va favqulodda ekranlar ochiladi. Boshqa ilovalar va ularning bildirishnomalari yopiq turadi.",
@@ -1380,8 +1385,66 @@ function mountDevices(content) {
     views.appendChild(b);
   }
   c.id = "activeCard";
-  content.append(views, limitForAllCard(), c, removed);
+  const dupes = card("Old copies of the same phone", "devices", "Reinstalling the app linked the same phone again. Keep only the copy that works now.");
+  dupes.id = "dupCard";
+  dupes.classList.add("hidden");
+  const dupList = el("div");
+  dupList.id = "dupList";
+  dupes.append(dupList, button("Remove old copies", "primary", "trash", removeOldCopies));
+  content.append(views, dupes, limitForAllCard(), c, removed);
   showDeviceView();
+}
+
+/** The same phone linked more than once: same user, same model, same system. */
+function duplicateGroups() {
+  const groups = {};
+  for (const d of overview.devices) {
+    const key = d.user + "|" + platformOf(d) + "|" + (d.model || d.name);
+    (groups[key] = groups[key] || []).push(d);
+  }
+  return Object.values(groups).filter((g) => g.length > 1)
+    .map((g) => [...g].sort((a, b) => b.lastSeen - a.lastSeen));
+}
+
+function updateDupes() {
+  const box = $("dupList");
+  if (!box) return;
+  const groups = duplicateGroups();
+  $("dupCard").classList.toggle("hidden", !groups.length || devFilter.view === "removed");
+  if (!changed("dupes", [groups.map((g) => g.map((d) => [d.id, d.lastSeen])), tick()])) return;
+  box.replaceChildren();
+  for (const g of groups) {
+    const row = el("div", "row");
+    const info = el("div", "grow");
+    info.append(el("div", "title", g[0].name + " · " + g[0].user),
+      el("div", "tiny", tr("Copies:") + " " + g.length + " · " + tr("keeps the one seen") + " " + timeAgo(g[0].lastSeen).toLowerCase()));
+    row.append(typeIcon(g[0]), info, pill(String(g.length - 1) + " " + tr("old"), "warn"));
+    box.appendChild(row);
+  }
+}
+
+/** Keeps the copy seen last in each group, moves the rules of the others to it, removes the rest. */
+async function removeOldCopies() {
+  const groups = duplicateGroups();
+  const old = groups.reduce((n, g) => n + g.length - 1, 0);
+  if (!old) return;
+  const ok = await modal({
+    title: "Remove old copies?",
+    message: tr("Old copies:") + " " + old + ". " + tr("For each phone the copy seen last stays, with the blocked apps and websites of all its copies."),
+    confirmText: "Remove old copies", danger: true
+  });
+  if (!ok) return;
+  for (const g of groups) {
+    const keep = g[0];
+    const apps = [...new Set(g.flatMap((d) => d.blockedApps))];
+    const sites = [...new Set(g.flatMap((d) => d.blockedSites))];
+    await api("/api/admin/rules", { deviceId: keep.id, blockedApps: apps, blockedSites: sites });
+    await api("/api/admin/remove", { deviceIds: g.slice(1).map((d) => d.id) });
+  }
+  toast("Old copies removed.");
+  await refresh();
+  memo = {};
+  update();
 }
 
 function showDeviceView() {
@@ -1389,6 +1452,7 @@ function showDeviceView() {
   $("activeCard").classList.toggle("hidden", removedView);
   $("limitAllCard").classList.toggle("hidden", removedView);
   $("removedCard").classList.toggle("hidden", !removedView);
+  updateDupes();
 }
 
 /** One daily limit for every device at once; each device can still be changed on the Screen time page. */
@@ -1426,6 +1490,7 @@ function updateDevices() {
   for (const id of [...selected]) if (!overview.devices.some((d) => d.id === id)) selected.delete(id);
   renderBulk();
   updateRemoved();
+  updateDupes();
   if (!changed("devices", [visibleDevices(), tick(), devFilter, [...selected]])) return;
   const body = $("devTable");
   body.replaceChildren();

@@ -141,6 +141,17 @@ class AdminLinkActivity : AppCompatActivity(), FixedBrandColors {
         checkComputer(0L)
     }
 
+    /**
+     * The same id after Curbox is reinstalled, so the admin keeps one entry per phone (with its
+     * rules) instead of a new copy each time. ANDROID_ID stays the same for this app on this phone.
+     */
+    private fun stableDeviceId(): String {
+        val androidId = runCatching {
+            android.provider.Settings.Secure.getString(contentResolver, android.provider.Settings.Secure.ANDROID_ID)
+        }.getOrNull()
+        return if (androidId.isNullOrBlank() || androidId == "9774d56d682e549c") UUID.randomUUID().toString() else "a-$androidId"
+    }
+
     private fun showAddressField() {
         binding.inputLayoutAddress.visibility = View.VISIBLE
         binding.btnOtherServer.visibility = View.GONE
@@ -225,7 +236,7 @@ class AdminLinkActivity : AppCompatActivity(), FixedBrandColors {
     private fun signInOnServer(url: String, username: String, password: String) {
         setBusy(true)
         lifecycleScope.launch {
-            val deviceId = current.deviceId.ifEmpty { UUID.randomUUID().toString() }
+            val deviceId = current.deviceId.ifEmpty { stableDeviceId() }
             val body = JSONObject()
                 .put("username", username)
                 .put("password", password)
