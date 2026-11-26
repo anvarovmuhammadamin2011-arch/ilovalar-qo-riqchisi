@@ -24,6 +24,7 @@
     <dimen name="curbox_min_touch">48dp</dimen>
 
     <style name="Theme.Curbox.User" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="linearProgressIndicatorStyle">@style/Widget.Curbox.LinearProgress</item>
         <item name="colorPrimary">@color/curbox_primary</item>
         <item name="colorOnPrimary">@color/curbox_on_primary</item>
         <item name="colorPrimaryContainer">@color/curbox_primary_container</item>
@@ -70,6 +71,13 @@
         <item name="android:letterSpacing">-0.02</item>
         <item name="fontFamily">@font/inter</item>
         <item name="android:fontFamily">@font/inter</item>
+    </style>
+
+    <!-- Progress bars as one smooth rounded line, without Material's end dot and gap. -->
+    <style name="Widget.Curbox.LinearProgress" parent="Widget.Material3.LinearProgressIndicator">
+        <item name="trackStopIndicatorSize">0dp</item>
+        <item name="indicatorTrackGapSize">0dp</item>
+        <item name="trackCornerRadius">8dp</item>
     </style>
 
     <!-- Page headings, like onboarding: large but calm, between Display and Title. -->

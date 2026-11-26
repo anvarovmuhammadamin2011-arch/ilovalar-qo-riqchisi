@@ -99,7 +99,7 @@
     <string name="user_activity_focus_stopped">%1$s, erta toʻxtatildi</string>
     <string name="user_activity_focus_running">Hozir ishlayapti</string>
     <string name="user_activity_empty_title">Hozircha hech narsa yoʻq</string>
-    <string name="user_activity_empty_message">Shu vaqtdagi ilova va fokus seanslari shu yerda chiqadi.</string>
+    <string name="user_activity_empty_message">Bir daqiqa yoki undan koʻp ishlatilgan ilovalar va fokus seanslari shu yerda chiqadi.</string>
     <string name="user_profile_title">Profil</string>
     <string name="user_profile_managed">Admin boshqaruvida</string>
     <string name="user_profile_computer">Server</string>

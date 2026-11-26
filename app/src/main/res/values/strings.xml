@@ -104,7 +104,7 @@
     <string name="user_activity_focus_stopped">%1$s, stopped early</string>
     <string name="user_activity_focus_running">Running now</string>
     <string name="user_activity_empty_title">Nothing here yet</string>
-    <string name="user_activity_empty_message">App use and focus sessions from this time show up here.</string>
+    <string name="user_activity_empty_message">Apps used for a minute or more, and focus sessions, show up here.</string>
     <string name="user_profile_title">Profile</string>
     <string name="user_profile_managed">Managed by your admin</string>
     <string name="user_profile_computer">Server</string>

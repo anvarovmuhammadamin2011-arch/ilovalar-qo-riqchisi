@@ -1,6 +1,7 @@
 <resources>
     <!-- Base application theme. -->
     <style name="Base.Theme.Curbox" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="linearProgressIndicatorStyle">@style/Widget.Curbox.LinearProgress</item>
 
         <item name="colorPrimary">@color/md_theme_primary</item>
         <item name="colorOnPrimary">@color/md_theme_onPrimary</item>
