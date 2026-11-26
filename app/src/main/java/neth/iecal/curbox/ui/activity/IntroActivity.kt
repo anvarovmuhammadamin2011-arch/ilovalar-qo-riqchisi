@@ -20,8 +20,8 @@ import neth.iecal.curbox.databinding.ItemIntroPageBinding
 import neth.iecal.curbox.ui.components.FixedBrandColors
 
 /**
- * Four short pages before the first permission screens. Then the existing onboarding
- * explains and asks for each Android permission.
+ * Four short pages before the first permission step. Then the Protection screen
+ * explains each Android permission before it opens Android's own setting.
  */
 class IntroActivity : AppCompatActivity(), FixedBrandColors {
 
@@ -71,10 +71,7 @@ class IntroActivity : AppCompatActivity(), FixedBrandColors {
 
     private fun finishIntro() {
         getSharedPreferences(AdminPanelActivity.PREFS, MODE_PRIVATE).edit().putBoolean(PREF_INTRO_SEEN, true).apply()
-        startActivity(
-            Intent(this, FragmentActivity::class.java)
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        )
+        startActivity(ProtectionActivity.setupIntent(this).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK))
         finish()
     }
 

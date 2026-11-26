@@ -16,6 +16,20 @@ add, delete or reset users under Users. Windows Firewall asks whether Java may u
 the network the first time: allow it on **private** networks, or phones cannot
 connect.
 
+## Share with other computers
+
+`build-windows.ps1` also makes `dist\MBSI PC V2.exe`, a small installer window
+(`MbsiInstaller.cs`, compiled with the C# compiler that ships with Windows) that holds
+the app. It installs for the current Windows user without admin rights, into the same
+folder as earlier versions, so data and the agent task keep working, and adds "MBSI PC"
+shortcuts.
+
+The exe is not code signed. A copy that came from a browser or a messenger carries the
+"downloaded from the internet" mark, so SmartScreen shows "Windows protected your PC":
+click "More info", then "Run anyway", or tick "Unblock" in the file's Properties. A copy
+from a USB stick has no mark and opens without the warning. Only a paid code signing
+certificate removes the warning everywhere.
+
 ## Link a phone
 
 1. On the phone open Curbox and tap **User**.

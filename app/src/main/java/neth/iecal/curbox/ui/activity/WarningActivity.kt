@@ -931,6 +931,10 @@ class WarningActivity : AppCompatActivity() {
         val view = ActivityAdminBlockBinding.inflate(layoutInflater)
         setContentView(view.root)
         val kind = intent.getStringExtra("admin_kind") ?: "app"
+        if (kind == "uninstall") {
+            showUninstallCode(view)
+            return
+        }
         val pkg = intent.getStringExtra("launch_package").orEmpty()
         val site = intent.getStringExtra("admin_site").orEmpty()
 
@@ -995,6 +999,94 @@ class WarningActivity : AppCompatActivity() {
         onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
             override fun handleOnBackPressed() = goHome()
         })
+    }
+
+    /**
+     * Someone tried to remove or stop Curbox while uninstall protection is on for the admin.
+     * The six digit code is checked here against the admin's PBKDF2 verifier, so it works
+     * offline too. Five wrong tries lock this screen for 15 minutes.
+     */
+    private fun showUninstallCode(view: ActivityAdminBlockBinding) {
+        view.tvTitle.setText(R.string.uninstall_code_title)
+        view.tvMessage.setText(R.string.uninstall_code_message)
+        view.targetRow.visibility = View.GONE
+        view.btnDetails.visibility = View.GONE
+        view.codeBox.visibility = View.VISIBLE
+        view.btnHome.setOnClickListener { goHome() }
+        view.btnRemove.setOnClickListener { checkUninstallCode(view) }
+        onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() = goHome()
+        })
+    }
+
+    private fun checkUninstallCode(view: ActivityAdminBlockBinding) {
+        val prefs = getSharedPreferences("uninstall_code", Context.MODE_PRIVATE)
+        val now = System.currentTimeMillis()
+        val lockedUntil = prefs.getLong("lockedUntil", 0L)
+        if (lockedUntil > now) {
+            view.layoutCode.error = getString(R.string.protection_release_locked, ((lockedUntil - now) / 60_000L + 1).toInt())
+            return
+        }
+        val code = view.inputCode.text?.toString().orEmpty()
+        if (!code.matches(Regex("[0-9]{6}"))) {
+            view.layoutCode.error = getString(R.string.protection_release_need_six)
+            return
+        }
+        view.layoutCode.error = null
+        view.btnRemove.isEnabled = false
+        lifecycleScope.launch {
+            val settings = DataStoreManager(this@WarningActivity).settings.first()
+            val stored = settings.antiUninstallConfig2.passwordHash
+            val ok = stored.isNotEmpty() &&
+                withContext(Dispatchers.Default) { neth.iecal.curbox.utils.AntiUninstallManager.verifyPassword(code, stored) }
+            view.btnRemove.isEnabled = true
+            if (stored.isEmpty()) {
+                view.layoutCode.error = getString(R.string.protection_release_no_code)
+                return@launch
+            }
+            if (!ok) {
+                val failures = prefs.getInt("failures", 0) + 1
+                view.inputCode.text?.clear()
+                if (failures >= 5) {
+                    prefs.edit().putInt("failures", 0).putLong("lockedUntil", now + 15 * 60_000L).apply()
+                    view.layoutCode.error = getString(R.string.protection_release_locked, 15)
+                } else {
+                    prefs.edit().putInt("failures", failures).apply()
+                    view.layoutCode.error = getString(R.string.protection_release_wrong, 5 - failures)
+                }
+                return@launch
+            }
+            prefs.edit().clear().apply()
+            releaseForUninstall(code, settings.adminLinkConfig)
+        }
+    }
+
+    private suspend fun releaseForUninstall(code: String, link: neth.iecal.curbox.data.models.AdminLinkConfig) {
+        // Tell the admin's computer when it can be reached; the code is already checked here.
+        if (link.isLinked()) {
+            withContext(Dispatchers.IO) {
+                runCatching {
+                    neth.iecal.curbox.utils.AdminLinkClient.post(
+                        link.serverUrl, "/api/device/release", org.json.JSONObject().put("code", code), link.deviceToken
+                    )
+                }
+            }
+        }
+        val store = DataStoreManager(this)
+        store.updateAntiUninstallConfig { it.copy(isEnabled = false, adminManaged = false, passwordHash = "", unlockRequestedAtMs = 0L) }
+        store.updateAdminLinkConfig { neth.iecal.curbox.data.models.AdminLinkConfig() }
+        withContext(Dispatchers.IO) {
+            runCatching { neth.iecal.curbox.utils.DeviceOwnerHelper.releaseManagement(this@WarningActivity) }
+            runCatching { neth.iecal.curbox.utils.AntiUninstallManager.removeProtection(this@WarningActivity) }
+        }
+        sendBroadcast(Intent(neth.iecal.curbox.blockers.AdminLinkBlocker.INTENT_ACTION_REFRESH_ADMIN_LINK).setPackage(packageName))
+        Toast.makeText(this, R.string.uninstall_code_done, Toast.LENGTH_LONG).show()
+        // Android's own app page, where Uninstall now works.
+        startActivity(
+            Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, android.net.Uri.parse("package:$packageName"))
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        )
+        finish()
     }
 
     private fun goHome() {

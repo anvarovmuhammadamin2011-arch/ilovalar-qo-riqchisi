@@ -178,6 +178,10 @@
   a.btnlink:hover { background: var(--bg); }
   input[type=date] { width: auto; padding: 9px 12px; }
   .printonly { display: none; }
+  .qrbox { display: flex; gap: 16px; align-items: center; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); flex-wrap: wrap; }
+  .qrbox img { border-radius: 12px; background: #fff; image-rendering: pixelated; }
+  .qrbox a { word-break: break-all; display: block; margin: 6px 0; color: var(--primary); }
+  img.qrbig { width: 100%; max-width: 360px; display: block; margin: 12px auto 0; background: #fff; border-radius: 12px; image-rendering: pixelated; }
   #login .langbtn { margin: 14px auto 0; display: flex; }
   button:focus-visible, a:focus-visible, [tabindex]:focus-visible, select:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
   .iconbtn { padding: 8px 10px; position: relative; }
@@ -542,6 +546,21 @@ const UZ = {
   "Sessions end after 12 hours without use.": "Seans 12 soat ishlatilmasa tugaydi.", "Loading…": "Yuklanmoqda…",
   "Waiting for the device": "Qurilma kutilmoqda", "Total screen time per device": "Har bir qurilmaning jami ekran vaqti",
   "Device removed": "Qurilma olib tashlandi", "Language": "Til",
+  "Blocked on every device": "Barcha qurilmalarda bloklangan",
+  "One list for all phones and computers. Devices linked later get it too.": "Barcha telefon va kompyuterlar uchun bitta ro‘yxat. Keyin ulanadigan qurilmalarga ham tushadi.",
+  "Websites to block on every device": "Barcha qurilmalarda bloklanadigan saytlar", "Block everywhere": "Hammasida bloklash",
+  "Paths like youtube.com/shorts only work on phones. On computers the whole website is blocked.": "youtube.com/shorts kabi yo‘llar faqat telefonda ishlaydi. Kompyuterda butun sayt bloklanadi.",
+  "Block a group of popular websites on every device.": "Mashhur saytlar guruhini barcha qurilmalarda bloklang.",
+  "These websites will be blocked on every device:": "Bu saytlar barcha qurilmalarda bloklanadi:",
+  "No websites are blocked on every device yet.": "Hali barcha qurilmalarda bloklangan sayt yo‘q.",
+  "Saved. Every device gets it within 10 seconds.": "Saqlandi. Har bir qurilma uni 10 soniya ichida oladi.", "Nothing changed.": "Hech narsa o‘zgarmadi.",
+  "Also blocked here, from the list for every device:": "Bu yerda barcha qurilmalar ro‘yxatidagi saytlar ham bloklangan:",
+  "Every device": "Barcha qurilmalar",
+  "To share the phone app by QR code, put mbsi.apk next to the data file (see Settings, This computer).": "Telefon ilovasini QR kod bilan tarqatish uchun mbsi.apk faylini maʼlumot fayli yoniga qoʻying (Sozlamalar, Bu kompyuter).",
+  "QR code to download the phone app": "Telefon ilovasini yuklab olish uchun QR kod",
+  "Phone app by QR code": "Telefon ilovasi QR kod orqali",
+  "Scan with the phone camera on the same WiFi. The app downloads, then tap it to install.": "Bir xil WiFi da telefon kamerasi bilan skanerlang. Ilova yuklanadi, keyin uni bosib oʻrnating.",
+  "Show bigger": "Kattaroq koʻrsatish", "Phone app": "Telefon ilovasi", "Ready to share by QR code": "QR kod orqali tarqatishga tayyor", "Missing: put mbsi.apk next to the data file": "Yoʻq: mbsi.apk ni maʼlumot fayli yoniga qoʻying", "Scan to get the phone app": "Telefon ilovasini olish uchun skanerlang", "Close": "Yopish",
   "Curbox for PC is not answering. Check that it is still running.": "Curbox for PC javob bermayapti. U ishlab turganini tekshiring."
 };
 
@@ -558,6 +577,9 @@ const UZ_PATTERNS = [
   [/^(\d+) (apps|programs) will be blocked\. These always stay allowed so the device keeps working:$/, "$1 ta bloklanadi. Qurilma ishlashi uchun bular doim ruxsatda qoladi:"],
   [/^Only (.+)$/, "Faqat $1"], [/^Ticked devices \((\d+)\)$/, "Belgilangan qurilmalar ($1)"], [/^All devices \((\d+)\)$/, "Barcha qurilmalar ($1)"],
   [/^Block (.+) websites\?$/, "$1 saytlari bloklansinmi?"], [/^Added user (.+)$/, "$1 foydalanuvchisi qo‘shildi"], [/^Deleted user (.+)$/, "$1 foydalanuvchisi o‘chirildi"],
+  [/^Blocked website on every device: (.+)$/, "Barcha qurilmalarda bloklandi: $1"],
+  [/^Unblocked website on every device: (.+)$/, "Barcha qurilmalarda blokdan chiqarildi: $1"],
+  [/^Websites \((\d+)\)$/, "Saytlar ($1)"],
   [/^Set a new password for (.+)$/, "$1 uchun yangi parol o‘rnatildi"], [/^Blocked website (.+)$/, "Bloklangan sayt: $1"], [/^Unblocked website (.+)$/, "Blokdan chiqarilgan sayt: $1"],
   [/^Blocked (.+)$/, "Bloklandi: $1"], [/^Allowed (.+)$/, "Ruxsat berildi: $1"], [/^New app found: (.+), blocked$/, "Yangi ilova topildi va bloklandi: $1"],
   [/^New app found: (.+)$/, "Yangi ilova topildi: $1"], [/^Daily limit: (.+)$/, "Kunlik limit: $1"], [/^Added schedule (.+)$/, "Jadval qo‘shildi: $1"],
@@ -809,6 +831,7 @@ $("loginUser").onkeydown = (e) => { if (e.key === "Enter") $("loginPass").focus(
 const PAGES = [
   { id: "dashboard", label: "Dashboard", icon: "dashboard" },
   { id: "devices", label: "Devices", icon: "devices" },
+  { id: "websites", label: "Websites", icon: "globe" },
   { id: "groups", label: "Groups", icon: "users" },
   { id: "profiles", label: "Profiles", icon: "shield" },
   { id: "screentime", label: "Screen time", icon: "clock" },
@@ -895,14 +918,14 @@ function mount() {
   content.replaceChildren();
   memo = {};
   if (route.page === "devices" && route.id) mountDevice(content);
-  else ({ dashboard: mountDashboard, devices: mountDevices, users: mountUsers, activity: mountActivity, reports: mountReports, screentime: mountScreenTime, schedules: mountSchedules, groups: mountGroups, profiles: mountProfiles, settings: mountSettings })[route.page](content);
+  else ({ dashboard: mountDashboard, devices: mountDevices, users: mountUsers, activity: mountActivity, reports: mountReports, screentime: mountScreenTime, schedules: mountSchedules, groups: mountGroups, profiles: mountProfiles, websites: mountWebsites, settings: mountSettings })[route.page](content);
   update();
 }
 
 function update() {
   if (!overview || $("app").classList.contains("hidden")) return;
   if (route.page === "devices" && route.id) updateDevice();
-  else ({ dashboard: updateDashboard, devices: updateDevices, users: updateUsers, activity: updateActivity, reports: updateReports, screentime: updateScreenTime, schedules: updateSchedules, groups: updateGroups, profiles: updateProfiles, settings: updateSettings })[route.page]();
+  else ({ dashboard: updateDashboard, devices: updateDevices, users: updateUsers, activity: updateActivity, reports: updateReports, screentime: updateScreenTime, schedules: updateSchedules, groups: updateGroups, profiles: updateProfiles, websites: updateWebsites, settings: updateSettings })[route.page]();
 }
 
 function setTitle(text) {
@@ -967,6 +990,37 @@ function connectSteps(box) {
   );
   box.appendChild(ol);
   box.appendChild(el("p", "small muted", "Every device must use the same WiFi as this computer."));
+  box.appendChild(appQr(addresses[0]));
+}
+
+/** QR code that downloads the phone app from this computer over the WiFi. */
+function appQr(address) {
+  const wrap = el("div", "qrbox");
+  if (!overview.apkAvailable) {
+    wrap.appendChild(el("p", "small muted", "To share the phone app by QR code, put mbsi.apk next to the data file (see Settings, This computer)."));
+    return wrap;
+  }
+  const url = "http://" + address + "/download/mbsi.apk";
+  const img = el("img");
+  img.src = "/download/qr.png?host=" + encodeURIComponent(address);
+  img.alt = "QR code to download the phone app";
+  img.width = 168;
+  img.height = 168;
+  const info = el("div", "grow");
+  const link = el("a", "small", url);
+  link.href = url;
+  info.append(el("div", "title wrap", "Phone app by QR code"),
+    el("div", "small muted", "Scan with the phone camera on the same WiFi. The app downloads, then tap it to install."),
+    link,
+    button("Show bigger", "ghost small", "apps", () => {
+      const big = el("img");
+      big.src = img.src;
+      big.alt = img.alt;
+      big.className = "qrbig";
+      modal({ title: "Scan to get the phone app", message: url, body: big, confirmText: "Close" });
+    }));
+  wrap.append(img, info);
+  return wrap;
 }
 
 // ---------------------------------------------------------------- dashboard
@@ -1611,13 +1665,21 @@ function mountDevSites(panel) {
 }
 
 function updateDevSites(d) {
-  if (!changed("sites", [d.id, d.blockedSites, d.platform])) return;
+  if (!changed("sites", [d.id, d.blockedSites, d.platform, overview.globalSites])) return;
   const pc = isPc(d);
   $("siteHint").textContent = pc
     ? "On a computer the whole website is blocked. Paths like youtube.com/shorts only work on phones."
     : "Block a whole website, or a path like youtube.com/shorts.";
   const list = $("siteList");
   list.replaceChildren();
+  const everywhere = overview.globalSites || [];
+  if (everywhere.length) {
+    const note = el("p", "small muted");
+    const link = el("a", "", tr("Websites") + " (" + everywhere.length + ")");
+    link.href = "#/websites";
+    note.append(document.createTextNode(tr("Also blocked here, from the list for every device:") + " "), link);
+    list.appendChild(note);
+  }
   if (!d.blockedSites.length) list.appendChild(el("p", "muted small", "No blocked websites."));
   for (const site of d.blockedSites) {
     const isPath = site.includes("/");
@@ -1726,6 +1788,8 @@ const LOG_TEXT = {
   profile_add: (e) => "Created profile " + e.target,
   profile_edit: (e) => "Changed profile " + e.target,
   profile_remove: (e) => "Deleted profile " + e.target,
+  global_site_add: (e) => "Blocked website on every device: " + e.target,
+  global_site_remove: (e) => "Unblocked website on every device: " + e.target,
   backup: () => "Downloaded a backup",
   restore: () => "Restored a backup"
 };
@@ -1737,7 +1801,7 @@ const LOG_ICON = {
   device_pending: "devices", device_approved: "check", approval_setting: "shield", limit_set: "clock",
   schedule_add: "calendar", schedule_edit: "calendar", schedule_remove: "calendar", schedule_on: "calendar", schedule_off: "calendar",
   group_add: "users", group_edit: "users", group_remove: "users", profile_add: "shield", profile_edit: "shield", profile_remove: "shield",
-  backup: "download", restore: "history"
+  backup: "download", restore: "history", global_site_add: "globe", global_site_remove: "globe"
 };
 
 function logTime(ms) {
@@ -3141,10 +3205,11 @@ function updateSettingsExtras() {
       body.appendChild(tr);
     }
   }
-  if (changed("pcSettings", [overview.addresses, overview.port, overview.autostart, overview.installed, overview.dataFile])) {
+  if (changed("pcSettings", [overview.addresses, overview.port, overview.autostart, overview.installed, overview.dataFile, overview.apkAvailable])) {
     const box = $("pcSettings");
     box.replaceChildren();
-    const rows = [["Port", String(overview.port)], ["Addresses", (overview.addresses || []).join(", ") || "No network"], ["Data file", overview.dataFile]];
+    const rows = [["Port", String(overview.port)], ["Addresses", (overview.addresses || []).join(", ") || "No network"], ["Data file", overview.dataFile],
+      ["Phone app", overview.apkAvailable ? tr("Ready to share by QR code") : tr("Missing: put mbsi.apk next to the data file")]];
     const kv = el("dl", "kv");
     rows.forEach(([k, v]) => kv.append(el("dt", "", k), el("dd", "", v)));
     box.appendChild(kv);
@@ -3161,6 +3226,80 @@ function updateSettingsExtras() {
     if (!overview.installed) box.appendChild(el("p", "tiny", "Only the installed app can start with Windows."));
     box.appendChild(el("p", "small muted", "Closing the window keeps Curbox for PC running in the tray, so devices stay managed. Use Quit in the tray menu to stop it."));
   }
+}
+
+// ---------------------------------------------------------------- websites on every device
+function mountWebsites(content) {
+  setTitle("Websites");
+  const grid = el("div", "grid2");
+  const c = card("Blocked on every device", "globe", "One list for all phones and computers. Devices linked later get it too.");
+  const form = el("div", "inline");
+  const input = el("input");
+  input.id = "globalInput";
+  input.placeholder = "youtube.com, tiktok.com";
+  input.setAttribute("aria-label", "Websites to block on every device");
+  input.onkeydown = (e) => { if (e.key === "Enter") addGlobalSites(); };
+  form.append(input, button("Block everywhere", "primary", "plus", addGlobalSites));
+  const err = el("div", "error");
+  err.id = "globalError";
+  const list = el("div");
+  list.id = "globalList";
+  c.append(form, err, list,
+    el("p", "small muted", "Paths like youtube.com/shorts only work on phones. On computers the whole website is blocked."));
+
+  const quick = card("Quick add", "sparkle", "Block a group of popular websites on every device.");
+  for (const [key, members] of Object.entries(overview.categories || {})) {
+    const row = el("div", "row");
+    const info = el("div", "grow");
+    info.append(el("div", "title", CATEGORY_LABELS[key] || key), el("div", "tiny wraptext", members.join(", ")));
+    row.append(info, button("Add", "ghost", "plus", async () => {
+      const ok = await modal({
+        title: "Block " + (CATEGORY_LABELS[key] || key).toLowerCase() + " websites?",
+        message: "These websites will be blocked on every device:", list: members, confirmText: "Block"
+      });
+      if (ok) saveGlobalSites({ add: members });
+    }));
+    quick.appendChild(row);
+  }
+  grid.append(c, quick);
+  content.appendChild(grid);
+}
+
+function updateWebsites() {
+  if (!changed("globalSites", [overview.globalSites])) return;
+  const list = $("globalList");
+  list.replaceChildren();
+  const sites = overview.globalSites || [];
+  if (!sites.length) list.appendChild(emptyState("globe", "No websites are blocked on every device yet."));
+  for (const site of sites) {
+    const row = el("div", "row");
+    const info = el("div", "grow");
+    info.appendChild(el("div", "title wrap", site));
+    const kind = site.includes("/") ? pill("Path (phones only)", "muted") : pill("Whole domain", "allowed");
+    const remove = button("Remove", "link", null, () => saveGlobalSites({ remove: [site] }));
+    remove.setAttribute("aria-label", "Remove " + site);
+    row.append(info, kind, remove);
+    list.appendChild(row);
+  }
+}
+
+async function addGlobalSites() {
+  const add = splitSites($("globalInput").value);
+  if (!add.length) return;
+  if (await saveGlobalSites({ add })) $("globalInput").value = "";
+}
+
+async function saveGlobalSites(body) {
+  $("globalError").textContent = "";
+  const { status, data } = await api("/api/admin/global-sites", body);
+  if (status === 200) {
+    toast(data.changed ? tr("Saved. Every device gets it within 10 seconds.") : tr("Nothing changed."));
+  } else if ($("globalError")) {
+    $("globalError").textContent = siteError(data);
+  }
+  await refresh();
+  update();
+  return status === 200;
 }
 
 // ---------------------------------------------------------------- users

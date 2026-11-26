@@ -1439,4 +1439,20 @@
     <string name="intro_start">Get started</string>
     <string name="intro_skip">Skip</string>
     <string name="intro_page">Page %1$d of %2$d</string>
+    <string name="protection_setup_title">Set up this phone</string>
+    <string name="protection_setup_continue">Continue</string>
+    <string name="protection_setup_missing_title">Some things are not on yet</string>
+    <string name="protection_setup_missing_body">These are still needed: %1$s. Until they are on, your admin\'s blocks may not work. You can turn them on later in Profile, Protection.</string>
+    <string name="protection_setup_fix">Turn them on</string>
+    <string name="protection_setup_continue_anyway">Continue anyway</string>
+    <string name="uninstall_code_title">Remove Curbox</string>
+    <string name="uninstall_code_message">This phone is managed by your admin. To remove or turn off Curbox, type the six digit code from your admin.</string>
+    <string name="uninstall_code_button">Unlock removal</string>
+    <string name="uninstall_code_done">Done. Tap Uninstall to remove Curbox.</string>
+    <string name="protection_grant_all">Give permission to manage</string>
+    <string name="protection_grant_all_title">Permission to manage this phone</string>
+    <string name="protection_grant_all_body">So your admin can manage this phone, Curbox needs:\n\n• notifications\n• the Curbox service (Accessibility)\n• showing block messages\n• running in the background\n• uninstall protection with your admin\'s code\n\nAndroid asks for each one on its own screen. Curbox opens them one after another. Turn each one on, then come back.</string>
+    <string name="protection_grant_all_yes">Allow</string>
+    <string name="protection_grant_all_done">Everything is on. Your admin can manage this phone.</string>
+    <string name="protection_grant_all_partly">Some permissions are still off. Tap Give permission to manage to try again.</string>
 </resources>

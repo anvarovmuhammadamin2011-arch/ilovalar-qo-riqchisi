@@ -223,6 +223,17 @@ public class CurboxAdmin {
                 System.out.println("Alert check failed: " + e);
             }
         }, 60, 60, TimeUnit.SECONDS);
+        Executors.newSingleThreadScheduledExecutor(r -> {
+            Thread t = new Thread(r, "curbox-network");
+            t.setDaemon(true);
+            return t;
+        }).scheduleWithFixedDelay(() -> {
+            try {
+                refreshLanServers();
+            } catch (Exception e) {
+                System.out.println("Network check failed: " + e);
+            }
+        }, 20, 20, TimeUnit.SECONDS);
     }
 
     static final List<HttpServer> adminServers = new ArrayList<>();
@@ -262,6 +273,46 @@ public class CurboxAdmin {
     static synchronized void stopAdminServers() {
         for (HttpServer server : adminServers) server.stop(0);
         adminServers.clear();
+    }
+
+    /**
+     * Laptops move between networks (school WiFi, a phone hotspot). Every 20 seconds the
+     * server listens on new WiFi addresses and stops on ones that are gone, so phones and
+     * the QR code keep working without "Restart server".
+     */
+    static synchronized void refreshLanServers() {
+        if (adminServers.isEmpty()) return;
+        Set<String> now = new LinkedHashSet<>();
+        for (InetAddress a : privateAddresses()) now.add(a.getHostAddress());
+        Set<String> bound = new LinkedHashSet<>();
+        for (java.util.Iterator<HttpServer> it = adminServers.iterator(); it.hasNext(); ) {
+            HttpServer server = it.next();
+            InetAddress address = server.getAddress().getAddress();
+            if (address.isLoopbackAddress()) continue;
+            String host = address.getHostAddress();
+            if (now.contains(host)) {
+                bound.add(host);
+            } else {
+                server.stop(0);
+                it.remove();
+                System.out.println("Stopped listening on " + host + " (network changed).");
+            }
+        }
+        for (String host : now) {
+            if (bound.contains(host)) continue;
+            try {
+                HttpServer server = HttpServer.create(new InetSocketAddress(InetAddress.getByName(host), PORT), 0);
+                server.createContext("/", CurboxAdmin::handle);
+                server.setExecutor(ADMIN_EXECUTOR);
+                server.start();
+                adminServers.add(server);
+                System.out.println("Device address: " + host + ":" + PORT + " (network changed)");
+                TrayIcon icon = trayIcon;
+                if (icon != null) icon.displayMessage(APP_NAME, "New network. Devices connect at " + host + ":" + PORT, TrayIcon.MessageType.INFO);
+            } catch (IOException e) {
+                System.out.println("Could not listen on " + host + ": " + e.getMessage());
+            }
+        }
     }
 
     /** IPv4 addresses on private ranges (10.x, 172.16 to 31.x, 192.168.x) of active adapters. */
@@ -484,6 +535,12 @@ public class CurboxAdmin {
                     case "/api/admin/state":
                         adminState(ex);
                         return;
+                    case "/download/mbsi.apk":
+                        downloadApk(ex);
+                        return;
+                    case "/download/qr.png":
+                        downloadQr(ex);
+                        return;
                     case "/api/admin/overview":
                         if (requireAdmin(ex)) adminOverview(ex);
                         return;
@@ -563,6 +620,9 @@ public class CurboxAdmin {
                         return;
                     case "/api/admin/profiles/save":
                         if (requireAdmin(ex)) adminSaveProfiles(ex);
+                        return;
+                    case "/api/admin/global-sites":
+                        if (requireAdmin(ex)) adminGlobalSites(ex);
                         return;
                     case "/api/admin/settings":
                         if (requireAdmin(ex)) adminSettings(ex);
@@ -954,6 +1014,9 @@ public class CurboxAdmin {
             out.put("profiles", profiles);
             out.put("knownApps", KNOWN_APPS);
             out.put("approveNewDevices", approveNewDevices);
+            out.put("globalSites", globalSites);
+            out.put("downloadUrls", downloadUrls());
+            out.put("apkAvailable", Files.exists(apkFile()));
             List<Object> recent = new ArrayList<>(notifications.subList(Math.max(0, notifications.size() - 50), notifications.size()));
             Collections.reverse(recent);
             out.put("notifications", recent);
@@ -1653,6 +1716,8 @@ public class CurboxAdmin {
     static final List<Map<String, Object>> groups = new ArrayList<>();
     static final List<Map<String, Object>> profiles = new ArrayList<>();
     static boolean approveNewDevices = false;
+    // Websites blocked on every device, also ones linked later.
+    static final List<String> globalSites = new ArrayList<>();
     static final Pattern PACKAGE_NAME = Pattern.compile("[A-Za-z0-9_]+(\\.[A-Za-z0-9_]+)+");
     static final Pattern EXE_NAME = Pattern.compile("[a-z0-9 ._()+-]{1,80}\\.exe");
 
@@ -1841,6 +1906,89 @@ public class CurboxAdmin {
         for (Map<String, Object> m : old.values()) logActivity(actor(), kind + "_remove", str(m, "name"), "ok", null);
     }
 
+    /** Adds and/or removes websites blocked on every device: {"add": [...], "remove": [...]}. */
+    static void adminGlobalSites(HttpExchange ex) throws IOException, BadSiteException {
+        Map<String, Object> body = readJsonObject(ex);
+        List<String> add = cleanSites(body.get("add"));
+        List<String> remove = cleanSites(body.get("remove"));
+        if (add.isEmpty() && remove.isEmpty()) {
+            sendJson(ex, 400, error("nothing_to_do"));
+            return;
+        }
+        int changed = 0;
+        synchronized (LOCK) {
+            for (String site : add) {
+                if (globalSites.contains(site) || globalSites.size() >= 1000) continue;
+                globalSites.add(site);
+                logActivity(actor(), "global_site_add", site, "ok", null);
+                changed++;
+            }
+            for (String site : remove) {
+                if (!globalSites.remove(site)) continue;
+                logActivity(actor(), "global_site_remove", site, "ok", null);
+                changed++;
+            }
+            // Every device's rules change; each one picks this up on its next sync.
+            if (changed > 0) {
+                for (Map<String, Object> device : devices) markChanged(device);
+                save();
+            }
+        }
+        Map<String, Object> out = ok();
+        out.put("changed", changed);
+        sendJson(ex, 200, out);
+    }
+
+    // ------------------------------------------------------- phone app download
+
+    /** The phone app shared on the WiFi: mbsi.apk next to the data file. */
+    static Path apkFile() {
+        return DATA_DIR.resolve("mbsi.apk");
+    }
+
+    static List<String> downloadUrls() {
+        List<String> out = new ArrayList<>();
+        for (String address : lanAddresses()) out.add("http://" + address + "/download/mbsi.apk");
+        return out;
+    }
+
+    /** Anyone on the WiFi may download the phone app; it holds no secrets. */
+    static void downloadApk(HttpExchange ex) throws IOException {
+        Path file = apkFile();
+        if (!Files.exists(file)) {
+            sendJson(ex, 404, error("no_apk"));
+            return;
+        }
+        ex.getResponseHeaders().set("Content-Type", "application/vnd.android.package-archive");
+        ex.getResponseHeaders().set("Content-Disposition", "attachment; filename=\"MBSI apk qoriqchi.apk\"");
+        ex.getResponseHeaders().set("Cache-Control", "no-store");
+        securityHeaders(ex);
+        ex.sendResponseHeaders(200, Files.size(file));
+        try (OutputStream os = ex.getResponseBody()) {
+            Files.copy(file, os);
+        }
+    }
+
+    /** A QR code for the download link, for one of this computer's own addresses only. */
+    static void downloadQr(HttpExchange ex) throws IOException {
+        List<String> urls = downloadUrls();
+        String host = query(ex).getOrDefault("host", "");
+        String url = urls.isEmpty() ? "" : urls.get(0);
+        for (String u : urls) if (u.equals("http://" + host + "/download/mbsi.apk")) url = u;
+        if (url.isEmpty()) {
+            sendJson(ex, 404, error("no_network"));
+            return;
+        }
+        byte[] bytes = Qr.png(Qr.encode(url), 12);
+        ex.getResponseHeaders().set("Content-Type", "image/png");
+        ex.getResponseHeaders().set("Cache-Control", "no-store");
+        securityHeaders(ex);
+        ex.sendResponseHeaders(200, bytes.length);
+        try (OutputStream os = ex.getResponseBody()) {
+            os.write(bytes);
+        }
+    }
+
     static void adminSettings(HttpExchange ex) throws IOException {
         Map<String, Object> body = readJsonObject(ex);
         if (!(body.get("approveNewDevices") instanceof Boolean)) throw new IllegalArgumentException();
@@ -1924,6 +2072,7 @@ public class CurboxAdmin {
         }
         for (String a : strings(device.get("blockedApps"))) apps.computeIfAbsent(a, k -> new ArrayList<>()).add(own);
         for (String s : strings(device.get("blockedSites"))) sites.computeIfAbsent(s, k -> new ArrayList<>()).add(own);
+        for (String s : globalSites) sites.computeIfAbsent(s, k -> new ArrayList<>()).add("Every device");
         long limit = num(device, "dailyLimitMinutes");
         String limitSource = limit > 0 ? own : "";
         for (Object o : schedulesOf(device)) {
@@ -2605,6 +2754,7 @@ public class CurboxAdmin {
         notifications.clear();
         notifyPrefs.clear();
         approveNewDevices = false;
+        globalSites.clear();
         policyVersion = 1;
         releaseCodeHash = "";
         releaseCodeSetAt = 0;
@@ -2641,6 +2791,7 @@ public class CurboxAdmin {
                     groups.addAll(mapsOf(map.get("groups")));
                     profiles.addAll(mapsOf(map.get("profiles")));
                     approveNewDevices = Boolean.TRUE.equals(map.get("approveNewDevices"));
+                    globalSites.addAll(strings(map.get("globalSites")));
                     notifications.addAll(mapsOf(map.get("notifications")));
                     if (map.get("notifyPrefs") instanceof Map) notifyPrefs.putAll(mapsOf(List.of(map.get("notifyPrefs"))).get(0));
                 }
@@ -2691,6 +2842,7 @@ public class CurboxAdmin {
         root.put("groups", groups);
         root.put("profiles", profiles);
         root.put("approveNewDevices", approveNewDevices);
+        root.put("globalSites", globalSites);
         root.put("notifications", notifications);
         root.put("notifyPrefs", notifyPrefs);
         return root;
@@ -4476,4 +4628,333 @@ final class PcUser {
             ex.close();
         }
     }
+}
+
+/**
+ * A small QR code encoder: byte mode, error correction level M, versions 1 to 10
+ * (up to 213 bytes, plenty for a link). Follows ISO/IEC 18004; no library needed.
+ */
+final class Qr {
+
+    // Error correction codewords per block and number of blocks, level M, versions 1 to 10.
+    private static final int[] ECC_PER_BLOCK = {0, 10, 16, 26, 18, 24, 16, 18, 22, 22, 26};
+    private static final int[] NUM_BLOCKS = {0, 1, 1, 1, 2, 2, 4, 4, 4, 5, 5};
+    private static final int FORMAT_LEVEL_M = 0;
+
+    private final int version;
+    private final int size;
+    private final boolean[][] modules;
+    private final boolean[][] isFunction;
+
+    private Qr(int version) {
+        this.version = version;
+        this.size = version * 4 + 17;
+        this.modules = new boolean[size][size];
+        this.isFunction = new boolean[size][size];
+    }
+
+    /** The dark (true) and light modules of the symbol, without the quiet zone, as [y][x]. */
+    static boolean[][] encode(String text) {
+        byte[] data = text.getBytes(StandardCharsets.UTF_8);
+        int version = 1;
+        while (true) {
+            if (version > 10) throw new IllegalArgumentException("Text too long for a QR code");
+            int countBits = version <= 9 ? 8 : 16;
+            if (4 + countBits + data.length * 8 <= dataCodewords(version) * 8) break;
+            version++;
+        }
+        Qr qr = new Qr(version);
+        qr.drawFunctionPatterns();
+        qr.drawCodewords(qr.addEccAndInterleave(qr.dataBytes(data)));
+        int best = 0;
+        long bestPenalty = Long.MAX_VALUE;
+        for (int mask = 0; mask < 8; mask++) {
+            qr.applyMask(mask);
+            qr.drawFormatBits(mask);
+            long penalty = qr.penalty();
+            if (penalty < bestPenalty) {
+                bestPenalty = penalty;
+                best = mask;
+            }
+            qr.applyMask(mask); // undo, the mask is its own inverse
+        }
+        qr.applyMask(best);
+        qr.drawFormatBits(best);
+        return qr.modules;
+    }
+
+    // ---------------------------------------------------------------- sizes
+
+    static int rawDataModules(int ver) {
+        int result = (16 * ver + 128) * ver + 64;
+        if (ver >= 2) {
+            int numAlign = ver / 7 + 2;
+            result -= (25 * numAlign - 10) * numAlign - 55;
+            if (ver >= 7) result -= 36;
+        }
+        return result;
+    }
+
+    static int dataCodewords(int ver) {
+        return rawDataModules(ver) / 8 - ECC_PER_BLOCK[ver] * NUM_BLOCKS[ver];
+    }
+
+    // ---------------------------------------------------------------- data
+
+    private byte[] dataBytes(byte[] data) {
+        List<Integer> bits = new ArrayList<>();
+        appendBits(bits, 0b0100, 4); // byte mode
+        appendBits(bits, data.length, version <= 9 ? 8 : 16);
+        for (byte b : data) appendBits(bits, b & 0xFF, 8);
+        int capacity = dataCodewords(version) * 8;
+        appendBits(bits, 0, Math.min(4, capacity - bits.size()));
+        appendBits(bits, 0, (8 - bits.size() % 8) % 8);
+        for (int pad = 0xEC; bits.size() < capacity; pad ^= 0xEC ^ 0x11) appendBits(bits, pad, 8);
+        byte[] out = new byte[bits.size() / 8];
+        for (int i = 0; i < bits.size(); i++) out[i >>> 3] |= (byte) (bits.get(i) << (7 - (i & 7)));
+        return out;
+    }
+
+    private static void appendBits(List<Integer> bits, int value, int length) {
+        for (int i = length - 1; i >= 0; i--) bits.add((value >>> i) & 1);
+    }
+
+    private byte[] addEccAndInterleave(byte[] data) {
+        int numBlocks = NUM_BLOCKS[version];
+        int blockEccLen = ECC_PER_BLOCK[version];
+        int rawCodewords = rawDataModules(version) / 8;
+        int numShortBlocks = numBlocks - rawCodewords % numBlocks;
+        int shortBlockLen = rawCodewords / numBlocks;
+        byte[] divisor = rsDivisor(blockEccLen);
+        List<byte[]> blocks = new ArrayList<>();
+        for (int i = 0, k = 0; i < numBlocks; i++) {
+            int dataLen = shortBlockLen - blockEccLen + (i < numShortBlocks ? 0 : 1);
+            byte[] dat = Arrays.copyOfRange(data, k, k + dataLen);
+            k += dataLen;
+            byte[] ecc = rsRemainder(dat, divisor);
+            byte[] block = new byte[shortBlockLen + 1];
+            // Short blocks get a placeholder byte so every block has the same layout.
+            System.arraycopy(dat, 0, block, 0, dat.length);
+            System.arraycopy(ecc, 0, block, block.length - blockEccLen, blockEccLen);
+            blocks.add(block);
+        }
+        byte[] result = new byte[rawCodewords];
+        int n = 0;
+        for (int i = 0; i < blocks.get(0).length; i++) {
+            for (int j = 0; j < blocks.size(); j++) {
+                if (i != shortBlockLen - blockEccLen || j >= numShortBlocks) result[n++] = blocks.get(j)[i];
+            }
+        }
+        return result;
+    }
+
+    private static byte[] rsDivisor(int degree) {
+        byte[] result = new byte[degree];
+        result[degree - 1] = 1;
+        int root = 1;
+        for (int i = 0; i < degree; i++) {
+            for (int j = 0; j < degree; j++) {
+                result[j] = (byte) gfMul(result[j] & 0xFF, root);
+                if (j + 1 < degree) result[j] ^= result[j + 1];
+            }
+            root = gfMul(root, 0x02);
+        }
+        return result;
+    }
+
+    private static byte[] rsRemainder(byte[] data, byte[] divisor) {
+        byte[] result = new byte[divisor.length];
+        for (byte b : data) {
+            int factor = (b ^ result[0]) & 0xFF;
+            System.arraycopy(result, 1, result, 0, result.length - 1);
+            result[result.length - 1] = 0;
+            for (int i = 0; i < result.length; i++) result[i] ^= (byte) gfMul(divisor[i] & 0xFF, factor);
+        }
+        return result;
+    }
+
+    private static int gfMul(int x, int y) {
+        int z = 0;
+        for (int i = 7; i >= 0; i--) {
+            z = (z << 1) ^ ((z >>> 7) * 0x11D);
+            z ^= ((y >>> i) & 1) * x;
+        }
+        return z;
+    }
+
+    // ---------------------------------------------------------------- drawing
+
+    private void setFunction(int x, int y, boolean dark) {
+        modules[y][x] = dark;
+        isFunction[y][x] = true;
+    }
+
+    private void drawFunctionPatterns() {
+        for (int i = 0; i < size; i++) {
+            setFunction(6, i, i % 2 == 0);
+            setFunction(i, 6, i % 2 == 0);
+        }
+        drawFinder(3, 3);
+        drawFinder(size - 4, 3);
+        drawFinder(3, size - 4);
+        int[] align = alignmentPositions();
+        for (int i = 0; i < align.length; i++) {
+            for (int j = 0; j < align.length; j++) {
+                boolean corner = (i == 0 && j == 0) || (i == 0 && j == align.length - 1) || (i == align.length - 1 && j == 0);
+                if (!corner) drawAlignment(align[i], align[j]);
+            }
+        }
+        drawFormatBits(0); // reserves the area; drawn again after masking
+        drawVersion();
+    }
+
+    private void drawFinder(int x, int y) {
+        for (int dy = -4; dy <= 4; dy++) {
+            for (int dx = -4; dx <= 4; dx++) {
+                int dist = Math.max(Math.abs(dx), Math.abs(dy));
+                int xx = x + dx;
+                int yy = y + dy;
+                if (xx >= 0 && xx < size && yy >= 0 && yy < size) setFunction(xx, yy, dist != 2 && dist != 4);
+            }
+        }
+    }
+
+    private void drawAlignment(int x, int y) {
+        for (int dy = -2; dy <= 2; dy++) {
+            for (int dx = -2; dx <= 2; dx++) setFunction(x + dx, y + dy, Math.max(Math.abs(dx), Math.abs(dy)) != 1);
+        }
+    }
+
+    private int[] alignmentPositions() {
+        if (version == 1) return new int[0];
+        int numAlign = version / 7 + 2;
+        int step = (version * 4 + numAlign * 2 + 1) / (numAlign * 2 - 2) * 2;
+        int[] result = new int[numAlign];
+        result[0] = 6;
+        for (int i = numAlign - 1, pos = size - 7; i >= 1; i--, pos -= step) result[i] = pos;
+        return result;
+    }
+
+    private void drawFormatBits(int mask) {
+        int data = FORMAT_LEVEL_M << 3 | mask;
+        int rem = data;
+        for (int i = 0; i < 10; i++) rem = (rem << 1) ^ ((rem >>> 9) * 0x537);
+        int bits = (data << 10 | rem) ^ 0x5412;
+        for (int i = 0; i <= 5; i++) setFunction(8, i, bit(bits, i));
+        setFunction(8, 7, bit(bits, 6));
+        setFunction(8, 8, bit(bits, 7));
+        setFunction(7, 8, bit(bits, 8));
+        for (int i = 9; i < 15; i++) setFunction(14 - i, 8, bit(bits, i));
+        for (int i = 0; i < 8; i++) setFunction(size - 1 - i, 8, bit(bits, i));
+        for (int i = 8; i < 15; i++) setFunction(8, size - 15 + i, bit(bits, i));
+        setFunction(8, size - 8, true); // the dark module
+    }
+
+    private void drawVersion() {
+        if (version < 7) return;
+        int rem = version;
+        for (int i = 0; i < 12; i++) rem = (rem << 1) ^ ((rem >>> 11) * 0x1F25);
+        int bits = version << 12 | rem;
+        for (int i = 0; i < 18; i++) {
+            boolean dark = bit(bits, i);
+            int a = size - 11 + i % 3;
+            int b = i / 3;
+            setFunction(a, b, dark);
+            setFunction(b, a, dark);
+        }
+    }
+
+    private void drawCodewords(byte[] data) {
+        int i = 0;
+        for (int right = size - 1; right >= 1; right -= 2) {
+            if (right == 6) right = 5;
+            for (int vert = 0; vert < size; vert++) {
+                for (int j = 0; j < 2; j++) {
+                    int x = right - j;
+                    boolean upward = ((right + 1) & 2) == 0;
+                    int y = upward ? size - 1 - vert : vert;
+                    if (!isFunction[y][x] && i < data.length * 8) {
+                        modules[y][x] = bit(data[i >>> 3], 7 - (i & 7));
+                        i++;
+                    }
+                }
+            }
+        }
+    }
+
+    private void applyMask(int mask) {
+        for (int y = 0; y < size; y++) {
+            for (int x = 0; x < size; x++) {
+                boolean invert;
+                switch (mask) {
+                    case 0: invert = (x + y) % 2 == 0; break;
+                    case 1: invert = y % 2 == 0; break;
+                    case 2: invert = x % 3 == 0; break;
+                    case 3: invert = (x + y) % 3 == 0; break;
+                    case 4: invert = (x / 3 + y / 2) % 2 == 0; break;
+                    case 5: invert = x * y % 2 + x * y % 3 == 0; break;
+                    case 6: invert = (x * y % 2 + x * y % 3) % 2 == 0; break;
+                    default: invert = ((x + y) % 2 + x * y % 3) % 2 == 0; break;
+                }
+                if (invert && !isFunction[y][x]) modules[y][x] = !modules[y][x];
+            }
+        }
+    }
+
+    /** Rules 1, 2 and 4 of the standard penalty; enough to avoid hard to read masks. */
+    private long penalty() {
+        long result = 0;
+        for (int pass = 0; pass < 2; pass++) {
+            for (int a = 0; a < size; a++) {
+                int run = 1;
+                for (int b = 1; b < size; b++) {
+                    boolean prev = pass == 0 ? modules[a][b - 1] : modules[b - 1][a];
+                    boolean cur = pass == 0 ? modules[a][b] : modules[b][a];
+                    if (cur == prev) {
+                        run++;
+                        if (run == 5) result += 3;
+                        else if (run > 5) result++;
+                    } else {
+                        run = 1;
+                    }
+                }
+            }
+        }
+        for (int y = 0; y < size - 1; y++) {
+            for (int x = 0; x < size - 1; x++) {
+                boolean c = modules[y][x];
+                if (c == modules[y][x + 1] && c == modules[y + 1][x] && c == modules[y + 1][x + 1]) result += 3;
+            }
+        }
+        int dark = 0;
+        for (boolean[] row : modules) for (boolean m : row) if (m) dark++;
+        int total = size * size;
+        int k = (Math.abs(dark * 20 - total * 10) + total - 1) / total - 1;
+        return result + Math.max(0, k) * 10L;
+    }
+
+    private static boolean bit(int x, int i) {
+        return ((x >>> i) & 1) != 0;
+    }
+
+    /** PNG with a 4 module quiet zone. */
+    static byte[] png(boolean[][] qr, int scale) throws IOException {
+        int border = 4;
+        int dim = (qr.length + border * 2) * scale;
+        java.awt.image.BufferedImage img = new java.awt.image.BufferedImage(dim, dim, java.awt.image.BufferedImage.TYPE_BYTE_BINARY);
+        java.awt.Graphics2D g = img.createGraphics();
+        g.setColor(java.awt.Color.WHITE);
+        g.fillRect(0, 0, dim, dim);
+        g.setColor(java.awt.Color.BLACK);
+        for (int y = 0; y < qr.length; y++) {
+            for (int x = 0; x < qr.length; x++) {
+                if (qr[y][x]) g.fillRect((x + border) * scale, (y + border) * scale, scale, scale);
+            }
+        }
+        g.dispose();
+        java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
+        ImageIO.write(img, "png", out);
+        return out.toByteArray();
+    }
+
 }

@@ -35,11 +35,13 @@ class AntiUninstallBlocker : BaseBlocker() {
         const val SETTINGS_PACKAGE = "com.android.settings"
         const val ACCESSIBILITY_SHORTCUT_TITLE = "accessibility_shortcut_title"
         const val SCREEN_SCAN_INTERVAL_MS = 300L
+        const val CODE_SCREEN_COOLDOWN_MS = 3000L
         val SERVICE_LABELS = listOf("App Blocker")
     }
 
     @Volatile private var config: AntiUninstallConfig = AntiUninstallConfig()
     private var lastScreenScan = 0L
+    private var lastCodeScreen = 0L
     private lateinit var service: AppBlockerService
     private var settingsJob: kotlinx.coroutines.Job? = null
 
@@ -121,6 +123,24 @@ class AntiUninstallBlocker : BaseBlocker() {
     private fun bounce() {
         service.pressBack()
         service.pressHome()
+        if (config.adminManaged) askForAdminCode()
+    }
+
+    /** Opens the code screen; after the right code, Curbox can be removed like any app. */
+    private fun askForAdminCode() {
+        val now = SystemClock.uptimeMillis()
+        if (now - lastCodeScreen < CODE_SCREEN_COOLDOWN_MS) return
+        lastCodeScreen = now
+        try {
+            service.startActivity(
+                android.content.Intent(service, neth.iecal.curbox.ui.activity.WarningActivity::class.java)
+                    .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                    .putExtra("mode", neth.iecal.curbox.Constants.WARNING_SCREEN_MODE_ADMIN_BLOCK)
+                    .putExtra("admin_kind", "uninstall")
+            )
+        } catch (e: Exception) {
+            CrashLogger(service).logNonFatalError(e)
+        }
     }
 
     /** True if the clicked node, or anything under it, is one of Curbox's accessibility services. */

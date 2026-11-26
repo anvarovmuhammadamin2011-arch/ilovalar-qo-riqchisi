@@ -11,6 +11,7 @@ import android.provider.Settings
 import android.text.format.DateUtils
 import android.util.TypedValue
 import android.view.View
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
@@ -58,6 +59,16 @@ import org.json.JSONObject
  */
 class ProtectionActivity : AppCompatActivity(), FixedBrandColors {
 
+    companion object {
+        private const val EXTRA_SETUP = "setup"
+
+        /** The last step of the first sign in: permissions, then Home. */
+        fun setupIntent(context: android.content.Context): Intent =
+            Intent(context, ProtectionActivity::class.java).putExtra(EXTRA_SETUP, true)
+    }
+
+    private val setupMode by lazy { intent.getBooleanExtra(EXTRA_SETUP, false) }
+
     private enum class State { FULL, STANDARD, PARTIAL, OFF, OFFLINE }
 
     private class Item(
@@ -99,10 +110,23 @@ class ProtectionActivity : AppCompatActivity(), FixedBrandColors {
             }
         }
         render()
+        continueGrantAll()
     }
 
     private val notificationPermission =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { render() }
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+            render()
+            continueGrantAll()
+        }
+
+    /**
+     * "Permission to manage": one tap that walks through every Android screen Curbox
+     * needs, one after another. Android allows no single dialog for all of them.
+     */
+    private enum class GrantStep { NOTIFICATIONS, SERVICE, OVERLAY, BATTERY, UNINSTALL }
+    private var grantRunning = false
+    private val grantTried = mutableSetOf<GrantStep>()
+    private var waitingForSettings = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -118,7 +142,14 @@ class ProtectionActivity : AppCompatActivity(), FixedBrandColors {
         dataStore = DataStoreManager(this)
 
         binding.toolbar.setNavigationOnClickListener { finish() }
+        if (setupMode) {
+            binding.toolbar.navigationIcon = null
+            binding.toolbar.setTitle(R.string.protection_setup_title)
+            binding.btnContinue.visibility = View.VISIBLE
+            binding.btnContinue.setOnClickListener { finishSetup() }
+        }
         binding.btnCheck.setOnClickListener { checkAdmin() }
+        binding.btnGrantAll.setOnClickListener { startGrantAll() }
         binding.btnModeHelp.setOnClickListener {
             MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.protection_mode_full_title)
@@ -127,13 +158,7 @@ class ProtectionActivity : AppCompatActivity(), FixedBrandColors {
                 .show()
         }
         binding.btnRelease.setOnClickListener { showReleaseDialog() }
-        binding.btnUninstall.setOnClickListener {
-            deviceAdminRequest.launch(
-                Intent(android.app.admin.DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN)
-                    .putExtra(android.app.admin.DevicePolicyManager.EXTRA_DEVICE_ADMIN, AntiUninstallManager.adminComponent(this))
-                    .putExtra(android.app.admin.DevicePolicyManager.EXTRA_ADD_EXPLANATION, getString(R.string.protection_uninstall_explain))
-            )
-        }
+        binding.btnUninstall.setOnClickListener { deviceAdminRequest.launch(deviceAdminIntent()) }
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -152,7 +177,84 @@ class ProtectionActivity : AppCompatActivity(), FixedBrandColors {
         super.onResume()
         // Coming back from Android settings: show what changed there.
         if (configLoaded) render()
+        if (waitingForSettings) {
+            waitingForSettings = false
+            continueGrantAll()
+        }
     }
+
+    private fun uninstallStepNeeded(): Boolean =
+        BuildConfig.SUPPORTS_ANTI_UNINSTALL && config.isLinked() && config.releaseVerifier.isNotEmpty() &&
+            !(AntiUninstallManager.isAdminActive(this) && antiUninstall.isEnabled)
+
+    private fun isDone(step: GrantStep): Boolean = when (step) {
+        GrantStep.NOTIFICATIONS -> NotificationManagerCompat.from(this).areNotificationsEnabled()
+        GrantStep.SERVICE -> PermissionUtils.isAccessibilityServiceEnabled(this, AppBlockerService::class.java)
+        GrantStep.OVERLAY -> PermissionUtils.hasOverlayPermission(this)
+        GrantStep.BATTERY -> ServiceProtectionManager.isIgnoringBatteryOptimizations(this)
+        GrantStep.UNINSTALL -> !uninstallStepNeeded()
+    }
+
+    private fun startGrantAll() {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.protection_grant_all_title)
+            .setMessage(R.string.protection_grant_all_body)
+            .setNegativeButton(android.R.string.cancel, null)
+            .setPositiveButton(R.string.protection_grant_all_yes) { _, _ ->
+                grantRunning = true
+                grantTried.clear()
+                continueGrantAll()
+            }
+            .show()
+    }
+
+    /** Opens the next Android screen that is still needed; each step is tried once per run. */
+    private fun continueGrantAll() {
+        if (!grantRunning) return
+        val next = GrantStep.values().firstOrNull { it !in grantTried && !isDone(it) }
+        if (next == null) {
+            grantRunning = false
+            render()
+            val allDone = GrantStep.values().all { isDone(it) }
+            Toast.makeText(this, if (allDone) R.string.protection_grant_all_done else R.string.protection_grant_all_partly, Toast.LENGTH_LONG).show()
+            return
+        }
+        grantTried += next
+        runCatching {
+            when (next) {
+                GrantStep.NOTIFICATIONS -> {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    } else {
+                        waitingForSettings = true
+                        startActivity(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, packageName))
+                    }
+                }
+                GrantStep.SERVICE -> {
+                    waitingForSettings = true
+                    PermissionUtils.openAccessibilityServiceScreen(this, AppBlockerService::class.java)
+                }
+                GrantStep.OVERLAY -> {
+                    waitingForSettings = true
+                    startActivity(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName")))
+                }
+                GrantStep.BATTERY -> {
+                    waitingForSettings = true
+                    startActivity(ServiceProtectionManager.ignoreBatteryOptimizationsIntent(this))
+                }
+                GrantStep.UNINSTALL -> deviceAdminRequest.launch(deviceAdminIntent())
+            }
+        }.onFailure {
+            // That screen does not exist on this phone; go on with the rest.
+            waitingForSettings = false
+            continueGrantAll()
+        }
+    }
+
+    private fun deviceAdminIntent(): Intent =
+        Intent(android.app.admin.DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN)
+            .putExtra(android.app.admin.DevicePolicyManager.EXTRA_DEVICE_ADMIN, AntiUninstallManager.adminComponent(this))
+            .putExtra(android.app.admin.DevicePolicyManager.EXTRA_ADD_EXPLANATION, getString(R.string.protection_uninstall_explain))
 
     // ------------------------------------------------------------ status
 
@@ -275,8 +377,36 @@ class ProtectionActivity : AppCompatActivity(), FixedBrandColors {
 
         binding.tvModeTitle.setText(if (owner) R.string.protection_mode_full_title else R.string.protection_mode_standard_title)
         binding.tvModeBody.setText(if (owner) R.string.protection_mode_full_body else R.string.protection_mode_standard_body)
-        binding.releaseSection.visibility = if (config.isLinked()) View.VISIBLE else View.GONE
+        binding.releaseSection.visibility = if (config.isLinked() && !setupMode) View.VISIBLE else View.GONE
         renderUninstall()
+        binding.btnGrantAll.visibility = if (GrantStep.values().all { isDone(it) }) View.GONE else View.VISIBLE
+    }
+
+    /** Ends the first sign in. Missing required items get one honest warning first. */
+    private fun finishSetup() {
+        val missing = items().filter { it.required && !it.ready && !it.isAdminLink }
+        if (missing.isEmpty()) {
+            completeSetup()
+            return
+        }
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.protection_setup_missing_title)
+            .setMessage(getString(R.string.protection_setup_missing_body, missing.joinToString(", ") { it.title }))
+            .setNegativeButton(R.string.protection_setup_fix, null)
+            .setPositiveButton(R.string.protection_setup_continue_anyway) { _, _ -> completeSetup() }
+            .show()
+    }
+
+    private fun completeSetup() {
+        lifecycleScope.launch {
+            // Linked users get no starter group from the old habit quiz; the admin sets the rules.
+            neth.iecal.curbox.utils.OnboardingState.complete(this@ProtectionActivity) { }
+            startActivity(
+                Intent(this@ProtectionActivity, UserMainActivity::class.java)
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            )
+            finish()
+        }
     }
 
     /** Uninstall protection with the admin's code: only where the flavor has it and a code is set. */

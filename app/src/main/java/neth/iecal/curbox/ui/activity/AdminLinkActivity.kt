@@ -33,7 +33,6 @@ import neth.iecal.curbox.databinding.ActivityAdminLinkBinding
 import neth.iecal.curbox.services.AppBlockerService
 import neth.iecal.curbox.ui.components.ConnectionChip
 import neth.iecal.curbox.ui.components.FixedBrandColors
-import neth.iecal.curbox.ui.fragments.installation.AccessibilityGuide
 import neth.iecal.curbox.utils.AdminLinkClient
 import neth.iecal.curbox.utils.AntiUninstallManager
 import neth.iecal.curbox.utils.DataStoreManager
@@ -282,17 +281,15 @@ class AdminLinkActivity : AppCompatActivity(), FixedBrandColors {
         when {
             !prefs.getBoolean("isFirstLaunchComplete", false) ->
                 startActivity(
-                    Intent(this, if (prefs.getBoolean(IntroActivity.PREF_INTRO_SEEN, false)) FragmentActivity::class.java else IntroActivity::class.java)
-                        .addFlags(clearTask)
+                    if (prefs.getBoolean(IntroActivity.PREF_INTRO_SEEN, false)) {
+                        ProtectionActivity.setupIntent(this)
+                    } else {
+                        Intent(this, IntroActivity::class.java)
+                    }.addFlags(clearTask)
                 )
+            // Blocks need the service; the Protection screen explains it and opens the setting.
             !PermissionUtils.isAccessibilityServiceEnabled(this, AppBlockerService::class.java) ->
-                startActivities(
-                    arrayOf(
-                        userMain,
-                        Intent(this, FragmentActivity::class.java)
-                            .putExtra("fragment", AccessibilityGuide.FRAGMENT_ID)
-                    )
-                )
+                startActivities(arrayOf(userMain, Intent(this, ProtectionActivity::class.java)))
             else -> startActivity(userMain)
         }
         finish()

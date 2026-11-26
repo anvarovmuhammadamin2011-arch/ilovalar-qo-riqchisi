@@ -294,4 +294,20 @@
     <string name="intro_start">Boshlash</string>
     <string name="intro_skip">Oʻtkazib yuborish</string>
     <string name="intro_page">%2$d tadan %1$d sahifa</string>
+    <string name="protection_setup_title">Telefonni sozlash</string>
+    <string name="protection_setup_continue">Davom etish</string>
+    <string name="protection_setup_missing_title">Baʼzi narsalar hali yoqilmagan</string>
+    <string name="protection_setup_missing_body">Bular hali kerak: %1$s. Ular yoqilmaguncha admin bloklari ishlamasligi mumkin. Ularni keyin Profil, Himoya boʻlimida yoqishingiz mumkin.</string>
+    <string name="protection_setup_fix">Yoqish</string>
+    <string name="protection_setup_continue_anyway">Baribir davom etish</string>
+    <string name="uninstall_code_title">Curbox ni oʻchirish</string>
+    <string name="uninstall_code_message">Bu telefon admin boshqaruvida. Curbox ni oʻchirish yoki toʻxtatish uchun admin bergan olti xonali kodni yozing.</string>
+    <string name="uninstall_code_button">Oʻchirishga ruxsat olish</string>
+    <string name="uninstall_code_done">Tayyor. Curbox ni oʻchirish uchun Uninstall ni bosing.</string>
+    <string name="protection_grant_all">Boshqarish uchun ruxsat berish</string>
+    <string name="protection_grant_all_title">Telefonni boshqarish uchun ruxsat</string>
+    <string name="protection_grant_all_body">Admin bu telefonni boshqarishi uchun Curbox ga quyidagilar kerak:\n\n• bildirishnomalar\n• Curbox xizmati (Accessibility)\n• blok xabarlarini koʻrsatish\n• fonda ishlash\n• admin kodi bilan oʻchirishdan himoya\n\nAndroid har birini alohida ekranda soʻraydi. Curbox ularni ketma ket ochadi. Har birini yoqib, orqaga qayting.</string>
+    <string name="protection_grant_all_yes">Ruxsat beraman</string>
+    <string name="protection_grant_all_done">Hammasi yoqildi. Admin endi bu telefonni boshqara oladi.</string>
+    <string name="protection_grant_all_partly">Baʼzi ruxsatlar hali oʻchiq. Qayta urinish uchun Boshqarish uchun ruxsat berish tugmasini bosing.</string>
 </resources>

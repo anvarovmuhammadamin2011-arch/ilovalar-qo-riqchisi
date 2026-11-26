@@ -81,7 +81,7 @@ android {
         versionCode = 7
         versionName = "7"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        resValue("string", "app_name", "Curbox")
+        resValue("string", "app_name", "MBSI nazoratchi")
 
         // Every flavor ships every feature unless it opts out below.
         buildConfigField("Boolean", "SUPPORTS_UI_HIDER", "true")
@@ -150,7 +150,7 @@ android {
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
 
-            resValue("string", "app_name", "Debug Curbox")
+            resValue("string", "app_name", "MBSI nazoratchi")
         }
     }
     compileOptions {
