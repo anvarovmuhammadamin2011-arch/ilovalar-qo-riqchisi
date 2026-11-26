@@ -105,18 +105,14 @@ class AdminLinkActivity : AppCompatActivity(), FixedBrandColors {
 
         lifecycleScope.launch {
             current = dataStoreManager.settings.first().adminLinkConfig
-            returningUser = current.isLinked() && current.username.isNotEmpty() && current.passwordHash.isNotEmpty()
+            // A phone linked to the old school computer signs in again on the internet server.
+            returningUser = current.isLinked() && current.username.isNotEmpty() && current.passwordHash.isNotEmpty() &&
+                current.serverUrl == AdminLinkClient.DEFAULT_SERVER_URL
             if (returningUser) {
                 showReturningUser()
             } else if (savedInstanceState == null) {
-                // Everyone uses the internet server; an address is typed only for another one.
-                val savedUrl = prefs.getString(AdminPanelActivity.PREF_ADMIN_URL, "").orEmpty()
-                if (savedUrl.isNotEmpty() && savedUrl != AdminLinkClient.DEFAULT_SERVER_URL) {
-                    binding.inputAddress.setText(savedUrl.removePrefix("http://"))
-                    showAddressField()
-                } else {
-                    checkComputer(0L)
-                }
+                // Everyone uses the internet server; an address is typed only after "another server".
+                checkComputer(0L)
                 if (prefs.getBoolean(PREF_REMEMBER_USERNAME, false)) {
                     binding.checkRemember.isChecked = true
                     binding.inputUsername.setText(prefs.getString(PREF_REMEMBERED_USERNAME, "").orEmpty())

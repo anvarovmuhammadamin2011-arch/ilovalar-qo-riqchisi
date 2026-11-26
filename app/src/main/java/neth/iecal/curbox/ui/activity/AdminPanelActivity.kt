@@ -68,7 +68,8 @@ class AdminPanelActivity : AppCompatActivity() {
             }
         })
 
-        binding.webView.loadUrl(savedUrl().ifEmpty { AdminLinkClient.DEFAULT_SERVER_URL })
+        // An old school computer address (plain http) gives way to the internet server.
+        binding.webView.loadUrl(savedUrl().takeIf { it.startsWith("https://") } ?: AdminLinkClient.DEFAULT_SERVER_URL)
     }
 
     private fun savedUrl(): String =
