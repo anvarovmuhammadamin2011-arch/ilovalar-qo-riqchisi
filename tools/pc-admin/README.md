@@ -16,6 +16,27 @@ add, delete or reset users under Users. Windows Firewall asks whether Java may u
 the network the first time: allow it on **private** networks, or phones cannot
 connect.
 
+## Run on an internet server
+
+Devices then connect from any WiFi or mobile data, not only the school WiFi. On a Linux
+server with an HTTPS proxy (nginx) in front, from the `tools/pc-admin` folder:
+
+    bash server/build.sh    # downloads a JDK 17 once into ~/mbsi/jdk, builds the jar
+    bash server/start.sh    # serves on 127.0.0.1:$PORT; data lives in ~/mbsi/data
+
+Settings, from the environment or a `.env` file next to `CurboxAdmin.java`:
+
+- `CURBOX_PUBLIC_URL` (required): the HTTPS address, for example `https://mbsi.example.uz`.
+- `CURBOX_ADMIN_PASSWORD`: the admin password for the very first start, 8 or more
+  characters. In internet mode there is no `admin123` and no starting user.
+- `PORT`: the port the proxy forwards to (default 8787).
+
+In this mode the server listens on loopback only, marks the login cookie `Secure`, and
+shows the public address and QR code on the admin page. `server/mbsi.apk` is copied to
+the data folder at every start, so phones download the app from `/download/mbsi.apk`.
+Phones and PCs type the address without `https://`: a domain name means HTTPS, while an
+IP address still means the admin computer on the WiFi.
+
 ## Share with other computers
 
 `build-windows.ps1` also makes `dist\MBSI PC V2.exe`, a small installer window

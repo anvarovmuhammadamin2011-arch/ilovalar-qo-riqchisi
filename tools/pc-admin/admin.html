@@ -560,7 +560,9 @@ const UZ = {
   "QR code to download the phone app": "Telefon ilovasini yuklab olish uchun QR kod",
   "Phone app by QR code": "Telefon ilovasi QR kod orqali",
   "Scan with the phone camera on the same WiFi. The app downloads, then tap it to install.": "Bir xil WiFi da telefon kamerasi bilan skanerlang. Ilova yuklanadi, keyin uni bosib oʻrnating.",
-  "Show bigger": "Kattaroq koʻrsatish", "Phone app": "Telefon ilovasi", "Ready to share by QR code": "QR kod orqali tarqatishga tayyor", "Missing: put mbsi.apk next to the data file": "Yoʻq: mbsi.apk ni maʼlumot fayli yoniga qoʻying", "Scan to get the phone app": "Telefon ilovasini olish uchun skanerlang", "Close": "Yopish",
+  "Show bigger": "Kattaroq koʻrsatish",
+  "Devices connect over the internet, from any WiFi or mobile data.": "Qurilmalar internet orqali ulanadi: istalgan WiFi yoki mobil internetdan.",
+  "Scan with the phone camera. The app downloads, then tap it to install.": "Telefon kamerasi bilan skanerlang. Ilova yuklanadi, keyin uni bosib oʻrnating.", "Phone app": "Telefon ilovasi", "Ready to share by QR code": "QR kod orqali tarqatishga tayyor", "Missing: put mbsi.apk next to the data file": "Yoʻq: mbsi.apk ni maʼlumot fayli yoniga qoʻying", "Scan to get the phone app": "Telefon ilovasini olish uchun skanerlang", "Close": "Yopish",
   "Curbox for PC is not answering. Check that it is still running.": "Curbox for PC javob bermayapti. U ishlab turganini tekshiring."
 };
 
@@ -989,7 +991,9 @@ function connectSteps(box) {
     el("li", "", "The device asks its owner for permission, then shows up here.")
   );
   box.appendChild(ol);
-  box.appendChild(el("p", "small muted", "Every device must use the same WiFi as this computer."));
+  box.appendChild(el("p", "small muted", overview.internet
+    ? "Devices connect over the internet, from any WiFi or mobile data."
+    : "Every device must use the same WiFi as this computer."));
   box.appendChild(appQr(addresses[0]));
 }
 
@@ -1000,7 +1004,7 @@ function appQr(address) {
     wrap.appendChild(el("p", "small muted", "To share the phone app by QR code, put mbsi.apk next to the data file (see Settings, This computer)."));
     return wrap;
   }
-  const url = "http://" + address + "/download/mbsi.apk";
+  const url = (/^https?:\/\//.test(address) ? address : "http://" + address) + "/download/mbsi.apk";
   const img = el("img");
   img.src = "/download/qr.png?host=" + encodeURIComponent(address);
   img.alt = "QR code to download the phone app";
@@ -1010,7 +1014,9 @@ function appQr(address) {
   const link = el("a", "small", url);
   link.href = url;
   info.append(el("div", "title wrap", "Phone app by QR code"),
-    el("div", "small muted", "Scan with the phone camera on the same WiFi. The app downloads, then tap it to install."),
+    el("div", "small muted", overview.internet
+      ? "Scan with the phone camera. The app downloads, then tap it to install."
+      : "Scan with the phone camera on the same WiFi. The app downloads, then tap it to install."),
     link,
     button("Show bigger", "ghost small", "apps", () => {
       const big = el("img");

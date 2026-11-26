@@ -69,6 +69,12 @@ import java.util.regex.Pattern;
 public class CurboxAdmin {
 
     static final int PORT = envInt("CURBOX_PORT", 8787);
+    /**
+     * Internet mode: the address devices use when this runs on a server behind an HTTPS
+     * proxy, for example https://mbsi.example.uz. Empty on a school computer (WiFi only).
+     */
+    static final String PUBLIC_URL = publicUrl();
+    static final boolean SECURE_COOKIES = PUBLIC_URL.startsWith("https://");
     static final long ONLINE_WINDOW_MS = 30_000L;
     static final int MAX_BODY_BYTES = 2 * 1024 * 1024;
     static final String SESSION_COOKIE = "cbx_admin";
@@ -251,7 +257,7 @@ public class CurboxAdmin {
             addresses.add(InetAddress.getByName("::1"));
         } catch (IOException ignored) {
         }
-        addresses.addAll(privateAddresses());
+        if (PUBLIC_URL.isEmpty()) addresses.addAll(privateAddresses());
 
         for (InetAddress address : addresses) {
             try {
@@ -281,7 +287,7 @@ public class CurboxAdmin {
      * the QR code keep working without "Restart server".
      */
     static synchronized void refreshLanServers() {
-        if (adminServers.isEmpty()) return;
+        if (adminServers.isEmpty() || !PUBLIC_URL.isEmpty()) return;
         Set<String> now = new LinkedHashSet<>();
         for (InetAddress a : privateAddresses()) now.add(a.getHostAddress());
         Set<String> bound = new LinkedHashSet<>();
@@ -356,6 +362,23 @@ public class CurboxAdmin {
     }
 
     // ---------------------------------------------------------- Windows shell
+
+    static String publicUrl() {
+        String url = System.getenv("CURBOX_PUBLIC_URL");
+        if (url == null) return "";
+        url = url.trim();
+        while (url.endsWith("/")) url = url.substring(0, url.length() - 1);
+        if (url.isEmpty()) return "";
+        if (!url.startsWith("https://") && !url.startsWith("http://")) {
+            throw new IllegalStateException("CURBOX_PUBLIC_URL must start with https://");
+        }
+        return url;
+    }
+
+    /** Address shown to devices: the public URL, or "host:port" on the local WiFi. */
+    static String baseUrl(String address) {
+        return address.startsWith("http://") || address.startsWith("https://") ? address : "http://" + address;
+    }
 
     static Path resolveDataDir() {
         String override = System.getenv("CURBOX_DATA_DIR");
@@ -996,7 +1019,7 @@ public class CurboxAdmin {
     static void adminLogout(HttpExchange ex) throws IOException {
         String token = cookie(ex, SESSION_COOKIE);
         if (!token.isEmpty()) sessions.remove(token);
-        ex.getResponseHeaders().add("Set-Cookie", SESSION_COOKIE + "=; Path=/; Max-Age=0; HttpOnly; SameSite=Strict");
+        ex.getResponseHeaders().add("Set-Cookie", SESSION_COOKIE + "=; Path=/; Max-Age=0; HttpOnly; SameSite=Strict" + (SECURE_COOKIES ? "; Secure" : ""));
         sendJson(ex, 200, ok());
     }
 
@@ -1006,6 +1029,7 @@ public class CurboxAdmin {
         synchronized (LOCK) {
             out.put("adminUser", adminUser);
             out.put("addresses", lanAddresses());
+            out.put("internet", !PUBLIC_URL.isEmpty());
             out.put("policyVersion", policyVersion);
             out.put("releaseCodeSet", !releaseCodeHash.isEmpty());
             out.put("releaseCodeSetAt", releaseCodeSetAt);
@@ -1948,7 +1972,7 @@ public class CurboxAdmin {
 
     static List<String> downloadUrls() {
         List<String> out = new ArrayList<>();
-        for (String address : lanAddresses()) out.add("http://" + address + "/download/mbsi.apk");
+        for (String address : lanAddresses()) out.add(baseUrl(address) + "/download/mbsi.apk");
         return out;
     }
 
@@ -1974,7 +1998,7 @@ public class CurboxAdmin {
         List<String> urls = downloadUrls();
         String host = query(ex).getOrDefault("host", "");
         String url = urls.isEmpty() ? "" : urls.get(0);
-        for (String u : urls) if (u.equals("http://" + host + "/download/mbsi.apk")) url = u;
+        for (String u : urls) if (u.equals(baseUrl(host) + "/download/mbsi.apk")) url = u;
         if (url.isEmpty()) {
             sendJson(ex, 404, error("no_network"));
             return;
@@ -2738,7 +2762,7 @@ public class CurboxAdmin {
         long now = System.currentTimeMillis();
         sessions.values().removeIf(lastUse -> now - lastUse > SESSION_IDLE_MS);
         sessions.put(token, now);
-        ex.getResponseHeaders().add("Set-Cookie", SESSION_COOKIE + "=" + token + "; Path=/; HttpOnly; SameSite=Strict");
+        ex.getResponseHeaders().add("Set-Cookie", SESSION_COOKIE + "=" + token + "; Path=/; HttpOnly; SameSite=Strict" + (SECURE_COOKIES ? "; Secure" : ""));
     }
 
     // ----------------------------------------------------------- persistence
@@ -2803,18 +2827,27 @@ public class CurboxAdmin {
         boolean seeded = false;
         if (adminUser.isEmpty() || adminHash.isEmpty()) {
             adminUser = DEFAULT_ADMIN_USER;
-            adminHash = hashPassword(DEFAULT_ADMIN_PASSWORD);
+            adminHash = hashPassword(PUBLIC_URL.isEmpty() ? DEFAULT_ADMIN_PASSWORD : startingAdminPassword());
             seeded = true;
         }
         // Only a brand new data file gets the starting user; an admin who deleted
-        // every user keeps an empty list.
-        if (!hasUserList) {
+        // every user keeps an empty list. On the internet nobody gets a known password.
+        if (!hasUserList && PUBLIC_URL.isEmpty()) {
             users.add(newUser(DEFAULT_USER, DEFAULT_USER_PASSWORD));
             seeded = true;
         }
         // Phones linked before accounts existed have no user; they must log in again.
         if (devices.removeIf(d -> str(d, "user").isEmpty())) seeded = true;
         if (seeded) save();
+    }
+
+    /** Internet mode: the first admin password comes from the server settings, never a default. */
+    static String startingAdminPassword() {
+        String password = System.getenv("CURBOX_ADMIN_PASSWORD");
+        if (password == null || password.trim().length() < 8) {
+            throw new IllegalStateException("Set CURBOX_ADMIN_PASSWORD (8 or more characters) for the first start on the internet.");
+        }
+        return password.trim();
     }
 
     static void save() {
@@ -2942,6 +2975,7 @@ public class CurboxAdmin {
 
     /** The addresses devices use: only the private ones the server listens on. */
     static List<String> lanAddresses() {
+        if (!PUBLIC_URL.isEmpty()) return List.of(PUBLIC_URL);
         List<String> out = new ArrayList<>();
         for (InetAddress a : privateAddresses()) out.add(a.getHostAddress() + ":" + PORT);
         return out;
@@ -3498,19 +3532,31 @@ final class PcUser {
         Files.move(tmp, file, StandardCopyOption.REPLACE_EXISTING);
     }
 
-    /** "192.168.1.5" or "192.168.1.5:8787" becomes "http://192.168.1.5:8787". "" when unusable. */
+    /**
+     * "192.168.1.5" or "192.168.1.5:8787" becomes "http://192.168.1.5:8787": a computer on the WiFi.
+     * A domain such as "mbsi.example.uz" is a server on the internet and becomes "https://mbsi.example.uz".
+     * "" when unusable.
+     */
     static String normalizeServerUrl(String input) {
         String text = input.trim();
         if (text.isEmpty()) return "";
-        if (!text.startsWith("http://") && !text.startsWith("https://")) text = "http://" + text;
+        boolean hasScheme = text.startsWith("http://") || text.startsWith("https://");
         try {
-            URI uri = URI.create(text);
-            if (uri.getHost() == null) return "";
-            int port = uri.getPort() == -1 ? DEFAULT_ADMIN_PORT : uri.getPort();
-            return uri.getScheme() + "://" + uri.getHost() + ":" + port;
+            URI uri = URI.create(hasScheme ? text : "http://" + text);
+            String host = uri.getHost();
+            if (host == null) return "";
+            boolean https = hasScheme ? "https".equals(uri.getScheme()) : !isLocalHost(host);
+            if (uri.getPort() != -1) return (https ? "https" : "http") + "://" + host + ":" + uri.getPort();
+            return https ? "https://" + host : "http://" + host + ":" + DEFAULT_ADMIN_PORT;
         } catch (Exception e) {
             return "";
         }
+    }
+
+    /** An IP address, "localhost" or a name without dots: the admin computer on the same network. */
+    static boolean isLocalHost(String host) {
+        return host.equalsIgnoreCase("localhost") || !host.contains(".") || host.toLowerCase(Locale.ROOT).endsWith(".local")
+            || host.chars().allMatch(c -> Character.isDigit(c) || c == '.');
     }
 
     // ------------------------------------------------------------ http

@@ -24,22 +24,34 @@ object AdminLinkClient {
     /** Shown in the admin's device list, like "Android 14". */
     fun osVersion(): String = "Android ${Build.VERSION.RELEASE}"
 
-    /** "192.168.1.5" or "192.168.1.5:8787" becomes "http://192.168.1.5:8787". Returns "" when unusable. */
+    /**
+     * "192.168.1.5" or "192.168.1.5:8787" becomes "http://192.168.1.5:8787": a computer on the WiFi.
+     * A domain such as "mbsi.example.uz" is a server on the internet and becomes "https://mbsi.example.uz".
+     * Returns "" when unusable.
+     */
     fun normalizeServerUrl(input: String): String {
-        var text = input.trim()
+        val text = input.trim()
         if (text.isEmpty()) return ""
-        if (!text.startsWith("http://", ignoreCase = true) && !text.startsWith("https://", ignoreCase = true)) {
-            text = "http://$text"
-        }
+        val hasScheme = text.startsWith("http://", ignoreCase = true) || text.startsWith("https://", ignoreCase = true)
         return try {
-            val url = URL(text)
-            if (url.host.isNullOrEmpty()) return ""
-            val port = if (url.port == -1) DEFAULT_PORT else url.port
-            "${url.protocol}://${url.host}:$port"
+            val url = URL(if (hasScheme) text else "http://$text")
+            val host = url.host
+            if (host.isNullOrEmpty()) return ""
+            val https = if (hasScheme) url.protocol.equals("https", ignoreCase = true) else !isLocalHost(host)
+            when {
+                url.port != -1 -> "${if (https) "https" else "http"}://$host:${url.port}"
+                https -> "https://$host"
+                else -> "http://$host:$DEFAULT_PORT"
+            }
         } catch (e: Exception) {
             ""
         }
     }
+
+    /** An IP address, "localhost" or a name without dots: the admin computer on the same network. */
+    private fun isLocalHost(host: String): Boolean =
+        host.equals("localhost", ignoreCase = true) || !host.contains('.') ||
+            host.endsWith(".local", ignoreCase = true) || host.all { it.isDigit() || it == '.' }
 
     /** Matches how the admin stores websites: lowercase, no scheme, no "www.", no trailing slash. */
     fun normalizeSite(input: String): String {
