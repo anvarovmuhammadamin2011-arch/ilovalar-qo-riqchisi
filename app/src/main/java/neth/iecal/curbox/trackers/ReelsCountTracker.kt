@@ -403,7 +403,8 @@ class ReelsCountTracker {
             try {
                 block()
             } catch (error: Exception) {
-                crashLogger.logNonFatalError(error)
+                // Cleanup can run when setup never did (the service stopped while starting).
+                if (::crashLogger.isInitialized) crashLogger.logNonFatalError(error)
             }
         }
     }

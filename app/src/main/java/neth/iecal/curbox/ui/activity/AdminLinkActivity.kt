@@ -52,6 +52,8 @@ class AdminLinkActivity : AppCompatActivity(), FixedBrandColors {
 
     companion object {
         private const val PREF_REMEMBER_USERNAME = "adminLinkRememberUsername"
+        /** A server address typed with "Use another server address", so signing in again keeps it. */
+        private const val PREF_CHOSEN_SERVER = "adminLinkChosenServer"
         private const val PREF_REMEMBERED_USERNAME = "adminLinkUsername"
         private const val STATUS_CHECK_DELAY_MS = 600L
         private const val STATUS_CHECK_TIMEOUT_MS = 3000
@@ -113,9 +115,11 @@ class AdminLinkActivity : AppCompatActivity(), FixedBrandColors {
 
         lifecycleScope.launch {
             current = dataStoreManager.settings.first().adminLinkConfig
-            // A phone linked to the old school computer signs in again on the internet server.
+            // A phone linked to the old school computer signs in again on the internet server;
+            // one that chose another server on purpose keeps it.
+            val chosen = prefs.getString(PREF_CHOSEN_SERVER, "").orEmpty()
             returningUser = current.isLinked() && current.username.isNotEmpty() && current.passwordHash.isNotEmpty() &&
-                current.serverUrl == AdminLinkClient.DEFAULT_SERVER_URL
+                (current.serverUrl == AdminLinkClient.DEFAULT_SERVER_URL || (chosen.isNotEmpty() && current.serverUrl == chosen))
             if (returningUser) {
                 showReturningUser()
             } else if (savedInstanceState == null) {
@@ -291,7 +295,10 @@ class AdminLinkActivity : AppCompatActivity(), FixedBrandColors {
                     pendingApproval = pending
                 )
             }
-            prefs.edit().putString(AdminPanelActivity.PREF_ADMIN_URL, url).apply()
+            prefs.edit()
+                .putString(AdminPanelActivity.PREF_ADMIN_URL, url)
+                .putString(PREF_CHOSEN_SERVER, if (url == AdminLinkClient.DEFAULT_SERVER_URL) "" else url)
+                .apply()
             sendBroadcast(Intent(AdminLinkBlocker.INTENT_ACTION_REFRESH_ADMIN_LINK).setPackage(packageName))
             Toast.makeText(
                 this@AdminLinkActivity,

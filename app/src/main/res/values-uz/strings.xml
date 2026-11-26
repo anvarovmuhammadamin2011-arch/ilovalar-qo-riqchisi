@@ -102,7 +102,7 @@
     <string name="user_activity_empty_message">Shu vaqtdagi ilova va fokus seanslari shu yerda chiqadi.</string>
     <string name="user_profile_title">Profil</string>
     <string name="user_profile_managed">Admin boshqaruvida</string>
-    <string name="user_profile_computer">Kompyuter</string>
+    <string name="user_profile_computer">Server</string>
     <string name="user_profile_device">Bu telefon</string>
     <string name="user_profile_version">Ilova versiyasi</string>
     <string name="user_profile_protection">Himoya va ruxsatlar</string>

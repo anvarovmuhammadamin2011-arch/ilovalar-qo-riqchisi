@@ -106,8 +106,9 @@ class UserRestrictionsFragment : Fragment() {
                         showPill(StatusPill.State.SCHEDULED)
                     }
                     Status.ALLOWED -> {
+                        // Allowed apps stay quiet, so the blocked and scheduled ones stand out.
                         subtitle = ""
-                        showPill(StatusPill.State.ALLOWED)
+                        clearTrailing()
                     }
                 }
                 setOnClickListener { showDetails(item, config) }
