@@ -1291,17 +1291,27 @@ public class CurboxAdmin {
         Map<String, Object> body = readJsonObject(ex);
         String deviceId = str(body, "deviceId");
         String policy = str(body, "newAppPolicy");
-        if (!policy.equals("allow") && !policy.equals("block")) throw new IllegalArgumentException();
+        // The admin's name for the device, like the full name of the student who uses it.
+        boolean rename = body.containsKey("fullName");
+        String fullName = limit(str(body, "fullName").trim().replaceAll("\\s+", " "), 60);
+        if (!policy.isEmpty() && !policy.equals("allow") && !policy.equals("block")) throw new IllegalArgumentException();
+        if (policy.isEmpty() && !rename) throw new IllegalArgumentException();
         synchronized (LOCK) {
             Map<String, Object> device = findIn(devices, "id", deviceId);
             if (device == null) {
                 sendJson(ex, 404, error("no_device"));
                 return;
             }
-            if (!policy.equals(device.get("newAppPolicy"))) {
+            if (!policy.isEmpty() && !policy.equals(device.get("newAppPolicy"))) {
                 device.put("newAppPolicy", policy);
                 save();
                 logActivity(actor(), "new_app_policy", policy, "ok", device);
+            }
+            if (rename && !fullName.equals(str(device, "fullName"))) {
+                if (fullName.isEmpty()) device.remove("fullName");
+                else device.put("fullName", fullName);
+                save();
+                logActivity(actor(), "device_renamed", fullName.isEmpty() ? str(device, "name") : fullName, "ok", device);
             }
         }
         sendJson(ex, 200, ok());
@@ -1637,6 +1647,11 @@ public class CurboxAdmin {
         }
 
         List<String> lines = new ArrayList<>();
+        boolean adminOnly = "admin".equals(query(ex).get("who"));
+        String admin;
+        synchronized (LOCK) {
+            admin = adminUser;
+        }
         synchronized (LOG_LOCK) {
             for (Path file : List.of(ACTIVITY_LOG_OLD, ACTIVITY_LOG)) {
                 if (Files.exists(file)) lines.addAll(Files.readAllLines(file, StandardCharsets.UTF_8));
@@ -1655,6 +1670,8 @@ public class CurboxAdmin {
             Object t = entry.get("t");
             if (!(t instanceof Number) || ((Number) t).longValue() < since) continue;
             if (!deviceId.isEmpty() && !deviceId.equals(String.valueOf(entry.get("device")))) continue;
+            // The Activity log page lists only what the admin did.
+            if (adminOnly && !admin.equals(String.valueOf(entry.get("actor")))) continue;
             if (!search.isEmpty()) {
                 String text = (entry.get("actor") + " " + entry.get("action") + " " + entry.get("target") + " "
                     + entry.get("deviceName") + " " + entry.get("result")).toLowerCase(Locale.ROOT);
@@ -2692,6 +2709,11 @@ public class CurboxAdmin {
                 if (!q.user.isEmpty() && !q.user.equals(device.get("user"))) continue;
                 Map<String, Object> d = new LinkedHashMap<>();
                 for (String key : new String[]{"id", "name", "user", "platform"}) d.put(key, str(device, key));
+                // Reports show the person's name when the admin gave the device one.
+                if (!str(device, "fullName").isEmpty()) {
+                    d.put("model", str(device, "name"));
+                    d.put("name", str(device, "fullName"));
+                }
                 Map<String, String> labels = new LinkedHashMap<>();
                 Object apps = device.get("apps");
                 if (apps instanceof List) {

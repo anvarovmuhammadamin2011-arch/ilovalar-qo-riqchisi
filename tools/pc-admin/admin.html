@@ -179,6 +179,22 @@
   a.btnlink:hover { background: var(--bg); }
   input[type=date] { width: auto; padding: 9px 12px; }
   .printonly { display: none; }
+  .usergrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 16px; }
+  .ucard { display: flex; flex-direction: column; gap: 12px; }
+  .ucard .top { display: flex; align-items: center; gap: 12px; }
+  .avatar { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 18px; background: var(--primary-soft); color: var(--primary); flex: none; }
+  .ucard .nums { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .ucard .num { background: var(--bg); border-radius: 12px; padding: 10px 12px; }
+  .ucard .num b { display: block; font-size: 18px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px; font-size: 12px; cursor: pointer; max-width: 100%; }
+  .chip .dot { flex: none; }
+  .chip span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ucard .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; }
+  tr.click { cursor: pointer; }
+  tr.click:hover td { background: var(--primary-soft); }
+  td.num, th.num { text-align: right; white-space: nowrap; }
+  .rank { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 13px; background: var(--primary-soft); color: var(--primary); flex: none; }
   .qrbox { display: flex; gap: 16px; align-items: center; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); flex-wrap: wrap; }
   .qrbox img { border-radius: 12px; background: #fff; image-rendering: pixelated; }
   .qrbox a { word-break: break-all; display: block; margin: 6px 0; color: var(--primary); }
@@ -308,6 +324,7 @@ const SVG = "http://www.w3.org/2000/svg";
 const ICONS = {
   dashboard: [["rect", {x: 3, y: 3, width: 7, height: 7, rx: 1.5}], ["rect", {x: 14, y: 3, width: 7, height: 7, rx: 1.5}], ["rect", {x: 3, y: 14, width: 7, height: 7, rx: 1.5}], ["rect", {x: 14, y: 14, width: 7, height: 7, rx: 1.5}]],
   devices: [["rect", {x: 2, y: 4, width: 13, height: 10, rx: 2}], ["path", {d: "M6 18h5"}], ["rect", {x: 17, y: 8, width: 5, height: 12, rx: 1.5}]],
+  edit: [["path", {d: "M4 20h4L18.5 9.5a2.1 2.1 0 0 0-3-3L5 17v3z"}], ["path", {d: "M14 8l3 3"}]],
   users: [["circle", {cx: 9, cy: 8, r: 4}], ["path", {d: "M2 21c0-3.9 3.1-7 7-7s7 3.1 7 7"}], ["path", {d: "M16 4.3a4 4 0 0 1 0 7.4"}], ["path", {d: "M19 14.5c1.8.9 3 3.2 3 6.5"}]],
   settings: [["path", {d: "M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"}], ["circle", {cx: 15, cy: 6, r: 2}], ["circle", {cx: 9, cy: 12, r: 2}], ["circle", {cx: 17, cy: 18, r: 2}]],
   phone: [["rect", {x: 7, y: 2, width: 10, height: 20, rx: 2}], ["path", {d: "M11 18h2"}]],
@@ -599,6 +616,23 @@ const UZ = {
   "Phone app by QR code": "Telefon ilovasi QR kod orqali",
   "Scan with the phone camera on the same WiFi. The app downloads, then tap it to install.": "Bir xil WiFi da telefon kamerasi bilan skanerlang. Ilova yuklanadi, keyin uni bosib oʻrnating.",
   "Show bigger": "Kattaroq koʻrsatish",
+  "Rename": "Nomini oʻzgartirish", "Name this device": "Qurilmaga nom berish", "Name saved.": "Nom saqlandi.",
+  "Name": "Ism familiya", "Model": "Model", "Not set": "Qoʻyilmagan",
+  "Removed devices": "Olib tashlangan qurilmalar", "No removed devices.": "Olib tashlangan qurilma yoʻq.",
+  "A removed device is released the next time it checks in. Link it again to manage it.": "Olib tashlangan qurilma keyingi ulanishida boʻshatiladi. Boshqarish uchun uni qayta ulang.",
+  "Screen time for everyone": "Hamma uchun ekran vaqti",
+  "Sets the same daily limit on every device at once. Devices linked later start without a limit.": "Barcha qurilmalarga bir xil kunlik limitni birdaniga qoʻyadi. Keyin ulangan qurilmalar limitsiz boshlanadi.",
+  "Set for everyone": "Hammaga qoʻyish", "Set this limit for everyone?": "Bu limit hammaga qoʻyilsinmi?",
+  "Daily limit for everyone": "Hamma uchun kunlik limit", "Saved. Devices get it within 10 seconds.": "Saqlandi. Qurilmalar uni 10 soniyada oladi.",
+  "Only what the admin did, newest first.": "Faqat admin qilgan ishlar, eng yangisi birinchi.",
+  "Most screen time today": "Bugun eng koʻp telefon ishlatganlar", "Click a user to see the apps they used.": "Qaysi ilovalardan foydalanganini koʻrish uchun foydalanuvchini bosing.",
+  "No screen time today yet.": "Bugun hali ekran vaqti yoʻq.", "Apps used by": "Foydalangan ilovalari:", "Total": "Jami", "Today": "Bugun",
+  "Daily table: users": "Kunlik jadval: foydalanuvchilar",
+  "Screen time of each user per day, all their devices added up. Click a user to see their apps.": "Har bir foydalanuvchining kunlik ekran vaqti, barcha qurilmalari qoʻshilgan. Ilovalarini koʻrish uchun foydalanuvchini bosing.",
+  "People who sign in on phones and computers. Click a device to open it.": "Telefon va kompyuterlarda kiradigan odamlar. Qurilmani ochish uchun ustiga bosing.",
+  "Search by login or device": "Login yoki qurilma boʻyicha qidirish", "No users match.": "Mos foydalanuvchi yoʻq.",
+  "Last 7 days": "Oxirgi 7 kun", "Apps used": "Foydalangan ilovalari", "Added": "Qoʻshilgan", "online": "onlayn",
+  "Could not load. Try again.": "Yuklab boʻlmadi. Qayta urinib koʻring.",
   "Tried to sign in with a login that does not exist": "Mavjud boʻlmagan login bilan kirishga urindi",
   "Typed a wrong password": "Notoʻgʻri parol terdi",
   "Devices connect over the internet, from any WiFi or mobile data.": "Qurilmalar internet orqali ulanadi: istalgan WiFi yoki mobil internetdan.",
@@ -620,6 +654,9 @@ const UZ_PATTERNS = [
   [/^Only (.+)$/, "Faqat $1"], [/^Ticked devices \((\d+)\)$/, "Belgilangan qurilmalar ($1)"], [/^All devices \((\d+)\)$/, "Barcha qurilmalar ($1)"],
   [/^Block (.+) websites\?$/, "$1 saytlari bloklansinmi?"], [/^Added user (.+)$/, "$1 foydalanuvchisi qo‘shildi"], [/^Deleted user (.+)$/, "$1 foydalanuvchisi o‘chirildi"],
   [/^Blocked website on every device: (.+)$/, "Barcha qurilmalarda bloklandi: $1"],
+  [/^Named the device (.+)$/, "Qurilmaga nom berildi: $1"],
+  [/^Type the first and last name of the person who uses (.+)\. Leave it empty to show the model name again\.$/, "$1 dan foydalanadigan odamning ism familiyasini yozing. Model nomini qaytarish uchun boʻsh qoldiring."],
+  [/^(.+) on all (\d+) devices\.$/, "$1, barcha $2 ta qurilmada."], [/^(.+) · Removed (\d.+)$/, "$1 · Olib tashlandi: $2"],
   [/^Unblocked website on every device: (.+)$/, "Barcha qurilmalarda blokdan chiqarildi: $1"],
   [/^Websites \((\d+)\)$/, "Saytlar ($1)"],
   [/^Set a new password for (.+)$/, "$1 uchun yangi parol o‘rnatildi"], [/^Blocked website (.+)$/, "Bloklangan sayt: $1"], [/^Unblocked website (.+)$/, "Blokdan chiqarilgan sayt: $1"],
@@ -971,7 +1008,13 @@ async function start() {
 
 async function refresh() {
   const { status, data } = await api("/api/admin/overview");
-  if (status === 200) overview = data;
+  if (status === 200) {
+    overview = data;
+    for (const d of overview.devices.concat(overview.removed || [])) {
+      d.model = d.name;
+      if (d.fullName) d.name = d.fullName;
+    }
+  }
   if (!overview) return;
   const addresses = overview.addresses || [];
   $("addrChip").replaceChildren(icon("link"), document.createTextNode(addresses[0] || "No network"));
@@ -1143,6 +1186,11 @@ function mountDashboard(content) {
 
   const usage = el("div", "grid2");
   const left = el("div", "stack");
+  const top = card("Most screen time today", "users", "Click a user to see the apps they used.");
+  const topBox = el("div");
+  topBox.id = "dashTopUsers";
+  topBox.appendChild(el("p", "muted small", "Loading…"));
+  top.appendChild(topBox);
   const chart = card("Screen time, last 7 days", "chart", "All devices added together.");
   const chartBox = el("div");
   chartBox.id = "dashChart";
@@ -1152,7 +1200,7 @@ function mountDashboard(content) {
   const todayBox = el("div");
   todayBox.id = "dashToday";
   today.appendChild(todayBox);
-  left.append(chart, today);
+  left.append(top, chart, today);
   const right = el("div", "stack");
   const apps = card("Top apps today", "apps");
   const appsBox = el("div");
@@ -1194,7 +1242,7 @@ function updateDashboard() {
 }
 
 // ---------------------------------------------------------------- devices
-const devFilter = { q: "", type: "all", state: "all", sort: "name", group: "" };
+const devFilter = { q: "", type: "all", state: "all", sort: "name", group: "", view: "active" };
 // Ticked devices, kept while moving between pages so a category can go to all of them.
 const selected = new Set();
 
@@ -1289,12 +1337,58 @@ function mountDevices(content) {
   empty.id = "devEmpty";
   c.append(bar, bulk, wrap, empty);
 
-  const removed = card("Removed devices", "trash", "A removed device is released the next time it checks in.");
+  const removed = card("Removed devices", "trash", "A removed device is released the next time it checks in. Link it again to manage it.");
   removed.id = "removedCard";
   const list = el("div");
   list.id = "removedList";
   removed.appendChild(list);
-  content.append(c, removed);
+
+  const views = el("div", "seg");
+  views.id = "devViews";
+  for (const [value, text] of [["active", "Devices"], ["removed", "Removed devices"]]) {
+    const b = button(text, value === devFilter.view ? "on" : "", null, () => {
+      devFilter.view = value;
+      for (const other of views.children) other.classList.toggle("on", other === b);
+      showDeviceView();
+    });
+    b.dataset.view = value;
+    views.appendChild(b);
+  }
+  c.id = "activeCard";
+  content.append(views, limitForAllCard(), c, removed);
+  showDeviceView();
+}
+
+function showDeviceView() {
+  const removedView = devFilter.view === "removed";
+  $("activeCard").classList.toggle("hidden", removedView);
+  $("limitAllCard").classList.toggle("hidden", removedView);
+  $("removedCard").classList.toggle("hidden", !removedView);
+}
+
+/** One daily limit for every device at once; each device can still be changed on the Screen time page. */
+function limitForAllCard() {
+  const c = card("Screen time for everyone", "clock", "Sets the same daily limit on every device at once. Devices linked later start without a limit.");
+  c.id = "limitAllCard";
+  const row = el("div", "inline wrap");
+  const presets = [[0, "No limit"], [60, "1 h"], [90, "1 h 30 min"], [120, "2 h"], [180, "3 h"], [240, "4 h"]];
+  const sel = selectBox(presets.map(([v, t]) => [String(v), t]), "120", "Daily limit for everyone", () => {});
+  row.append(sel, button("Set for everyone", "primary", "check", async () => {
+    const minutes = Number(sel.value);
+    const ok = await modal({
+      title: "Set this limit for everyone?",
+      message: (minutes ? limitText(minutes) : "No limit") + " on all " + overview.devices.length + " devices.",
+      confirmText: "Set for everyone"
+    });
+    if (!ok) return;
+    const { status } = await api("/api/admin/limits", { all: true, dailyLimitMinutes: minutes });
+    toast(status === 200 ? "Saved. Devices get it within 10 seconds." : "Could not save. Try again.");
+    await refresh();
+    memo = {};
+    update();
+  }));
+  c.appendChild(row);
+  return c;
 }
 
 function updateDevices() {
@@ -1362,16 +1456,16 @@ function updateRemoved() {
   const box = $("removedList");
   if (!box) return;
   const now = Date.now();
-  const recent = (overview.removed || [])
-    .filter((r) => now - (r.releasedAt || r.removedAt) < 7 * 86400000)
-    .sort((a, b) => b.removedAt - a.removedAt);
-  $("removedCard").classList.toggle("hidden", !recent.length);
+  const recent = [...(overview.removed || [])].sort((a, b) => b.removedAt - a.removedAt);
+  const tab = document.querySelector('#devViews [data-view="removed"]');
+  if (tab) tab.textContent = tr("Removed devices") + " (" + recent.length + ")";
   if (!changed("removed", [recent, tick()])) return;
   box.replaceChildren();
+  if (!recent.length) box.appendChild(emptyState("trash", "No removed devices."));
   for (const r of recent) {
     const row = el("div", "row");
     const info = el("div", "grow");
-    info.append(el("div", "title", r.name), el("div", "tiny", r.user + " · Removed " + timeAgo(r.removedAt).toLowerCase()));
+    info.append(el("div", "title", r.name), el("div", "tiny", r.user + " · Removed " + new Date(r.removedAt).toLocaleString()));
     let state;
     if (r.releasedAt) state = pill("Released " + timeAgo(r.releasedAt).toLowerCase(), "ok", "check");
     else if (r.wasOnline && now - r.removedAt < 60000) state = pill("Waiting for the device", "warn");
@@ -1492,20 +1586,41 @@ function updateDevice() {
   }
   setTitle(d.name);
   $("devTabs").querySelector('[data-tab="apps"]').textContent = isPc(d) ? "Programs" : "Apps";
-  if (changed("deviceHead", [d.name, d.user, d.online, d.appVersion, d.osVersion, tick()])) {
+  if (changed("deviceHead", [d.name, d.model, d.user, d.online, d.appVersion, d.osVersion, tick()])) {
     head.replaceChildren();
     const row = el("div", "head");
     const info = el("div", "grow");
     info.append(
       el("div", "title", d.name),
-      el("div", "tiny", d.user + " · " + osText(d) + (d.appVersion ? " · Curbox " + d.appVersion : ""))
+      el("div", "tiny", d.user + " · " + (d.fullName ? d.model + " · " : "") + osText(d) + (d.appVersion ? " · Curbox " + d.appVersion : ""))
     );
-    row.append(typeIcon(d), info, statusBadge(d), button("Remove", "danger", "trash", async () => {
-      if (await removeDevices([d.id])) location.hash = "#/devices";
-    }));
+    row.append(typeIcon(d), info, statusBadge(d), button("Rename", "ghost", "edit", () => renameDevice(d)),
+      button("Remove", "danger", "trash", async () => {
+        if (await removeDevices([d.id])) location.hash = "#/devices";
+      }));
     head.appendChild(row);
   }
   ({ overview: updateDevOverview, apps: updateDevApps, sites: updateDevSites, protection: updateDevProtection, activity: updateDevActivity })[route.tab](d);
+}
+
+/** The admin names a device after the person who uses it, like "Anvarov Muhammadamin". */
+async function renameDevice(d) {
+  const field = el("input");
+  field.type = "text";
+  field.maxLength = 60;
+  field.value = d.fullName || "";
+  field.placeholder = "Anvarov Muhammadamin";
+  const name = await modal({
+    title: "Name this device",
+    message: "Type the first and last name of the person who uses " + d.model + ". Leave it empty to show the model name again.",
+    field, confirmText: "Save"
+  });
+  if (name === null || name === undefined) return;
+  const { status } = await api("/api/admin/device/settings", { deviceId: d.id, fullName: name.trim() });
+  toast(status === 200 ? "Name saved." : "Could not save. Try again.");
+  await refresh();
+  memo = {};
+  update();
 }
 
 async function saveRules(d, patch, message) {
@@ -1566,6 +1681,8 @@ function updateDevOverview(d) {
   facts.replaceChildren();
   const rows = [
     ["Type", isPc(d) ? "Windows computer" : "Android phone"],
+    ["Name", d.fullName || "Not set"],
+    ["Model", d.model],
     ["User", d.user],
     ["System", osText(d)],
     ["Curbox", d.appVersion || "Unknown"],
@@ -1857,6 +1974,7 @@ const LOG_TEXT = {
   new_app: (e) => "New app found: " + e.target + (e.result === "blocked" ? ", blocked" : ""),
   new_app_policy: (e) => e.target === "block" ? "New apps are now blocked" : "New apps are now allowed",
   device_pending: () => "Signed in and is waiting for approval",
+  device_renamed: (e) => "Named the device " + e.target,
   became_user: (e) => "Turned this computer into a user computer: " + e.target,
   device_login: (e) => (e.result === "no_user" ? "Tried to sign in with a login that does not exist" : "Typed a wrong password")
     + (e.target ? " on " + e.target : ""),
@@ -1884,7 +2002,7 @@ const LOG_ICON = {
   app_block: "ban", app_unblock: "check", site_add: "globe", site_remove: "globe", device_linked: "link",
   device_removed: "trash", device_released: "check", device_released_by_code: "shield", release_attempt: "shield",
   release_code_set: "shield", release_code_clear: "shield", new_app: "sparkle", new_app_policy: "sparkle",
-  device_pending: "devices", device_login: "key", device_approved: "check", approval_setting: "shield", limit_set: "clock",
+  device_pending: "devices", device_login: "key", device_renamed: "edit", device_approved: "check", approval_setting: "shield", limit_set: "clock",
   schedule_add: "calendar", schedule_edit: "calendar", schedule_remove: "calendar", schedule_on: "calendar", schedule_off: "calendar",
   group_add: "users", group_edit: "users", group_remove: "users", profile_add: "shield", profile_edit: "shield", profile_remove: "shield",
   backup: "download", restore: "history", global_site_add: "globe", global_site_remove: "globe"
@@ -1922,7 +2040,7 @@ function renderLog(box, entries, showDevice) {
 
 function mountActivity(content) {
   setTitle("Activity log");
-  const c = card("Activity log", "history", "Admin changes and device events, newest first. Kept on this computer only.");
+  const c = card("Activity log", "history", "Only what the admin did, newest first.");
   const bar = el("div", "toolbar");
   const seg = el("div", "seg");
   seg.id = "logRange";
@@ -1956,7 +2074,7 @@ function mountActivity(content) {
 
 async function updateActivity() {
   const want = [logView.range, logView.q];
-  const { status, data } = await api("/api/admin/activity?range=" + logView.range + "&q=" + encodeURIComponent(logView.q));
+  const { status, data } = await api("/api/admin/activity?who=admin&range=" + logView.range + "&q=" + encodeURIComponent(logView.q));
   const box = $("logList");
   // A newer filter may have started while this one was loading.
   if (status !== 200 || !box || want[0] !== logView.range || want[1] !== logView.q) return;
@@ -2086,6 +2204,32 @@ function appTable(apps, limit) {
   return wrap;
 }
 
+/** Usage report rows added up per user: total, each day, and the names of their devices. */
+function usageByUser(data) {
+  const byUser = {};
+  for (const d of data.devices) {
+    const u = byUser[d.user] || (byUser[d.user] = { user: d.user, totalMs: 0, daily: data.dates.map(() => null), names: [] });
+    u.totalMs += d.totalMs;
+    u.names.push(d.name);
+    d.daily.forEach((ms, i) => { if (ms !== null) u.daily[i] = (u.daily[i] || 0) + ms; });
+  }
+  return Object.values(byUser).sort((a, b) => b.totalMs - a.totalMs);
+}
+
+/** Which apps one user used between two days, on all their devices. */
+async function showUserApps(user, from, to) {
+  const { status, data } = await api("/api/admin/usage?from=" + from + "&to=" + to + "&user=" + encodeURIComponent(user));
+  if (status !== 200) { toast("Could not load. Try again."); return; }
+  const total = data.devices.reduce((n, d) => n + d.totalMs, 0);
+  const body = el("div", "stack");
+  const when = from === to ? (from === daysBack(0) ? tr("Today") : from) : from + " → " + to;
+  body.append(el("p", "muted", when + " · " + tr("Total") + " " + fmtDur(total)));
+  const devices = el("div", "chips");
+  data.devices.forEach((d) => devices.appendChild(el("span", "chip", d.name + " · " + fmtDur(d.totalMs))));
+  body.append(devices, appTable(data.apps, 100));
+  await modal({ title: tr("Apps used by") + " " + user, body, confirmText: "Close", wide: true });
+}
+
 // ---------------------------------------------------------------- dashboard usage
 let dashUsageAt = 0;
 
@@ -2114,6 +2258,23 @@ async function loadDashUsage(force) {
     rows.forEach((r) => list.appendChild(usageRow(r.d, r.ms, max, noUsageText(r.d))));
   }
   if (day.status === 200) {
+    const users = usageByUser(day.data).filter((u) => u.totalMs > 0).slice(0, 8);
+    const topBox = $("dashTopUsers");
+    topBox.replaceChildren();
+    if (!users.length) topBox.appendChild(emptyState("users", "No screen time today yet."));
+    const topMax = Math.max(1, ...users.map((u) => u.totalMs));
+    users.forEach((u, i) => {
+      const row = el("div", "row click");
+      const info = el("div", "grow");
+      const meter = el("div", "meter");
+      const fill = el("span");
+      fill.style.width = Math.max(2, Math.round((u.totalMs / topMax) * 100)) + "%";
+      meter.appendChild(fill);
+      info.append(el("div", "title", u.user), el("div", "tiny", u.names.join(", ")), meter);
+      row.append(el("div", "rank", String(i + 1)), info, el("span", "value", fmtDur(u.totalMs)));
+      row.onclick = () => showUserApps(u.user, today, today);
+      topBox.appendChild(row);
+    });
     const box = $("dashApps");
     box.replaceChildren();
     const apps = day.data.apps.slice(0, 6);
@@ -2196,6 +2357,10 @@ function mountReports(content) {
   const chartBox = el("div");
   chartBox.id = "repChart";
   chart.appendChild(chartBox);
+  const usersCard = card("Daily table: users", "users", "Screen time of each user per day, all their devices added up. Click a user to see their apps.");
+  const usersBox = el("div");
+  usersBox.id = "repUsers";
+  usersCard.appendChild(usersBox);
   const devicesCard = card("Devices", "devices", "Total screen time per device for this time.");
   const devBox = el("div");
   devBox.id = "repDevices";
@@ -2204,7 +2369,7 @@ function mountReports(content) {
   const appBox = el("div");
   appBox.id = "repApps";
   appsCard.appendChild(appBox);
-  content.append(bar, printHead, stats, chart, devicesCard, appsCard);
+  content.append(bar, printHead, stats, usersCard, chart, devicesCard, appsCard);
 }
 
 function updateReports() {
@@ -2272,6 +2437,38 @@ async function loadReport(force) {
   });
 
   $("repApps").replaceChildren(appTable(data.apps, 50));
+  $("repUsers").replaceChildren(userDayTable(data));
+}
+
+function userDayTable(data) {
+  const users = usageByUser(data);
+  const wrap = el("div", "tablewrap");
+  if (!users.length) {
+    wrap.appendChild(emptyState("users", "No devices match."));
+    return wrap;
+  }
+  const table = el("table", "plain");
+  const head = el("tr");
+  head.appendChild(el("th", "", "User"));
+  const many = data.dates.length > 7;
+  data.dates.forEach((x) => head.appendChild(el("th", "num", dayLabel(x, many))));
+  head.appendChild(el("th", "num", "Total"));
+  const thead = el("thead");
+  thead.appendChild(head);
+  const body = el("tbody");
+  for (const u of users) {
+    const tr = el("tr", "click");
+    const name = el("td");
+    name.append(el("div", "title", u.user), el("div", "tiny", u.names.join(", ")));
+    tr.appendChild(name);
+    u.daily.forEach((ms) => tr.appendChild(el("td", "num small", ms === null ? "–" : fmtDur(ms))));
+    tr.appendChild(el("td", "num small strong", fmtDur(u.totalMs)));
+    tr.onclick = () => showUserApps(u.user, data.from, data.to);
+    body.appendChild(tr);
+  }
+  table.append(thead, body);
+  wrap.appendChild(table);
+  return wrap;
 }
 
 // ---------------------------------------------------------------- shared rule helpers
@@ -2344,7 +2541,7 @@ function mountScreenTime(content) {
   const empty = el("div");
   empty.id = "limitEmpty";
   c.append(wrap, empty);
-  content.append(top, c);
+  content.append(limitForAllCard(), top, c);
   limitUsageAt = 0;
 }
 
@@ -3392,10 +3589,18 @@ async function saveGlobalSites(body) {
 function mountUsers(content) {
   setTitle("Users");
   const grid = el("div", "grid2");
-  const list = card("Users", "users", "People who sign in on phones and computers.");
-  const body = el("div");
+  const list = el("div", "stack");
+  const head = card("Users", "users", "People who sign in on phones and computers. Click a device to open it.");
+  const search = el("input");
+  search.placeholder = "Search by login or device";
+  search.setAttribute("aria-label", "Search users");
+  search.value = userView.q;
+  search.oninput = () => { userView.q = search.value; memo.users = ""; updateUsers(); };
+  head.appendChild(search);
+  const body = el("div", "usergrid");
   body.id = "userList";
-  list.appendChild(body);
+  list.append(head, body);
+  userUsageAt = 0;
 
   const add = card("Add a user", "plus", "They use this login on their device.");
   const name = el("input");
@@ -3423,21 +3628,63 @@ function mountUsers(content) {
   content.appendChild(grid);
 }
 
-function updateUsers() {
-  if (!changed("users", [overview.users, overview.devices.map((d) => [d.user, d.name, d.platform])])) return;
+const userView = { q: "" };
+let userUsage = null;
+let userUsageAt = 0;
+
+async function updateUsers() {
+  if (Date.now() - userUsageAt > 60000) {
+    userUsageAt = Date.now();
+    const { status, data } = await api("/api/admin/usage?from=" + daysBack(6) + "&to=" + daysBack(0));
+    if (status === 200) userUsage = data;
+    memo.users = "";
+  }
   const body = $("userList");
+  if (!body) return;
+  const q = userView.q.trim().toLowerCase();
+  const users = overview.users.filter((u) => !q || u.username.includes(q)
+    || overview.devices.some((d) => d.user === u.username && d.name.toLowerCase().includes(q)));
+  if (!changed("users", [users, overview.devices.map((d) => [d.user, d.name, d.platform, d.online]), userUsage && userUsage.dailyTotal, tick()])) return;
+  const usage = {};
+  if (userUsage) usageByUser(userUsage).forEach((u) => { usage[u.user] = u; });
   body.replaceChildren();
   if (!overview.users.length) body.appendChild(emptyState("users", "No users yet. Add one on the right."));
-  for (const u of overview.users) {
+  else if (!users.length) body.appendChild(emptyState("users", "No users match."));
+  for (const u of users) {
     const mine = overview.devices.filter((d) => d.user === u.username);
-    const row = el("div", "row");
-    const badge = el("div", "typeicon", u.username.slice(0, 1).toUpperCase());
+    const used = usage[u.username];
+    const c = el("section", "card ucard");
+    const top = el("div", "top");
     const info = el("div", "grow");
-    info.append(el("div", "title", u.username), el("div", "tiny", mine.length === 1 ? "1 device" : mine.length + " devices"));
+    const online = mine.filter((d) => d.online).length;
+    info.append(el("div", "title", u.username),
+      el("div", "tiny", (mine.length === 1 ? "1 device" : mine.length + " devices") + (online ? " · " + online + " " + tr("online") : "")));
+    top.append(el("div", "avatar", u.username.slice(0, 1).toUpperCase()), info);
+
+    const nums = el("div", "nums");
+    const today = el("div", "num");
+    today.append(el("span", "tiny", "Today"), el("b", "", used ? fmtDur(used.daily[used.daily.length - 1] || 0) : "0m"));
+    const week = el("div", "num");
+    week.append(el("span", "tiny", "Last 7 days"), el("b", "", used ? fmtDur(used.totalMs) : "0m"));
+    nums.append(today, week);
+
+    const chips = el("div", "chips");
+    if (!mine.length) chips.appendChild(el("span", "tiny", "This user has no devices."));
+    for (const d of mine) {
+      const chip = el("span", "chip");
+      chip.append(el("span", "dot" + (d.online ? " on" : "")), el("span", "", d.name));
+      chip.title = d.model + " · " + osText(d);
+      chip.onclick = () => { location.hash = "#/devices/" + encodeURIComponent(d.id); };
+      chips.appendChild(chip);
+    }
+
+    const actions = el("div", "actions");
     const del = button("", "danger", "trash", () => deleteUser(u, mine));
     del.setAttribute("aria-label", "Delete " + u.username);
-    row.append(badge, info, button("New password", "ghost", "key", () => newPassword(u)), del);
-    body.appendChild(row);
+    actions.append(button("Apps used", "ghost", "apps", () => showUserApps(u.username, daysBack(6), daysBack(0))),
+      button("New password", "ghost", "key", () => newPassword(u)), del);
+    c.append(top, nums, chips, el("div", "tiny", tr("Added") + " " + (u.createdAt ? new Date(u.createdAt).toLocaleDateString() : "")), actions);
+    body.appendChild(c);
   }
 }
 
@@ -3507,20 +3754,6 @@ async function deleteUser(u, mine) {
 function mountSettings(content) {
   setTitle("Settings");
   const grid = el("div", "grid2");
-  const account = card("Admin account", "key");
-  const who = el("p", "sub muted");
-  who.id = "adminName";
-  account.appendChild(who);
-  for (const [id, label] of [["curPass", "Current password"], ["nextPass", "New password"], ["nextPass2", "New password again"]]) {
-    const i = el("input");
-    i.id = id;
-    i.type = "password";
-    account.append(el("label", "field", label), i);
-  }
-  const err = el("div", "error");
-  err.id = "passError";
-  account.append(err, button("Change password", "primary", "check", changePassword));
-
   const code = card("Release code", "shield", "A device needs this six digit code to leave management from inside Curbox.");
   const codeState = el("p", "sub");
   codeState.id = "codeState";
@@ -3555,7 +3788,7 @@ function mountSettings(content) {
   approvalRow.append(approvalBox, document.createTextNode("Approve new devices before rules apply"));
   approval.append(approvalRow, el("p", "small muted", "When this is on, a device that signs in for the first time waits on the Dashboard until you approve it. Devices you already have are not affected."));
   const left = el("div", "stack");
-  left.append(account, approval, code);
+  left.append(approval, code);
 
   const net = card("Connection", "link", "Phones and computers on the same WiFi use this address.");
   const box = el("div");
@@ -3578,7 +3811,6 @@ function mountSettings(content) {
 }
 
 function updateSettings() {
-  $("adminName").textContent = "Login: " + overview.adminUser;
   $("codeState").replaceChildren(overview.releaseCodeSet
     ? pill("Code is set" + (overview.releaseCodeSetAt ? " on " + new Date(overview.releaseCodeSetAt).toLocaleDateString() : ""), "ok", "check")
     : pill("No code yet. Devices cannot release themselves until you set one.", "warn"));
@@ -3611,21 +3843,6 @@ async function saveCode(clear) {
   err.textContent = data.error === "weak_code"
     ? "This code is too easy to guess. Avoid 123456 or the same digit six times."
     : "Type exactly six digits.";
-}
-
-async function changePassword() {
-  const err = $("passError");
-  err.textContent = "";
-  if ($("nextPass").value !== $("nextPass2").value) { err.textContent = "The new passwords are not the same."; return; }
-  const { status } = await api("/api/admin/password", { currentPassword: $("curPass").value, newPassword: $("nextPass").value });
-  if (status === 200) {
-    for (const id of ["curPass", "nextPass", "nextPass2"]) $(id).value = "";
-    toast("Password changed. Other sessions were signed out.");
-  } else if (status === 403) {
-    err.textContent = "The current password is wrong.";
-  } else {
-    err.textContent = "Use at least 4 characters.";
-  }
 }
 
 // ---------------------------------------------------------------- go
