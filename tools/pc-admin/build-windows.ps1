@@ -5,7 +5,7 @@
                                      Curbox for PC\            the app folder
                                      Curbox for PC.exe         one file to share: installs and opens it
                                      Curbox for PC.zip         same app plus "Install Curbox for PC.cmd"
-                                     MBSI PC V2.exe            installer window for other computers
+                                     MBSI PC V3.exe            installer window for other computers
     .\build-windows.ps1 -Install   also installs it here (see install.ps1)
 
   Needs a JDK 17 or newer (JAVA_HOME, or %USERPROFILE%\jdks\jdk-*).
@@ -14,7 +14,7 @@ param([switch]$Install)
 
 $ErrorActionPreference = 'Stop'
 $AppName = 'Curbox for PC'
-$Version = '2.0.0'
+$Version = '3.0.0'
 $Here = $PSScriptRoot
 
 function Find-Jdk {
@@ -149,15 +149,15 @@ if (Test-Path $Zip) { Remove-Item $Zip -Force }
 Compress-Archive -Path (Join-Path $ZipStage '*') -DestinationPath $Zip
 Write-Host "Zip:   $Zip"
 
-# MBSI PC V2.exe: a real installer window (MbsiInstaller.cs) with the app inside, built by the
+# MBSI PC V3.exe: a real installer window (MbsiInstaller.cs) with the app inside, built by the
 # C# compiler that ships with Windows. Unlike the IExpress exe it starts no PowerShell script.
 $Csc = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
-$Mbsi = Join-Path $Dist 'MBSI PC V2.exe'
+$Mbsi = Join-Path $Dist 'MBSI PC V3.exe'
 if (Test-Path $Mbsi) { Remove-Item $Mbsi -Force }
 & $Csc /nologo /target:winexe /codepage:65001 /optimize+ "/out:$Mbsi" "/win32icon:$(Join-Path $Here 'favicon.ico')" `
     /reference:System.IO.Compression.dll /reference:System.IO.Compression.FileSystem.dll `
     "/resource:$(Join-Path $Share 'app.zip'),app.zip" (Join-Path $Here 'MbsiInstaller.cs')
-if ($LASTEXITCODE -ne 0) { throw 'csc failed to make MBSI PC V2.exe' }
+if ($LASTEXITCODE -ne 0) { throw 'csc failed to make MBSI PC V3.exe' }
 Write-Host "MBSI:  $Mbsi"
 
 if ($Install) {

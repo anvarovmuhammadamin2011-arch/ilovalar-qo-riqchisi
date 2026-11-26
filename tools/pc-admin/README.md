@@ -37,9 +37,19 @@ the data folder at every start, so phones download the app from `/download/mbsi.
 Phones and PCs type the address without `https://`: a domain name means HTTPS, while an
 IP address still means the admin computer on the WiFi.
 
+### On Render
+
+`render.yaml` at the repository root is a Render Blueprint: Render builds
+`tools/pc-admin/Dockerfile`, gives the service an https address (passed to the server as
+`RENDER_EXTERNAL_URL`), and asks for `CURBOX_ADMIN_PASSWORD` when the Blueprint is created.
+The data lives on a 1 GB persistent disk at `/data`, which needs a paid plan.
+
+A device token the server does not know (for example after its data was lost) gets 409,
+so devices keep their rules; only a device the admin removed gets 401 and lifts its blocks.
+
 ## Share with other computers
 
-`build-windows.ps1` also makes `dist\MBSI PC V2.exe`, a small installer window
+`build-windows.ps1` also makes `dist\MBSI PC V3.exe`, a small installer window
 (`MbsiInstaller.cs`, compiled with the C# compiler that ships with Windows) that holds
 the app. It installs for the current Windows user without admin rights, into the same
 folder as earlier versions, so data and the agent task keep working, and adds "MBSI PC"

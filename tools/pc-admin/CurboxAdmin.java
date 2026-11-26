@@ -252,12 +252,18 @@ public class CurboxAdmin {
      */
     static synchronized boolean bindAdminServers() {
         List<InetAddress> addresses = new ArrayList<>();
-        addresses.add(InetAddress.getLoopbackAddress());
-        try {
-            addresses.add(InetAddress.getByName("::1"));
-        } catch (IOException ignored) {
+        // In a container (Render) the HTTPS proxy reaches the server from outside the
+        // container, so it must listen on every interface; the container has no other door.
+        if ("1".equals(System.getenv("CURBOX_BIND_ALL")) && !PUBLIC_URL.isEmpty()) {
+            addresses.add(new InetSocketAddress(0).getAddress());
+        } else {
+            addresses.add(InetAddress.getLoopbackAddress());
+            try {
+                addresses.add(InetAddress.getByName("::1"));
+            } catch (IOException ignored) {
+            }
+            if (PUBLIC_URL.isEmpty()) addresses.addAll(privateAddresses());
         }
-        if (PUBLIC_URL.isEmpty()) addresses.addAll(privateAddresses());
 
         for (InetAddress address : addresses) {
             try {
@@ -365,6 +371,8 @@ public class CurboxAdmin {
 
     static String publicUrl() {
         String url = System.getenv("CURBOX_PUBLIC_URL");
+        // Render sets its own https address for the service.
+        if (url == null || url.trim().isEmpty()) url = System.getenv("RENDER_EXTERNAL_URL");
         if (url == null) return "";
         url = url.trim();
         while (url.endsWith("/")) url = url.substring(0, url.length() - 1);
@@ -596,6 +604,9 @@ public class CurboxAdmin {
                     case "/api/admin/login":
                         adminLogin(ex);
                         return;
+                    case "/api/local/become-user":
+                        becomeUser(ex);
+                        return;
                     case "/api/admin/logout":
                         adminLogout(ex);
                         return;
@@ -686,6 +697,54 @@ public class CurboxAdmin {
         }
     }
 
+    // --------------------------------------------------- this PC becomes a user
+
+    /**
+     * From the sign in page: a computer opened as admin by mistake links to the real admin
+     * with a user login instead, so the admin can block its programs. Only the person at
+     * this computer can ask, and never on an admin that already manages devices, so a
+     * student cannot turn the school's admin computer off this way.
+     */
+    static void becomeUser(HttpExchange ex) throws IOException {
+        if (!PcUser.isLocalRequest(ex, PORT) || !ex.getRemoteAddress().getAddress().isLoopbackAddress()) {
+            sendJson(ex, 403, error("forbidden"));
+            return;
+        }
+        if (!PACKAGED || !PUBLIC_URL.isEmpty()) {
+            sendJson(ex, 409, error("not_installed"));
+            return;
+        }
+        synchronized (LOCK) {
+            if (!devices.isEmpty()) {
+                sendJson(ex, 409, error("has_devices"));
+                return;
+            }
+        }
+        Map<String, Object> body = readJsonObject(ex);
+        String problem = PcUser.linkWithAdmin(str(body, "address"), str(body, "username"), str(body, "password"));
+        if (!problem.isEmpty()) {
+            sendJson(ex, PcUser.statusFor(problem), error(problem));
+            return;
+        }
+        PcUser.writeMode(PcUser.MODE_NONE);
+        PcUser.startSetup("install", "", false);
+        Map<String, Object> out = ok();
+        out.put("next", PcUser.localUrl(PcUser.SETUP_PORT));
+        sendJson(ex, 200, out);
+        logActivity(str(body, "username"), "became_user", PcUser.computerName(), "ok", null);
+        new Thread(() -> {
+            try {
+                Thread.sleep(1500);
+            } catch (InterruptedException ignored) {
+                Thread.currentThread().interrupt();
+            }
+            TrayIcon icon = trayIcon;
+            if (icon != null) SystemTray.getSystemTray().remove(icon);
+            trayIcon = null;
+            stopAdminServers();
+        }).start();
+    }
+
     // ----------------------------------------------------------- phone routes
 
     static void deviceLogin(HttpExchange ex) throws IOException {
@@ -712,6 +771,8 @@ public class CurboxAdmin {
         // Hashing is slow on purpose, so it runs outside the lock that device syncs share.
         if (!verifyPassword(password, stored)) {
             recordFailure(lockKey);
+            // The admin sees in the activity log who could not sign in, and from which device.
+            logActivity(username, "device_login", name, stored.isEmpty() ? "no_user" : "failed", null);
             slowDown();
             sendJson(ex, 403, error("wrong_login"));
             return;
@@ -765,6 +826,21 @@ public class CurboxAdmin {
         }
     }
 
+    /**
+     * Devices lift every block when they hear 401, so it goes only to a device the admin
+     * really removed. A token this server has never seen, for example after its data file
+     * was lost, gets 409: the device keeps its rules and its uninstall protection.
+     * Call while holding LOCK.
+     */
+    static void sendUnknownDevice(HttpExchange ex, String token) throws IOException {
+        boolean removed = !token.isEmpty() && findIn(removedDevices, "token", token) != null;
+        if (removed) {
+            sendJson(ex, 401, error("unlinked"));
+        } else {
+            sendJson(ex, 409, error("unknown_device"));
+        }
+    }
+
     static void deviceSync(HttpExchange ex) throws IOException {
         String token = header(ex, "X-Device-Token");
         Map<String, Object> body = readJsonObject(ex);
@@ -779,7 +855,7 @@ public class CurboxAdmin {
                     save();
                     logActivity("system", "device_released", str(removed, "name"), "ok", removed);
                 }
-                sendJson(ex, 401, error("unlinked"));
+                sendUnknownDevice(ex, token);
                 return;
             }
             boolean changed = false;
@@ -1261,7 +1337,7 @@ public class CurboxAdmin {
         synchronized (LOCK) {
             Map<String, Object> device = token.isEmpty() ? null : findIn(devices, "token", token);
             if (device == null) {
-                sendJson(ex, 401, error("unlinked"));
+                sendUnknownDevice(ex, token);
                 return;
             }
             deviceId = str(device, "id");
@@ -1301,7 +1377,7 @@ public class CurboxAdmin {
         synchronized (LOCK) {
             Map<String, Object> device = findIn(devices, "token", token);
             if (device == null) {
-                sendJson(ex, 401, error("unlinked"));
+                sendUnknownDevice(ex, token);
                 return;
             }
             Map<String, Object> retired = retireDevice(device, "release_code");
@@ -3414,7 +3490,7 @@ final class PcUser {
     static final String MODE_USER = "user";
     static final String MODE_NONE = "none";
     static final String TASK_NAME = "Curbox for PC Agent";
-    static final String APP_VERSION = "1.0.0 (PC)";
+    static final String APP_VERSION = "3.0.0 (PC)";
     static final int AGENT_PORT = CurboxAdmin.envInt("CURBOX_AGENT_PORT", 8788);
     static final int SETUP_PORT = CurboxAdmin.envInt("CURBOX_SETUP_PORT", 8789);
     static final int DEFAULT_ADMIN_PORT = 8787;
@@ -3668,8 +3744,12 @@ final class PcUser {
 
     /** Opens the Admin or User choice. [note] instead starts at sign in and says why. */
     static void runSetup(String note) {
-        setupStatus = note == null ? "choose" : "signin";
-        setupNote = note == null ? "" : note;
+        startSetup(note == null ? "choose" : "signin", note == null ? "" : note, true);
+    }
+
+    static void startSetup(String status, String note, boolean openWindow) {
+        setupStatus = status;
+        setupNote = note;
         try {
             HttpServer server = HttpServer.create(new InetSocketAddress(InetAddress.getLoopbackAddress(), SETUP_PORT), 0);
             server.createContext("/", PcUser::handleSetup);
@@ -3682,7 +3762,7 @@ final class PcUser {
             System.out.println("Setup failed: " + e);
             return;
         }
-        CurboxAdmin.openWindow(localUrl(SETUP_PORT));
+        if (openWindow) CurboxAdmin.openWindow(localUrl(SETUP_PORT));
     }
 
     static void stopSetup() {
@@ -3772,17 +3852,37 @@ final class PcUser {
 
     static void setupSignIn(HttpExchange ex) throws IOException {
         Map<String, Object> body = CurboxAdmin.readJsonObject(ex);
-        String url = normalizeServerUrl(CurboxAdmin.str(body, "address"));
-        String username = CurboxAdmin.normalizeUsername(CurboxAdmin.str(body, "username"));
-        String password = CurboxAdmin.str(body, "password");
-        if (url.isEmpty()) {
-            CurboxAdmin.sendJson(ex, 400, CurboxAdmin.error("bad_address"));
+        String problem = linkWithAdmin(CurboxAdmin.str(body, "address"), CurboxAdmin.str(body, "username"), CurboxAdmin.str(body, "password"));
+        if (!problem.isEmpty()) {
+            CurboxAdmin.sendJson(ex, statusFor(problem), CurboxAdmin.error(problem));
             return;
         }
-        if (username.isEmpty() || password.isEmpty()) {
-            CurboxAdmin.sendJson(ex, 400, CurboxAdmin.error("missing"));
-            return;
+        setupStatus = "install";
+        CurboxAdmin.sendJson(ex, 200, CurboxAdmin.ok());
+    }
+
+    static int statusFor(String problem) {
+        switch (problem) {
+            case "wrong_login":
+                return 403;
+            case "locked":
+                return 429;
+            case "unreachable":
+                return 502;
+            default:
+                return 400;
         }
+    }
+
+    /**
+     * Signs in to the admin with a user login and saves the link for the agent install.
+     * Returns "" on success, or the problem: bad_address, missing, unreachable, wrong_login, locked.
+     */
+    static String linkWithAdmin(String address, String usernameInput, String password) throws IOException {
+        String url = normalizeServerUrl(address);
+        String username = CurboxAdmin.normalizeUsername(usernameInput);
+        if (url.isEmpty()) return "bad_address";
+        if (username.isEmpty() || password.isEmpty()) return "missing";
 
         String deviceId = deviceId();
         Map<String, Object> request = new LinkedHashMap<>();
@@ -3797,23 +3897,13 @@ final class PcUser {
         try {
             response = httpPost(url + "/api/device/login", CurboxAdmin.Json.write(request), null);
         } catch (IOException e) {
-            CurboxAdmin.sendJson(ex, 502, CurboxAdmin.error("unreachable"));
-            return;
+            return "unreachable";
         }
-        if (response.code == 403) {
-            CurboxAdmin.sendJson(ex, 403, CurboxAdmin.error("wrong_login"));
-            return;
-        }
-        if (response.code == 429) {
-            CurboxAdmin.sendJson(ex, 429, CurboxAdmin.error("locked"));
-            return;
-        }
+        if (response.code == 403) return "wrong_login";
+        if (response.code == 429) return "locked";
         Map<String, Object> parsed = response.code == 200 ? parseObject(response.body) : null;
         String token = parsed == null ? "" : CurboxAdmin.str(parsed, "token");
-        if (token.isEmpty()) {
-            CurboxAdmin.sendJson(ex, 502, CurboxAdmin.error("unreachable"));
-            return;
-        }
+        if (token.isEmpty()) return "unreachable";
 
         Map<String, Object> link = new LinkedHashMap<>();
         link.put("serverUrl", url);
@@ -3826,9 +3916,7 @@ final class PcUser {
         Files.createDirectories(userDir());
         writeAtomic(pendingFile(), CurboxAdmin.Json.write(link));
         Files.write(userDir().resolve("last-address.txt"), url.getBytes(StandardCharsets.UTF_8));
-
-        setupStatus = "install";
-        CurboxAdmin.sendJson(ex, 200, CurboxAdmin.ok());
+        return "";
     }
 
     static void setupInstall(HttpExchange ex) throws IOException {

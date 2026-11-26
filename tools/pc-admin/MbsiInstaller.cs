@@ -1,4 +1,4 @@
-// "MBSI PC V2.exe": the one file to share with other computers.
+// "MBSI PC V3.exe": the one file to share with other computers.
 // A small window that installs the app for the current Windows user (no admin rights),
 // adds "MBSI PC" shortcuts and opens it. build-windows.ps1 compiles it with the C# compiler
 // that ships with Windows and embeds the app folder as app.zip.
@@ -11,13 +11,13 @@ using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
 
-[assembly: AssemblyTitle("MBSI PC V2")]
+[assembly: AssemblyTitle("MBSI PC V3")]
 [assembly: AssemblyDescription("MBSI PC: telefonlar va kompyuterlarni boshqarish")]
 [assembly: AssemblyCompany("MBSI")]
 [assembly: AssemblyProduct("MBSI PC")]
 [assembly: AssemblyCopyright("MBSI")]
-[assembly: AssemblyVersion("2.0.0.0")]
-[assembly: AssemblyFileVersion("2.0.0.0")]
+[assembly: AssemblyVersion("3.0.0.0")]
+[assembly: AssemblyFileVersion("3.0.0.0")]
 
 static class MbsiInstaller
 {
@@ -42,7 +42,7 @@ static class MbsiInstaller
         Application.SetCompatibleTextRenderingDefault(false);
 
         form = new Form();
-        form.Text = "MBSI PC V2";
+        form.Text = "MBSI PC V3";
         form.FormBorderStyle = FormBorderStyle.FixedDialog;
         form.MaximizeBox = false;
         form.StartPosition = FormStartPosition.CenterScreen;
@@ -52,7 +52,7 @@ static class MbsiInstaller
         try { form.Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath); } catch (Exception) { }
 
         Label title = new Label();
-        title.Text = "MBSI PC V2";
+        title.Text = "MBSI PC V3";
         title.Font = new Font("Segoe UI Semibold", 18f);
         title.AutoSize = true;
         title.Location = new Point(24, 20);
@@ -256,7 +256,7 @@ static class MbsiInstaller
         }
         catch (Exception ex)
         {
-            MessageBox.Show(form, "Ochib boʻlmadi: " + ex.Message, "MBSI PC V2");
+            MessageBox.Show(form, "Ochib boʻlmadi: " + ex.Message, "MBSI PC V3");
         }
     }
 

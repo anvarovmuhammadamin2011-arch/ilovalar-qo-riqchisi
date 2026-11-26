@@ -49,6 +49,7 @@
   .pw { position: relative; }
   .pw button { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: none; color: var(--muted); padding: 6px; }
   #login button.primary { width: 100%; justify-content: center; margin-top: 16px; padding: 13px; }
+  #userModeBtn, #userLinkBtn, #userBackBtn { width: 100%; justify-content: center; margin-top: 10px; padding: 11px; }
 
   /* Shell */
   #app { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
@@ -254,6 +255,23 @@
     </div>
     <div id="loginError" class="error"></div>
     <button class="primary" id="loginBtn">Sign in</button>
+    <button class="ghost" id="userModeBtn" type="button">I am a user: link this computer</button>
+  </div>
+  <div class="card hidden" id="userCard">
+    <div class="brand">
+      <img src="/logo.png" alt="">
+      <h1>Link this computer</h1>
+      <div class="muted">Sign in with the login your admin gave you. Then the admin can block programs and websites on this computer.</div>
+    </div>
+    <label class="field" for="userAddress">Admin address</label>
+    <input id="userAddress" placeholder="192.168.1.5:8787" autocomplete="off">
+    <label class="field" for="userLogin">Login</label>
+    <input id="userLogin" autocomplete="username">
+    <label class="field" for="userPass">Password</label>
+    <input id="userPass" type="password" autocomplete="current-password">
+    <div id="userError" class="error"></div>
+    <button class="primary" id="userLinkBtn">Link this computer</button>
+    <button class="ghost" id="userBackBtn" type="button">Back to admin sign in</button>
   </div>
 </section>
 
@@ -543,6 +561,18 @@ const UZ = {
   "Type exactly six digits.": "Aynan olti ta raqam yozing.", "The new passwords are not the same.": "Yangi parollar bir xil emas.",
   "Password changed. Other sessions were signed out.": "Parol o‘zgartirildi. Boshqa seanslardan chiqildi.", "The current password is wrong.": "Joriy parol noto‘g‘ri.",
   "Sign in to manage phones and computers": "Telefon va kompyuterlarni boshqarish uchun kiring", "Sign in": "Kirish",
+  "I am a user: link this computer": "Men foydalanuvchiman: bu kompyuterni ulash",
+  "Link this computer": "Bu kompyuterni ulash",
+  "Sign in with the login your admin gave you. Then the admin can block programs and websites on this computer.": "Admin bergan login bilan kiring. Shunda admin bu kompyuterdagi dasturlar va saytlarni bloklay oladi.",
+  "Admin address": "Admin manzili",
+  "Back to admin sign in": "Admin kirishiga qaytish",
+  "Type the admin address, for example 192.168.1.5:8787.": "Admin manzilini yozing, masalan 192.168.1.5:8787.",
+  "Type your login and password.": "Login va parolni yozing.",
+  "Cannot reach the admin. Check the address and that both computers use the same network.": "Adminga ulanib boʻlmadi. Manzilni va ikkala kompyuter bir tarmoqda ekanini tekshiring.",
+  "Too many wrong tries. Wait a few minutes and try again.": "Juda koʻp xato urinish. Bir necha daqiqa kutib, qayta urinib koʻring.",
+  "This computer is the admin and already manages devices, so it cannot become a user.": "Bu kompyuter admin va qurilmalarni boshqaryapti, shuning uchun foydalanuvchiga aylana olmaydi.",
+  "Install MBSI PC on this computer first.": "Avval bu kompyuterga MBSI PC ni oʻrnating.",
+  "Something went wrong. Try again.": "Nimadir xato ketdi. Qayta urinib koʻring.",
   "Sessions end after 12 hours without use.": "Seans 12 soat ishlatilmasa tugaydi.", "Loading…": "Yuklanmoqda…",
   "Waiting for the device": "Qurilma kutilmoqda", "Total screen time per device": "Har bir qurilmaning jami ekran vaqti",
   "Device removed": "Qurilma olib tashlandi", "Language": "Til",
@@ -561,6 +591,8 @@ const UZ = {
   "Phone app by QR code": "Telefon ilovasi QR kod orqali",
   "Scan with the phone camera on the same WiFi. The app downloads, then tap it to install.": "Bir xil WiFi da telefon kamerasi bilan skanerlang. Ilova yuklanadi, keyin uni bosib oʻrnating.",
   "Show bigger": "Kattaroq koʻrsatish",
+  "Tried to sign in with a login that does not exist": "Mavjud boʻlmagan login bilan kirishga urindi",
+  "Typed a wrong password": "Notoʻgʻri parol terdi",
   "Devices connect over the internet, from any WiFi or mobile data.": "Qurilmalar internet orqali ulanadi: istalgan WiFi yoki mobil internetdan.",
   "Scan with the phone camera. The app downloads, then tap it to install.": "Telefon kamerasi bilan skanerlang. Ilova yuklanadi, keyin uni bosib oʻrnating.", "Phone app": "Telefon ilovasi", "Ready to share by QR code": "QR kod orqali tarqatishga tayyor", "Missing: put mbsi.apk next to the data file": "Yoʻq: mbsi.apk ni maʼlumot fayli yoniga qoʻying", "Scan to get the phone app": "Telefon ilovasini olish uchun skanerlang", "Close": "Yopish",
   "Curbox for PC is not answering. Check that it is still running.": "Curbox for PC javob bermayapti. U ishlab turganini tekshiring."
@@ -826,6 +858,38 @@ async function doLogin() {
     : "Wrong login or password.";
 }
 $("loginBtn").onclick = doLogin;
+
+// A computer opened as admin by mistake links to the real admin as a user instead.
+function showUserCard(show) {
+  $("login").querySelector(".card").classList.toggle("hidden", show);
+  $("userCard").classList.toggle("hidden", !show);
+  (show ? $("userAddress") : $("loginUser")).focus();
+}
+$("userModeBtn").onclick = () => showUserCard(true);
+$("userBackBtn").onclick = () => showUserCard(false);
+async function doUserLink() {
+  $("userLinkBtn").disabled = true;
+  $("userError").textContent = "";
+  const { status, data } = await api("/api/local/become-user", {
+    address: $("userAddress").value, username: $("userLogin").value, password: $("userPass").value });
+  $("userLinkBtn").disabled = false;
+  if (status === 200 && data.next) {
+    location.href = data.next;
+    return;
+  }
+  const messages = {
+    bad_address: "Type the admin address, for example 192.168.1.5:8787.",
+    missing: "Type your login and password.",
+    unreachable: "Cannot reach the admin. Check the address and that both computers use the same network.",
+    wrong_login: "Wrong login or password.",
+    locked: "Too many wrong tries. Wait a few minutes and try again.",
+    has_devices: "This computer is the admin and already manages devices, so it cannot become a user.",
+    not_installed: "Install MBSI PC on this computer first."
+  };
+  $("userError").textContent = tr(messages[data.error] || "Something went wrong. Try again.");
+}
+$("userLinkBtn").onclick = doUserLink;
+$("userPass").onkeydown = (e) => { if (e.key === "Enter") doUserLink(); };
 $("loginPass").onkeydown = (e) => { if (e.key === "Enter") doLogin(); };
 $("loginUser").onkeydown = (e) => { if (e.key === "Enter") $("loginPass").focus(); };
 
@@ -1780,6 +1844,9 @@ const LOG_TEXT = {
   new_app: (e) => "New app found: " + e.target + (e.result === "blocked" ? ", blocked" : ""),
   new_app_policy: (e) => e.target === "block" ? "New apps are now blocked" : "New apps are now allowed",
   device_pending: () => "Signed in and is waiting for approval",
+  became_user: (e) => "Turned this computer into a user computer: " + e.target,
+  device_login: (e) => (e.result === "no_user" ? "Tried to sign in with a login that does not exist" : "Typed a wrong password")
+    + (e.target ? " on " + e.target : ""),
   device_approved: () => "Approved the device",
   approval_setting: (e) => e.target === "on" ? "New devices now need approval" : "New devices no longer need approval",
   limit_set: (e) => "Daily limit: " + e.target,
@@ -1804,7 +1871,7 @@ const LOG_ICON = {
   app_block: "ban", app_unblock: "check", site_add: "globe", site_remove: "globe", device_linked: "link",
   device_removed: "trash", device_released: "check", device_released_by_code: "shield", release_attempt: "shield",
   release_code_set: "shield", release_code_clear: "shield", new_app: "sparkle", new_app_policy: "sparkle",
-  device_pending: "devices", device_approved: "check", approval_setting: "shield", limit_set: "clock",
+  device_pending: "devices", device_login: "key", device_approved: "check", approval_setting: "shield", limit_set: "clock",
   schedule_add: "calendar", schedule_edit: "calendar", schedule_remove: "calendar", schedule_on: "calendar", schedule_off: "calendar",
   group_add: "users", group_edit: "users", group_remove: "users", profile_add: "shield", profile_edit: "shield", profile_remove: "shield",
   backup: "download", restore: "history", global_site_add: "globe", global_site_remove: "globe"
@@ -3529,7 +3596,7 @@ async function changePassword() {
 buildNav();
 renderPassToggle();
 $("logoutBtn").before(langButton());
-$("loginBtn").after(langButton());
+$("userModeBtn").after(langButton());
 startTranslation();
 start();
 </script>

@@ -1,0 +1,22 @@
+# Render Blueprint for the MBSI server (tools/pc-admin), so phones and computers
+# reach the admin from any network. Render gives the https address and passes it to
+# the server as RENDER_EXTERNAL_URL.
+services:
+  - type: web
+    name: mbsi-server
+    runtime: docker
+    dockerfilePath: ./tools/pc-admin/Dockerfile
+    dockerContext: ./tools/pc-admin
+    # A persistent disk needs a paid plan. Without it every restart wipes accounts and
+    # devices, and every phone would have to sign in again.
+    plan: starter
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      # Asked for when the Blueprint is created: the first admin password, 8 or more characters.
+      - key: CURBOX_ADMIN_PASSWORD
+        sync: false
+    disk:
+      name: mbsi-data
+      mountPath: /data
+      sizeGB: 1
