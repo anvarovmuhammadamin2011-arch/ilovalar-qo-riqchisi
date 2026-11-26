@@ -95,7 +95,6 @@
     <string name="sample_end_time">05:00 مساءً</string>
     <string name="all_groups">جميع المجموعات</string>
     <string name="value_zero_minutes">0د</string>
-    <string name="value_zero_percent">0%</string>
     <string name="a_few_final_steps">بضع خطوات أخيرة</string>
     <string name="create_a_new_group">إنشاء مجموعة جديدة</string>
     <string name="use_a_focus_group_to_instantly">استخدم مجموعة تركيز لبدء جلسة تركيز فورًا مع التطبيقات والمواقع التي تختارها.</string>

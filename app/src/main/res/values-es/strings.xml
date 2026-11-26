@@ -95,7 +95,6 @@
     <string name="sample_end_time">05:00 p. m.</string>
     <string name="all_groups">Todos los grupos</string>
     <string name="value_zero_minutes">0m</string>
-    <string name="value_zero_percent">0%</string>
     <string name="a_few_final_steps">Unos últimos pasos</string>
     <string name="create_a_new_group">Crear un grupo nuevo</string>
     <string name="use_a_focus_group_to_instantly">Usa un grupo de enfoque para iniciar al instante una sesión con las apps y sitios web que elijas.</string>

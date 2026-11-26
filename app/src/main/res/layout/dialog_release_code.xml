@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingHorizontal="24dp"
+    android:paddingTop="@dimen/curbox_space_s">
+
+    <TextView
+        style="@style/TextAppearance.Curbox.Body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/protection_release_dialog_body" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layout_code"
+        style="@style/Widget.Curbox.TextInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/curbox_space_l"
+        android:hint="@string/protection_release_hint">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/input_code"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:importantForAutofill="no"
+            android:inputType="numberPassword"
+            android:letterSpacing="0.5"
+            android:maxLength="6"
+            android:textSize="24sp" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/curbox_space_s"
+        android:indeterminate="true"
+        android:visibility="invisible" />
+</LinearLayout>

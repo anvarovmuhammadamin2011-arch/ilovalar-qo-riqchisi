@@ -95,7 +95,6 @@
     <string name="sample_end_time">午後5:00</string>
     <string name="all_groups">すべてのグループ</string>
     <string name="value_zero_minutes">0分</string>
-    <string name="value_zero_percent">0%</string>
     <string name="a_few_final_steps">最後にもう少しだけ</string>
     <string name="create_a_new_group">新しいグループを作成</string>
     <string name="use_a_focus_group_to_instantly">フォーカスグループを使うと、選んだアプリやウェブサイトですぐにフォーカスセッションを始められます。</string>

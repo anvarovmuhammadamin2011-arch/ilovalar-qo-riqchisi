@@ -52,7 +52,7 @@ android {
 
     // Libraries ship strings for about 80 languages. Keep only the ones Curbox translates.
     androidResources {
-        localeFilters += listOf("en", "ar", "de", "es", "it", "ja", "pt-rBR", "ru", "tr", "vi", "zh-rCN")
+        localeFilters += listOf("en", "ar", "de", "es", "it", "ja", "pt-rBR", "ru", "tr", "uz", "vi", "zh-rCN")
     }
 
     dependenciesInfo {

@@ -28,5 +28,11 @@ data class AntiUninstallConfig(
      * Real time millis when the user asked to turn protection off.
      * 0 means no request is pending. Used by [AntiUninstallMode.TIMED] and [AntiUninstallMode.COOLDOWN].
      */
-    val unlockRequestedAtMs: Long = 0L
+    val unlockRequestedAtMs: Long = 0L,
+
+    /**
+     * Turned on from the Protection screen for Curbox Admin. Then [passwordHash] is the
+     * admin's six digit code verifier, kept in step by AdminLinkBlocker.
+     */
+    val adminManaged: Boolean = false
 )

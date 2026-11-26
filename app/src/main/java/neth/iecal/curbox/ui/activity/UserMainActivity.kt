@@ -24,6 +24,11 @@ import neth.iecal.curbox.ui.fragments.user.UserUsageFragment
  */
 class UserMainActivity : AppCompatActivity(), FixedBrandColors {
 
+    companion object {
+        const val EXTRA_OPEN_TAB = "open_tab"
+        const val TAB_RESTRICTIONS = "restrictions"
+    }
+
     // Each tab keeps its fragment alive across switches (hide and show, not replace).
     private val tabTags = mapOf(
         R.id.nav_user_home to "user_home",
@@ -54,8 +59,10 @@ class UserMainActivity : AppCompatActivity(), FixedBrandColors {
         }
 
         if (savedInstanceState == null) {
-            binding.userBottomNav.selectedItemId = R.id.nav_user_home
-            showTab(R.id.nav_user_home, commitNow = true)
+            // The admin block screen opens Restrictions with "See details".
+            val first = if (intent.getStringExtra(EXTRA_OPEN_TAB) == TAB_RESTRICTIONS) R.id.nav_user_restrictions else R.id.nav_user_home
+            binding.userBottomNav.selectedItemId = first
+            showTab(first, commitNow = true)
         }
         binding.userBottomNav.setOnItemSelectedListener { item ->
             if (item.itemId == binding.userBottomNav.selectedItemId) return@setOnItemSelectedListener false

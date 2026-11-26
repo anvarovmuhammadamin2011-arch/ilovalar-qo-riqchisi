@@ -2,6 +2,7 @@ package neth.iecal.curbox.utils
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import org.json.JSONArray
 import org.json.JSONObject
 import java.net.HttpURLConnection
@@ -19,6 +20,9 @@ object AdminLinkClient {
     private const val TIMEOUT_MS = 6000
 
     data class Response(val code: Int, val body: String)
+
+    /** Shown in the admin's device list, like "Android 14". */
+    fun osVersion(): String = "Android ${Build.VERSION.RELEASE}"
 
     /** "192.168.1.5" or "192.168.1.5:8787" becomes "http://192.168.1.5:8787". Returns "" when unusable. */
     fun normalizeServerUrl(input: String): String {

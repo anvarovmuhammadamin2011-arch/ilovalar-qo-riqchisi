@@ -112,10 +112,6 @@
         <item name="cardElevation">0dp</item>
     </style>
 
-    <style name="Widget.Curbox.Card.Tile">
-        <item name="cardCornerRadius">@dimen/curbox_radius_tile</item>
-    </style>
-
     <style name="Widget.Curbox.Button" parent="Widget.Material3.Button">
         <item name="cornerRadius">@dimen/curbox_radius_button</item>
         <item name="android:minHeight">56dp</item>

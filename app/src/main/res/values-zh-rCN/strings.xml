@@ -95,7 +95,6 @@
     <string name="sample_end_time">05:00 下午</string>
     <string name="all_groups">全部分组</string>
     <string name="value_zero_minutes">0分钟</string>
-    <string name="value_zero_percent">0%</string>
     <string name="a_few_final_steps">最后几个步骤</string>
     <string name="create_a_new_group">创建一个新分组</string>
     <string name="use_a_focus_group_to_instantly">用专注小组，一键为你选定的应用和网站开启专注会话。</string>

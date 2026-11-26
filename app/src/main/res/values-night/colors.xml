@@ -165,4 +165,5 @@
     <color name="curbox_warning">#F2A93B</color>
     <color name="curbox_warning_text">#F5BC63</color>
     <color name="curbox_error">#EE6B78</color>
+    <color name="curbox_error_container">#3A1E24</color>
 </resources>

@@ -24,7 +24,9 @@ import com.google.android.material.radiobutton.MaterialRadioButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import neth.iecal.curbox.R
 import neth.iecal.curbox.data.models.AntiUninstallConfig
 import neth.iecal.curbox.data.models.AntiUninstallMode
@@ -286,11 +288,16 @@ class AntiUninstallFragment : Fragment() {
 
     private fun onTurnOffClicked() {
         when (latestConfig.mode) {
-            AntiUninstallMode.PASSWORD -> showVerifyPasswordDialog {
-                if (AntiUninstallManager.hashPassword(it) == latestConfig.passwordHash) {
-                    finishProtection()
-                } else {
-                    Toast.makeText(requireContext(), R.string.anti_uninstall_wrong_password, Toast.LENGTH_SHORT).show()
+            AntiUninstallMode.PASSWORD -> showVerifyPasswordDialog { typed ->
+                val stored = latestConfig.passwordHash
+                viewLifecycleOwner.lifecycleScope.launch {
+                    // The admin's code verifier is PBKDF2, which takes a moment.
+                    val ok = withContext(Dispatchers.Default) { AntiUninstallManager.verifyPassword(typed, stored) }
+                    if (ok) {
+                        finishProtection()
+                    } else {
+                        Toast.makeText(requireContext(), R.string.anti_uninstall_wrong_password, Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
             AntiUninstallMode.TIMED -> MaterialAlertDialogBuilder(requireContext())
@@ -324,7 +331,7 @@ class AntiUninstallFragment : Fragment() {
 
     private fun finishProtection() {
         viewLifecycleOwner.lifecycleScope.launch {
-            dataStore.updateAntiUninstallConfig { it.copy(isEnabled = false, unlockRequestedAtMs = 0L) }
+            dataStore.updateAntiUninstallConfig { it.copy(isEnabled = false, unlockRequestedAtMs = 0L, adminManaged = false) }
             try {
                 ServiceProtectionManager.removeDeviceAdmin(requireContext())
             } catch (e: Exception) {

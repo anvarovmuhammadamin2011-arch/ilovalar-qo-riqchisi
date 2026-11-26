@@ -7,282 +7,3218 @@
 <link rel="icon" href="/favicon.ico">
 <style>
   :root {
-    --bg: #f4f6fb; --card: #ffffff; --text: #1b2333; --muted: #64708a;
-    --line: #e3e7f0; --brand: #013388; --brand-soft: #e6ecf8;
-    --ok: #1f9d55; --off: #a0a8b8; --danger: #c0392b;
+    --bg: #F6F7FB; --surface: #FFFFFF; --text: #20243A; --muted: #858BA3; --line: #E6E8F0;
+    --primary: #5B6EE1; --primary-soft: #E7EAFC; --on-primary: #FFFFFF; --secondary: #8B9CF5;
+    --ok: #25A56A; --ok-soft: #E2F4EB; --warn: #A86100; --warn-soft: #FDF1DE;
+    --err: #E05260; --err-soft: #FBE7E9; --shadow: 0 1px 2px rgba(32,36,58,.04), 0 6px 20px rgba(32,36,58,.05);
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #10141c; --card: #181e2a; --text: #e8ecf4; --muted: #9aa5bb;
-      --line: #2a3242; --brand: #6f9bff; --brand-soft: #1e2a44;
-      --ok: #3ecf7e; --off: #5c6577; --danger: #ff6b5b;
+      --bg: #12141C; --surface: #1B1E29; --text: #ECEEF6; --muted: #9AA0B8; --line: #2A2E3D;
+      --primary: #8B9CF5; --primary-soft: #2B3266; --on-primary: #12141C; --secondary: #A9B5F8;
+      --ok: #3CC387; --ok-soft: #173326; --warn: #F5BC63; --warn-soft: #3A2F1B;
+      --err: #EE6B78; --err-soft: #3A1E24; --shadow: none;
     }
   }
   * { box-sizing: border-box; }
   body { margin: 0; font: 15px/1.45 "Segoe UI", system-ui, sans-serif; background: var(--bg); color: var(--text); }
-  header { display: flex; align-items: center; gap: 12px; padding: 14px 24px; background: var(--card); border-bottom: 1px solid var(--line); }
-  header img { width: 40px; height: 40px; border-radius: 10px; }
-  header h1 { font-size: 18px; margin: 0; flex: 1; }
-  button { font: inherit; border: 0; border-radius: 10px; padding: 9px 16px; cursor: pointer; background: var(--brand); color: #fff; }
-  button.ghost { background: transparent; color: var(--brand); border: 1px solid var(--line); }
-  button.danger { background: transparent; color: var(--danger); border: 1px solid var(--line); }
-  button.small { padding: 5px 10px; font-size: 13px; }
+  svg.ic { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+  button { font: inherit; cursor: pointer; border: 0; border-radius: 12px; padding: 9px 16px; display: inline-flex; align-items: center; gap: 8px; }
+  button.primary { background: var(--primary); color: var(--on-primary); font-weight: 600; }
+  button.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); }
+  button.danger { background: var(--err-soft); color: var(--err); font-weight: 600; }
+  button.link { background: none; color: var(--primary); padding: 6px 0; font-weight: 600; }
   button:disabled { opacity: .5; cursor: default; }
-  input { font: inherit; width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--text); }
-  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 20px; }
-  .center { max-width: 380px; margin: 10vh auto; display: grid; gap: 12px; text-align: center; }
-  .center img { width: 96px; height: 96px; border-radius: 22px; margin: 0 auto; }
+  input { font: inherit; width: 100%; padding: 11px 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); color: var(--text); }
+  input:focus { outline: 2px solid var(--primary); border-color: transparent; }
+  label.field { display: block; font-size: 13px; color: var(--muted); margin: 12px 0 4px; }
   .muted { color: var(--muted); }
-  .error { color: var(--danger); min-height: 1.2em; }
-  .note { color: var(--ok); min-height: 1.2em; }
-  main { display: grid; grid-template-columns: 340px 1fr; gap: 20px; padding: 20px 24px; align-items: start; }
-  @media (max-width: 860px) { main { grid-template-columns: 1fr; } }
-  .addr { font-family: Consolas, monospace; font-size: 18px; font-weight: 600; color: var(--brand); background: var(--brand-soft); padding: 6px 10px; border-radius: 8px; display: inline-block; margin: 4px 0; }
-  h2 { font-size: 15px; margin: 0 0 10px; }
-  ol { margin: 8px 0 0; padding-left: 20px; }
-  .device, .user { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 12px; }
-  .device { cursor: pointer; }
-  .device:hover { background: var(--brand-soft); }
-  .device.selected { background: var(--brand-soft); outline: 1px solid var(--brand); }
-  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--off); flex: none; }
-  .dot.on { background: var(--ok); }
-  .grow { flex: 1; min-width: 0; }
-  .title { font-weight: 600; }
-  .sub { color: var(--muted); font-size: 13px; }
-  .stack { display: grid; gap: 16px; }
-  .row { display: flex; gap: 8px; align-items: center; }
-  .applist { max-height: 55vh; overflow: auto; border-top: 1px solid var(--line); margin-top: 10px; }
-  .app { display: flex; align-items: center; gap: 10px; padding: 9px 4px; border-bottom: 1px solid var(--line); }
-  .app .pkg { color: var(--muted); font-size: 12px; }
-  .switch { position: relative; width: 44px; height: 24px; flex: none; }
-  .switch input { display: none; }
-  .switch span { position: absolute; inset: 0; background: var(--off); border-radius: 24px; transition: .2s; cursor: pointer; }
-  .switch span::after { content: ""; position: absolute; width: 18px; height: 18px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: .2s; }
-  .switch input:checked + span { background: var(--danger); }
-  .switch input:checked + span::after { transform: translateX(20px); }
-  .chip { display: inline-flex; align-items: center; gap: 6px; background: var(--brand-soft); padding: 5px 6px 5px 12px; border-radius: 20px; margin: 4px 4px 0 0; }
-  .chip button { padding: 2px 8px; border-radius: 12px; background: transparent; color: var(--danger); }
+  .small { font-size: 13px; }
   .hidden { display: none !important; }
-  .empty { padding: 30px 10px; text-align: center; }
-  details summary { cursor: pointer; color: var(--brand); margin-top: 6px; }
-  .form { display: grid; gap: 8px; margin-top: 10px; }
+  .error { color: var(--err); min-height: 1.3em; font-size: 14px; margin-top: 8px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 20px; box-shadow: var(--shadow); }
+  .card h2 { font-size: 16px; margin: 0 0 4px; display: flex; align-items: center; gap: 8px; }
+  .card .sub { margin: 0 0 14px; }
+
+  /* Login */
+  #login { min-height: 100vh; display: grid; place-items: center; padding: 20px; }
+  #login .card { width: 100%; max-width: 400px; padding: 28px; }
+  #login .brand { text-align: center; margin-bottom: 8px; }
+  #login .brand img { width: 76px; height: 76px; border-radius: 20px; }
+  #login h1 { font-size: 22px; margin: 12px 0 2px; }
+  .pw { position: relative; }
+  .pw button { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: none; color: var(--muted); padding: 6px; }
+  #login button.primary { width: 100%; justify-content: center; margin-top: 16px; padding: 13px; }
+
+  /* Shell */
+  #app { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+  aside { background: var(--surface); border-right: 1px solid var(--line); padding: 18px 12px; position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; }
+  aside .brand { display: flex; align-items: center; gap: 10px; padding: 4px 10px 18px; font-weight: 700; }
+  aside .brand img { width: 34px; height: 34px; border-radius: 10px; }
+  nav a { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; color: var(--muted); text-decoration: none; font-weight: 600; margin-bottom: 2px; }
+  nav a:hover { background: var(--bg); color: var(--text); }
+  nav a.active { background: var(--primary-soft); color: var(--primary); }
+  aside .foot { margin-top: auto; padding: 10px 12px; }
+  main { min-width: 0; }
+  header.top { display: flex; align-items: center; gap: 12px; padding: 16px 28px; border-bottom: 1px solid var(--line); background: var(--surface); position: sticky; top: 0; z-index: 5; }
+  header.top h1 { font-size: 20px; margin: 0; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 99px; font-size: 13px; font-weight: 600; background: var(--primary-soft); color: var(--primary); font-family: Consolas, monospace; }
+  #content { padding: 24px 28px 40px; display: grid; gap: 16px; }
+  @media (max-width: 900px) {
+    #app { grid-template-columns: 1fr; }
+    aside { position: static; height: auto; flex-direction: row; align-items: center; padding: 8px; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+    aside .brand span, aside .foot { display: none; }
+    aside .brand { padding: 0 8px 0 4px; }
+    nav { display: flex; gap: 4px; }
+    nav a { white-space: nowrap; margin: 0; }
+    header.top { padding: 12px 16px; position: static; flex-wrap: wrap; }
+    #content { padding: 16px; }
+    .grid2 { grid-template-columns: 1fr !important; }
+  }
+
+  /* Pieces */
+  .stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; }
+  .stat { display: flex; flex-direction: column; gap: 10px; }
+  .stat .icon { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; }
+  .stat .value { font-size: 28px; font-weight: 700; line-height: 1; }
+  .grid2 { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; align-items: start; }
+  .row { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--line); }
+  .row:last-child { border-bottom: 0; }
+  .row.click { cursor: pointer; border-radius: 12px; padding: 11px 8px; margin: 0 -8px; }
+  .row.click:hover { background: var(--bg); }
+  .grow { flex: 1; min-width: 0; }
+  .title { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tiny { font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .typeicon { width: 38px; height: 38px; border-radius: 12px; background: var(--primary-soft); color: var(--primary); display: grid; place-items: center; flex: none; font-weight: 700; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--muted); flex: none; }
+  .dot.on { background: var(--ok); }
+  .status { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; white-space: nowrap; }
+  .pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 99px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+  .pill.blocked { background: var(--err-soft); color: var(--err); }
+  .pill.allowed { background: var(--primary-soft); color: var(--primary); }
+  .pill svg.ic { width: 14px; height: 14px; }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); font-weight: 600; padding: 0 10px 10px; border-bottom: 1px solid var(--line); }
+  td { padding: 12px 10px; border-bottom: 1px solid var(--line); }
+  tbody tr { cursor: pointer; }
+  tbody tr:hover td { background: var(--bg); }
+  tbody tr:last-child td { border-bottom: 0; }
+  .tablewrap { overflow-x: auto; }
+  .empty { text-align: center; padding: 28px 10px; color: var(--muted); }
+  .empty svg.ic { width: 34px; height: 34px; color: var(--primary); margin-bottom: 6px; }
+  .inline { display: flex; gap: 8px; align-items: center; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .site { display: inline-flex; align-items: center; gap: 8px; background: var(--bg); border: 1px solid var(--line); padding: 5px 6px 5px 12px; border-radius: 99px; }
+  .site button { padding: 3px 8px; border-radius: 99px; background: none; color: var(--err); font-size: 13px; font-weight: 600; }
+  .switch { position: relative; width: 44px; height: 24px; flex: none; }
+  .switch input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; z-index: 1; padding: 0; }
+  .switch span { position: absolute; inset: 0; background: var(--line); border-radius: 24px; transition: .2s; }
+  .switch span::after { content: ""; position: absolute; width: 18px; height: 18px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: .2s; }
+  .switch input:checked + span { background: var(--err); }
+  .switch input:checked + span::after { transform: translateX(20px); }
+  .switch input:focus-visible + span { outline: 2px solid var(--primary); outline-offset: 2px; }
+  .applist { max-height: 60vh; overflow: auto; margin-top: 10px; }
+  .back { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); text-decoration: none; font-weight: 600; }
+  .head { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  ol.steps { margin: 6px 0 0; padding-left: 20px; }
+  ol.steps li { margin: 4px 0; }
+  .addr { font-family: Consolas, monospace; font-size: 18px; font-weight: 700; color: var(--primary); }
+  select { font: inherit; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); color: var(--text); cursor: pointer; }
+  select:focus { outline: 2px solid var(--primary); border-color: transparent; }
+  input[type=checkbox], input[type=radio] { width: 18px; height: 18px; padding: 0; margin: 0; accent-color: var(--primary); cursor: pointer; flex: none; }
+  input[type=checkbox]:disabled { cursor: default; opacity: .35; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
+  .toolbar input:not([type]) { flex: 1 1 220px; width: auto; }
+  .bulkbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 14px; background: var(--primary-soft); margin-bottom: 12px; }
+  .bulkbar .title { margin-right: auto; color: var(--primary); }
+  th.check, td.check { width: 34px; padding-right: 0; }
+  tr.picked td { background: var(--primary-soft); }
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); overflow-x: auto; }
+  .tabs a { padding: 10px 14px; color: var(--muted); text-decoration: none; font-weight: 600; border-bottom: 2px solid transparent; white-space: nowrap; }
+  .tabs a:hover { color: var(--text); }
+  .tabs a.active { color: var(--primary); border-color: var(--primary); }
+  .stack { display: grid; gap: 16px; align-content: start; min-width: 0; }
+  .pill.ok, .pill.new { background: var(--ok-soft); color: var(--ok); }
+  .pill.warn { background: var(--warn-soft); color: var(--warn); white-space: normal; }
+  .pill.muted { background: var(--bg); color: var(--muted); border: 1px solid var(--line); white-space: normal; }
+  .kv { display: grid; grid-template-columns: max-content 1fr; gap: 10px 18px; margin: 6px 0 0; }
+  .kv dt { color: var(--muted); }
+  .kv dd { margin: 0; font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
+  .seg { display: inline-flex; flex-wrap: wrap; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 3px; gap: 3px; }
+  .seg button { padding: 7px 14px; border-radius: 9px; background: none; color: var(--muted); font-weight: 600; }
+  .seg button.on { background: var(--surface); color: var(--primary); box-shadow: 0 1px 3px rgba(32,36,58,.12); }
+  .cap { display: flex; gap: 10px; padding: 7px 0; align-items: flex-start; }
+  .cap svg.ic { color: var(--ok); margin-top: 1px; }
+  .cap.no { color: var(--muted); }
+  .cap.no svg.ic { color: var(--warn); }
+  .choices { margin-top: 12px; }
+  .choice { display: flex; align-items: center; gap: 10px; padding: 6px 0; cursor: pointer; white-space: nowrap; }
+  .logicon { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--primary-soft); color: var(--primary); flex: none; }
+  .logicon svg.ic { width: 18px; height: 18px; }
+  .logicon.fail { background: var(--err-soft); color: var(--err); }
+  .title.wrap { white-space: normal; overflow-wrap: anywhere; }
+  .grid2 > *, #content > * { min-width: 0; }
+  .time { font-size: 12px; color: var(--muted); white-space: nowrap; }
+  button.small { padding: 6px 12px; font-size: 13px; }
+  .modal .chips { margin-top: 10px; }
+  .modal input { margin-top: 4px; }
+  svg.chart { width: 100%; height: auto; max-height: 240px; display: block; }
+  svg.chart .track { fill: var(--bg); }
+  svg.chart .bar { fill: var(--primary); }
+  svg.chart g:hover .bar { fill: var(--secondary); }
+  svg.chart .label { fill: var(--muted); font-size: 11px; font-family: inherit; }
+  .meter { height: 6px; border-radius: 6px; background: var(--bg); margin-top: 6px; overflow: hidden; min-width: 60px; }
+  .meter span { display: block; height: 100%; border-radius: 6px; background: var(--primary); }
+  .value { font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .strong { font-weight: 700; }
+  table.plain tbody tr { cursor: default; }
+  table.plain tbody tr:hover td { background: none; }
+  table.plain td .title { max-width: 260px; }
+  a.btnlink { display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 12px; border: 1px solid var(--line); color: var(--text); text-decoration: none; }
+  a.btnlink:hover { background: var(--bg); }
+  input[type=date] { width: auto; padding: 9px 12px; }
+  .printonly { display: none; }
+  #login .langbtn { margin: 14px auto 0; display: flex; }
+  button:focus-visible, a:focus-visible, [tabindex]:focus-visible, select:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+  .iconbtn { padding: 8px 10px; position: relative; }
+  .badge { position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--err); color: #fff; font-size: 11px; font-weight: 700; display: grid; place-items: center; }
+  .bellpanel { position: fixed; top: 64px; right: 16px; width: min(420px, calc(100vw - 32px)); max-height: calc(100vh - 90px); overflow: auto; z-index: 40; }
+  .row.unread .title { font-weight: 700; }
+  .rulegroup { padding: 10px 0; border-top: 1px solid var(--line); }
+  .rulegroup:first-of-type { border-top: 0; }
+  .ruleline { display: flex; justify-content: space-between; gap: 12px; padding: 4px 0; flex-wrap: wrap; }
+  .ruleline .tiny { white-space: normal; }
+  .wraptext { white-space: normal; }
+  .chipbtn { padding: 6px 12px; border-radius: 99px; border: 1px solid var(--line); background: var(--bg); color: var(--text); font-size: 13px; }
+  .chipbtn svg.ic { width: 14px; height: 14px; }
+  .chipbtn.on { background: var(--primary-soft); color: var(--primary); border-color: var(--primary); }
+  .inline.wrap { flex-wrap: wrap; margin-top: 6px; }
+  .inline.wrap input { flex: 1 1 160px; width: auto; }
+  .windowrow { border: 1px solid var(--line); border-radius: 12px; padding: 10px; margin-top: 8px; display: grid; gap: 8px; }
+  .switch.on input:checked + span { background: var(--primary); }
+  .modal { max-height: calc(100vh - 40px); overflow: auto; }
+  .modal.wide { max-width: 640px; }
+  .form .seg.days button { min-width: 48px; }
+  .picklist { max-height: 200px; overflow: auto; border: 1px solid var(--line); border-radius: 12px; padding: 4px 12px; margin-top: 8px; }
+  .picklist .choice { white-space: normal; }
+  input[type=time] { width: auto; }
+  .warntext { color: var(--warn); margin: 8px 0 0; }
+  .weekgrid { display: grid; grid-template-columns: 38px repeat(24, minmax(8px, 1fr)); gap: 3px; align-items: center; overflow-x: auto; }
+  .weekgrid .hour { font-size: 10px; color: var(--muted); }
+  .weekgrid .dayname { font-size: 12px; color: var(--muted); font-weight: 600; }
+  .weekgrid .cell { height: 20px; border-radius: 4px; background: var(--bg); border: 1px solid var(--line); }
+  .weekgrid .cell.on { background: var(--primary); border-color: var(--primary); }
+  .weekgrid .cell.both { background: var(--warn); border-color: var(--warn); }
+  @media print {
+    body { background: #fff; color: #000; }
+    aside, header.top, .noprint, #toast, .backdrop { display: none !important; }
+    #app { display: block; }
+    #content { padding: 0; gap: 12px; }
+    .printonly { display: block; }
+    .printonly h1 { font-size: 20px; margin: 0 0 4px; }
+    .card { box-shadow: none; border-color: #ccc; break-inside: avoid; background: #fff; }
+    .grid2 { grid-template-columns: 1fr 1fr; }
+    svg.chart .track { fill: #f1f1f4; }
+    svg.chart .bar, .meter span { fill: #5B6EE1; background: #5B6EE1; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* Modal and toast */
+  .backdrop { position: fixed; inset: 0; background: rgba(18,20,28,.45); display: grid; place-items: center; padding: 20px; z-index: 50; }
+  .modal { width: 100%; max-width: 420px; }
+  .modal h2 { font-size: 18px; }
+  .modal .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+  .modal ul { margin: 8px 0 0; padding-left: 20px; }
+  #toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--text); color: var(--surface); padding: 10px 18px; border-radius: 12px; font-weight: 600; opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 60; }
+  #toast.show { opacity: 1; }
 </style>
 </head>
 <body>
 
-<!-- Login -->
-<section id="login" class="center card hidden">
-  <img src="/logo.png" alt="">
-  <h2>Curbox for PC</h2>
-  <input id="loginUser" placeholder="Login" autocomplete="username">
-  <input id="loginPass" type="password" placeholder="Password" autocomplete="current-password">
-  <div id="loginError" class="error"></div>
-  <button id="loginBtn">Log in</button>
+<section id="login" class="hidden">
+  <div class="card">
+    <div class="brand">
+      <img src="/logo.png" alt="">
+      <h1>Curbox for PC</h1>
+      <div class="muted">Sign in to manage phones and computers</div>
+    </div>
+    <label class="field" for="loginUser">Login</label>
+    <input id="loginUser" autocomplete="username">
+    <label class="field" for="loginPass">Password</label>
+    <div class="pw">
+      <input id="loginPass" type="password" autocomplete="current-password">
+      <button id="togglePass" type="button" aria-label="Show password"></button>
+    </div>
+    <div id="loginError" class="error"></div>
+    <button class="primary" id="loginBtn">Sign in</button>
+  </div>
 </section>
 
-<!-- Dashboard -->
-<div id="dash" class="hidden">
-  <header>
-    <img src="/logo.png" alt="">
-    <h1>Curbox for PC</h1>
-    <button id="logoutBtn" class="ghost">Log out</button>
-  </header>
+<div id="app" class="hidden">
+  <aside>
+    <div class="brand"><img src="/logo.png" alt=""><span>Curbox for PC</span></div>
+    <nav id="nav"></nav>
+    <div class="foot small muted">Sessions end after 12 hours without use.</div>
+  </aside>
   <main>
-    <div class="stack">
-      <div class="card">
-        <h2>Connect a phone or computer</h2>
-        <div id="addresses"></div>
-        <ol class="muted">
-          <li>Phone: open Curbox and tap <b>User</b>.</li>
-          <li>Computer: install Curbox for PC and pick <b>User</b>.</li>
-          <li>Type the address above, then a login from the list below.</li>
-        </ol>
-        <p class="muted">Every device must use the same WiFi as this computer.</p>
-      </div>
-
-      <div class="card">
-        <h2>Phones</h2>
-        <div id="deviceList"></div>
-      </div>
-
-      <div class="card">
-        <h2>Users</h2>
-        <div id="userList"></div>
-        <details>
-          <summary>Add a user</summary>
-          <div class="form">
-            <input id="newUser" placeholder="Login, like anvarov">
-            <input id="newUserPass" type="password" placeholder="Password">
-            <div id="userError" class="error"></div>
-            <button id="addUserBtn">Add user</button>
-          </div>
-        </details>
-      </div>
-
-      <div class="card">
-        <h2>Admin account</h2>
-        <div class="muted">Login: <b id="adminName"></b></div>
-        <details>
-          <summary>Change admin password</summary>
-          <div class="form">
-            <input id="curPass" type="password" placeholder="Current password">
-            <input id="nextPass" type="password" placeholder="New password">
-            <div id="passError" class="error"></div>
-            <div id="passNote" class="note"></div>
-            <button id="changePassBtn">Save new password</button>
-          </div>
-        </details>
-      </div>
-    </div>
-
-    <div class="card" id="detail">
-      <div id="noDevice" class="empty muted">Pick a phone on the left to see its apps.</div>
-      <div id="deviceDetail" class="hidden stack">
-        <div class="row">
-          <div class="grow">
-            <h2 id="dName" style="margin:0"></h2>
-            <div id="dStatus" class="muted"></div>
-          </div>
-          <button id="removeBtn" class="danger">Remove phone</button>
-        </div>
-
-        <div>
-          <h2>Blocked websites</h2>
-          <p id="siteHint" class="muted hidden" style="margin-top:-4px">On a computer the whole website is blocked. Paths like youtube.com/shorts only work on phones.</p>
-          <div class="row">
-            <input id="siteInput" placeholder="Website, like youtube.com">
-            <button id="addSiteBtn">Block</button>
-          </div>
-          <div id="siteList"></div>
-        </div>
-
-        <div>
-          <h2 id="appsHeading">Apps on this phone</h2>
-          <input id="appSearch" placeholder="Search apps">
-          <div class="applist" id="appList"></div>
-        </div>
-      </div>
-    </div>
+    <header class="top">
+      <h1 id="pageTitle"></h1>
+      <span id="addrChip" class="chip"></span>
+      <button class="ghost iconbtn" id="bellBtn" aria-label="Notifications"></button>
+      <span id="adminChip" class="small muted"></span>
+      <button class="ghost" id="logoutBtn"></button>
+    </header>
+    <div id="content"></div>
   </main>
 </div>
 
+<div id="toast" role="status" aria-live="polite"></div>
+
 <script>
 "use strict";
+// ---------------------------------------------------------------- helpers
 const $ = (id) => document.getElementById(id);
-let overview = null;
-let selectedId = null;
-let lastAppsKey = "";
-let pollTimer = null;
+const SVG = "http://www.w3.org/2000/svg";
 
-async function api(path, body) {
-  const options = body === undefined
-    ? { method: "GET" }
-    : { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) };
-  const res = await fetch(path, options);
-  let data = {};
-  try { data = await res.json(); } catch (e) { /* empty body */ }
-  return { status: res.status, data };
+// Simple line icons, drawn here so the panel never loads anything from the internet.
+const ICONS = {
+  dashboard: [["rect", {x: 3, y: 3, width: 7, height: 7, rx: 1.5}], ["rect", {x: 14, y: 3, width: 7, height: 7, rx: 1.5}], ["rect", {x: 3, y: 14, width: 7, height: 7, rx: 1.5}], ["rect", {x: 14, y: 14, width: 7, height: 7, rx: 1.5}]],
+  devices: [["rect", {x: 2, y: 4, width: 13, height: 10, rx: 2}], ["path", {d: "M6 18h5"}], ["rect", {x: 17, y: 8, width: 5, height: 12, rx: 1.5}]],
+  users: [["circle", {cx: 9, cy: 8, r: 4}], ["path", {d: "M2 21c0-3.9 3.1-7 7-7s7 3.1 7 7"}], ["path", {d: "M16 4.3a4 4 0 0 1 0 7.4"}], ["path", {d: "M19 14.5c1.8.9 3 3.2 3 6.5"}]],
+  settings: [["path", {d: "M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"}], ["circle", {cx: 15, cy: 6, r: 2}], ["circle", {cx: 9, cy: 12, r: 2}], ["circle", {cx: 17, cy: 18, r: 2}]],
+  phone: [["rect", {x: 7, y: 2, width: 10, height: 20, rx: 2}], ["path", {d: "M11 18h2"}]],
+  computer: [["rect", {x: 2, y: 4, width: 20, height: 13, rx: 2}], ["path", {d: "M8 21h8M12 17v4"}]],
+  logout: [["path", {d: "M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"}], ["path", {d: "M10 17l5-5-5-5M15 12H3"}]],
+  plus: [["path", {d: "M12 5v14M5 12h14"}]],
+  trash: [["path", {d: "M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"}]],
+  globe: [["circle", {cx: 12, cy: 12, r: 9}], ["path", {d: "M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18"}]],
+  ban: [["circle", {cx: 12, cy: 12, r: 9}], ["path", {d: "M5.6 5.6l12.8 12.8"}]],
+  check: [["path", {d: "M5 12l5 5 9-10"}]],
+  key: [["circle", {cx: 8, cy: 15, r: 4}], ["path", {d: "M11 12l9-9M17 6l3 3"}]],
+  link: [["path", {d: "M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"}], ["path", {d: "M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"}]],
+  back: [["path", {d: "M15 18l-6-6 6-6"}]],
+  eye: [["path", {d: "M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"}], ["circle", {cx: 12, cy: 12, r: 3}]],
+  eyeOff: [["path", {d: "M3 3l18 18M10.6 5.1A10 10 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-3.2 4M6.6 6.6C3.8 8.4 2 12 2 12s3.5 7 10 7a9.7 9.7 0 0 0 5.4-1.6"}], ["path", {d: "M9.9 9.9a3 3 0 0 0 4.2 4.2"}]],
+  online: [["path", {d: "M5 12.6a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0M2 9a15 15 0 0 1 20 0"}], ["circle", {cx: 12, cy: 19.5, r: .8}]],
+  offline: [["path", {d: "M3 3l18 18M8.5 16a5 5 0 0 1 7 0M5 12.6a10 10 0 0 1 5-2.7M16.7 10.3A10 10 0 0 1 19 12.6"}], ["circle", {cx: 12, cy: 19.5, r: .8}]],
+  apps: [["rect", {x: 3, y: 3, width: 7, height: 7, rx: 2}], ["rect", {x: 14, y: 3, width: 7, height: 7, rx: 2}], ["rect", {x: 3, y: 14, width: 7, height: 7, rx: 2}], ["path", {d: "M17.5 14v7M14 17.5h7"}]],
+  history: [["path", {d: "M3 12a9 9 0 1 0 3-6.7L3 8"}], ["path", {d: "M3 3v5h5"}], ["path", {d: "M12 7v5l3 2"}]],
+  shield: [["path", {d: "M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"}]],
+  sparkle: [["path", {d: "M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"}], ["path", {d: "M19 16l.7 2.3L22 19l-2.3.7L19 22l-.7-2.3L16 19l2.3-.7z"}]],
+  info: [["circle", {cx: 12, cy: 12, r: 9}], ["path", {d: "M12 11v6M12 7.5v.5"}]],
+  chart: [["path", {d: "M3 21h18"}], ["rect", {x: 5, y: 11, width: 3, height: 7, rx: 1}], ["rect", {x: 10.5, y: 5, width: 3, height: 13, rx: 1}], ["rect", {x: 16, y: 8, width: 3, height: 10, rx: 1}]],
+  download: [["path", {d: "M12 4v11M7 10l5 5 5-5M5 20h14"}]],
+  clock: [["circle", {cx: 12, cy: 12, r: 9}], ["path", {d: "M12 7v5l3 2"}]],
+  calendar: [["rect", {x: 3, y: 5, width: 18, height: 16, rx: 2}], ["path", {d: "M3 10h18M8 3v4M16 3v4"}]],
+  print: [["path", {d: "M7 9V3h10v6"}], ["rect", {x: 3, y: 9, width: 18, height: 8, rx: 2}], ["path", {d: "M7 14h10v7H7z"}]],
+  bell: [["path", {d: "M6 17V11a6 6 0 0 1 12 0v6l2 2H4z"}], ["path", {d: "M10 21h4"}]]
+};
+
+function icon(name) {
+  const svg = document.createElementNS(SVG, "svg");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("class", "ic");
+  svg.setAttribute("aria-hidden", "true");
+  for (const [tag, attrs] of ICONS[name] || []) {
+    const node = document.createElementNS(SVG, tag);
+    for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
+    svg.appendChild(node);
+  }
+  return svg;
 }
 
+// Text from devices goes in through textContent only.
 function el(tag, className, text) {
   const node = document.createElement(tag);
   if (className) node.className = className;
-  if (text !== undefined) node.textContent = text;
+  if (text !== undefined && text !== null) node.textContent = text;
   return node;
 }
 
-function show(id) {
-  for (const s of ["login", "dash"]) $(s).classList.toggle("hidden", s !== id);
+function button(text, className, iconName, onClick) {
+  const b = el("button", className);
+  if (iconName) b.appendChild(icon(iconName));
+  if (text) b.appendChild(document.createTextNode(text));
+  if (onClick) b.onclick = onClick;
+  return b;
 }
 
-async function start() {
-  const { data } = await api("/api/admin/state");
-  if (!data.loggedIn) { show("login"); $("loginUser").focus(); return; }
-  show("dash");
-  await refresh();
-  clearInterval(pollTimer);
-  pollTimer = setInterval(refresh, 5000);
+// ---------------------------------------------------------------- language
+// English is written in the code. Uzbek comes from this dictionary: whole texts first,
+// then patterns for texts with names or numbers. Pages are translated as they are drawn.
+const UZ = {
+  "Never": "Hech qachon", "Just now": "Hozirgina", "Cancel": "Bekor qilish", "OK": "OK",
+  "Hide password": "Parolni yashirish", "Show password": "Parolni ko‘rsatish",
+  "Wrong login or password.": "Login yoki parol noto‘g‘ri.",
+  "Dashboard": "Bosh sahifa", "Devices": "Qurilmalar", "Groups": "Guruhlar", "Profiles": "Profillar",
+  "Screen time": "Ekran vaqti", "Schedules": "Jadvallar", "Reports": "Hisobotlar", "Users": "Foydalanuvchilar",
+  "Activity log": "Faoliyat tarixi", "Settings": "Sozlamalar", "Log out": "Chiqish", "No network": "Tarmoq yo‘q",
+  "Connect this computer to WiFi": "Bu kompyuterni WiFi tarmog‘iga ulang", "Online": "Onlayn",
+  "This computer is not on a network. Connect it to WiFi, then use Restart server in the tray.": "Bu kompyuter tarmoqqa ulanmagan. Uni WiFi tarmog‘iga ulang, keyin tray menyusidagi Restart server bandini bosing.",
+  "Phone: install Curbox, open it and tap User.": "Telefon: Curbox ni o‘rnating, oching va User ni bosing.",
+  "Computer: install Curbox for PC and pick User.": "Kompyuter: Curbox for PC ni o‘rnating va User ni tanlang.",
+  "Type the address above, then a login from Users.": "Yuqoridagi manzilni, keyin Foydalanuvchilar bo‘limidagi loginni yozing.",
+  "The device asks its owner for permission, then shows up here.": "Qurilma egasidan ruxsat so‘raydi, keyin shu yerda paydo bo‘ladi.",
+  "Every device must use the same WiFi as this computer.": "Har bir qurilma shu kompyuter bilan bir xil WiFi tarmog‘ida bo‘lishi kerak.",
+  "Total devices": "Jami qurilmalar", "Offline": "Oflayn", "Blocked apps": "Bloklangan ilovalar", "Blocked websites": "Bloklangan saytlar",
+  "Phones and computers, online first.": "Telefon va kompyuterlar, avval onlayn turganlari.",
+  "Connect a device": "Qurilma ulash", "Use this address on the phone or computer.": "Telefon yoki kompyuterda shu manzilni yozing.",
+  "Screen time, last 7 days": "Ekran vaqti, oxirgi 7 kun", "All devices added together.": "Barcha qurilmalar birga hisoblangan.",
+  "Today per device": "Bugun har bir qurilma", "Top apps today": "Bugungi top ilovalar", "Recent events": "So‘nggi hodisalar",
+  "Open the activity log": "Faoliyat tarixini ochish",
+  "No devices yet. Connect one with the address on the right.": "Hali qurilma yo‘q. O‘ngdagi manzil bilan bittasini ulang.",
+  "All devices": "Barcha qurilmalar", "Click a device to manage it. Tick devices to change several at once.": "Boshqarish uchun qurilmani bosing. Bir nechtasini birdan o‘zgartirish uchun belgilang.",
+  "Search by device or user": "Qurilma yoki foydalanuvchi bo‘yicha qidirish", "Search devices": "Qurilmalarni qidirish",
+  "All types": "Barcha turlar", "Phones": "Telefonlar", "Computers": "Kompyuterlar", "Device type": "Qurilma turi",
+  "Online and offline": "Onlayn va oflayn", "Status": "Holat", "Sort by name": "Nomi bo‘yicha", "Sort by last seen": "Oxirgi ko‘rinish bo‘yicha",
+  "Sort": "Saralash", "All groups": "Barcha guruhlar", "Group": "Guruh", "Select all shown devices": "Ko‘rinib turgan barcha qurilmalarni belgilash",
+  "Device": "Qurilma", "User": "Foydalanuvchi", "System": "Tizim", "Removed devices": "Olib tashlangan qurilmalar",
+  "A removed device is released the next time it checks in.": "Olib tashlangan qurilma keyingi ulanishida bo‘shatiladi.",
+  "No devices yet. See Dashboard for how to connect one.": "Hali qurilma yo‘q. Qanday ulash Bosh sahifada yozilgan.",
+  "No devices match these filters.": "Bu filtrlarga mos qurilma yo‘q.", "Computer": "Kompyuter", "Phone": "Telefon",
+  "Waiting for approval": "Tasdiqlash kutilmoqda", "1 device selected": "1 ta qurilma tanlandi", "Block websites": "Saytlarni bloklash",
+  "Remove": "Olib tashlash", "Clear": "Tozalash", "Waiting for the device": "Qurilma kutilmoqda",
+  "Device is offline, it will release when it comes back": "Qurilma oflayn, qaytib ulanganda bo‘shatiladi",
+  "Could not save. Try again.": "Saqlab bo‘lmadi. Qayta urinib ko‘ring.", "Social media": "Ijtimoiy tarmoqlar", "Video": "Video", "Gaming": "O‘yinlar",
+  "Type websites separated by commas, or add a group below.": "Saytlarni vergul bilan ajratib yozing yoki pastdan guruh qo‘shing.",
+  "Block": "Bloklash", "Type at least one website.": "Kamida bitta sayt yozing.", "Those websites were already blocked.": "Bu saytlar allaqachon bloklangan.",
+  "Management stops and every block is lifted the next time the device checks in. A device that is off releases when it comes back. To manage it again, sign in on the device.": "Boshqaruv to‘xtaydi va qurilma keyingi ulanishida barcha bloklar olib tashlanadi. O‘chiq qurilma qaytib ulanganda bo‘shatiladi. Uni qayta boshqarish uchun qurilmada qayta kiring.",
+  "Device removed.": "Qurilma olib tashlandi.", "Overview": "Umumiy", "Apps": "Ilovalar", "Websites": "Saytlar", "Protection": "Himoya", "Activity": "Faoliyat",
+  "This device is no longer linked. Removed devices are listed on the Devices page.": "Bu qurilma endi ulanmagan. Olib tashlangan qurilmalar Qurilmalar sahifasida.",
+  "Programs": "Dasturlar", "Saved. The device gets it within 10 seconds.": "Saqlandi. Qurilma uni 10 soniya ichida oladi.",
+  "About this device": "Qurilma haqida", "What Curbox can do here": "Curbox bu yerda nima qila oladi", "New apps": "Yangi ilovalar",
+  "What happens to apps installed after this device was linked.": "Qurilma ulangandan keyin o‘rnatilgan ilovalar bilan nima bo‘ladi.",
+  "Rules on this device": "Bu qurilmadagi qoidalar", "Everything this device follows, and where each rule comes from.": "Qurilma amal qiladigan barcha qoidalar va har biri qayerdan kelgani.",
+  "Block apps. When a blocked app opens, Curbox sends the phone back to the home screen.": "Ilovalarni bloklaydi. Bloklangan ilova ochilsa, Curbox telefonni bosh ekranga qaytaradi.",
+  "Block whole websites, like youtube.com, in supported browsers.": "Qo‘llab quvvatlanadigan brauzerlarda butun saytni bloklaydi, masalan youtube.com.",
+  "Block parts of a website, like youtube.com/shorts.": "Saytning bir qismini bloklaydi, masalan youtube.com/shorts.",
+  "Send the list of installed apps.": "O‘rnatilgan ilovalar ro‘yxatini yuboradi.",
+  "On a normal phone the owner can still turn Curbox off in Android settings. If that happens, the phone goes offline here.": "Oddiy telefonda egasi Curbox ni Android sozlamalarida o‘chira oladi. Shunda telefon bu yerda oflayn bo‘lib ko‘rinadi.",
+  "Close blocked programs within two seconds.": "Bloklangan dasturlarni ikki soniya ichida yopadi.",
+  "Block whole websites, like youtube.com, for the whole computer.": "Butun kompyuter uchun butun saytni bloklaydi, masalan youtube.com.",
+  "Parts of a website, like youtube.com/shorts, cannot be blocked on a computer.": "Kompyuterda saytning bir qismini, masalan youtube.com/shorts, bloklab bo‘lmaydi.",
+  "A browser with secure DNS turned on can skip website blocks.": "Secure DNS yoqilgan brauzer sayt bloklarini chetlab o‘tishi mumkin.",
+  "Type": "Turi", "Windows computer": "Windows kompyuter", "Android phone": "Android telefon", "Unknown": "Noma’lum", "Linked": "Ulangan",
+  "Allow new apps": "Yangi ilovalarga ruxsat", "Block new apps": "Yangi ilovalarni bloklash",
+  "New apps will be blocked.": "Yangi ilovalar bloklanadi.", "New apps will be allowed.": "Yangi ilovalarga ruxsat beriladi.",
+  "New apps are tagged New for one day and written to the activity log.": "Yangi ilovalar bir kun New belgisi bilan turadi va faoliyat tarixiga yoziladi.",
+  "Show blocked only": "Faqat bloklanganlar", "Block all": "Hammasini bloklash", "Programs on this computer": "Bu kompyuterdagi dasturlar",
+  "Apps on this phone": "Bu telefondagi ilovalar", "Search programs": "Dasturlarni qidirish", "Search apps": "Ilovalarni qidirish",
+  "Block all programs": "Barcha dasturlarni bloklash", "Block all apps": "Barcha ilovalarni bloklash", "Allow": "Ruxsat berish",
+  "The program list shows up a minute after the computer connects.": "Dasturlar ro‘yxati kompyuter ulangandan bir daqiqa keyin chiqadi.",
+  "The app list shows up a few seconds after the phone connects.": "Ilovalar ro‘yxati telefon ulangandan bir necha soniya keyin chiqadi.",
+  "Nothing is blocked here.": "Bu yerda hech narsa bloklanmagan.", "Nothing matches your search.": "Qidiruvga mos narsa topilmadi.",
+  "New": "Yangi", "Always allowed": "Doim ruxsat", "Blocked": "Bloklangan", "Allowed": "Ruxsat",
+  "Windows system programs and Curbox": "Windows tizim dasturlari va Curbox",
+  "Curbox, the home screen, phone, settings and the keyboard": "Curbox, bosh ekran, telefon, sozlamalar va klaviatura",
+  "All blocked. The device gets it within 10 seconds.": "Hammasi bloklandi. Qurilma buni 10 soniya ichida oladi.",
+  "Website, like youtube.com": "Sayt, masalan youtube.com", "Quick add": "Tez qo‘shish",
+  "Block a group of popular websites on this device, the ticked devices, or every device.": "Mashhur saytlar guruhini shu qurilmada, belgilangan qurilmalarda yoki hammasida bloklang.",
+  "Add": "Qo‘shish", "On a computer the whole website is blocked. Paths like youtube.com/shorts only work on phones.": "Kompyuterda butun sayt bloklanadi. youtube.com/shorts kabi yo‘llar faqat telefonda ishlaydi.",
+  "Block a whole website, or a path like youtube.com/shorts.": "Butun saytni yoki youtube.com/shorts kabi yo‘lni bloklang.",
+  "No blocked websites.": "Bloklangan sayt yo‘q.", "Not used on this computer.": "Bu kompyuterda ishlatilmaydi.",
+  "Path (phones only)": "Yo‘l (faqat telefon)", "Whole domain": "Butun domen", "These websites will be blocked:": "Bu saytlar bloklanadi:",
+  "Changes and events for this device, newest first.": "Bu qurilmadagi o‘zgarish va hodisalar, eng yangisi birinchi.",
+  "Signed in to the admin panel": "Admin panelga kirdi", "Wrong admin login or password": "Admin login yoki paroli noto‘g‘ri",
+  "Changed the admin password": "Admin parolini o‘zgartirdi", "Wrong current password while changing the admin password": "Admin parolini o‘zgartirishda joriy parol noto‘g‘ri",
+  "Linked the device": "Qurilmani uladi", "Removed the device": "Qurilmani olib tashladi", "The device checked in and was released": "Qurilma ulandi va bo‘shatildi",
+  "Released the device with the release code": "Qurilma kod bilan bo‘shatildi", "Typed a wrong release code": "Noto‘g‘ri kod yozildi",
+  "Set the release code": "Bo‘shatish kodini o‘rnatdi", "Removed the release code": "Bo‘shatish kodini olib tashladi",
+  "New apps are now blocked": "Endi yangi ilovalar bloklanadi", "New apps are now allowed": "Endi yangi ilovalarga ruxsat",
+  "Signed in and is waiting for approval": "Kirdi va tasdiqlashni kutmoqda", "Approved the device": "Qurilmani tasdiqladi",
+  "New devices now need approval": "Endi yangi qurilmalar tasdiqlanadi", "New devices no longer need approval": "Endi yangi qurilmalar tasdiqlanmaydi",
+  "Downloaded a backup": "Zaxira nusxani yuklab oldi", "Restored a backup": "Zaxira nusxani tikladi", "Nothing here yet.": "Hozircha hech narsa yo‘q.",
+  "Failed": "Xato", "Admin changes and device events, newest first. Kept on this computer only.": "Admin o‘zgarishlari va qurilma hodisalari, eng yangisi birinchi. Faqat shu kompyuterda saqlanadi.",
+  "Today": "Bugun", "7 days": "7 kun", "All": "Hammasi", "Search the log": "Tarixdan qidirish", "Screen time per day": "Kunlik ekran vaqti",
+  "Usage is not available on this computer yet. It starts after someone signs in to Windows.": "Bu kompyuterda foydalanish ma’lumoti hali yo‘q. U kimdir Windows ga kirgandan keyin boshlanadi.",
+  "No usage yet. The phone sends it every 5 minutes.": "Hali ma’lumot yo‘q. Telefon uni har 5 daqiqada yuboradi.",
+  "No report for this time.": "Bu vaqt uchun ma’lumot yo‘q.", "No app usage for this time yet.": "Bu vaqt uchun ilova ma’lumoti hali yo‘q.",
+  "App": "Ilova", "Time": "Vaqt", "Share": "Ulush", "No data yet. Phones send usage every 5 minutes after they link.": "Hali ma’lumot yo‘q. Telefonlar ulangandan keyin har 5 daqiqada yuboradi.",
+  "No devices yet.": "Hali qurilma yo‘q.", "No app usage today yet.": "Bugun hali ilova ma’lumoti yo‘q.", "30 days": "30 kun", "Custom": "Tanlash",
+  "From": "Dan", "To": "Gacha", "All users": "Barcha foydalanuvchilar", "Export CSV": "CSV yuklab olish", "Print or save as PDF": "Chop etish yoki PDF",
+  "Daily screen time": "Kunlik ekran vaqti", "All chosen devices added together. Hover a bar for the exact time.": "Tanlangan qurilmalar birga. Aniq vaqt uchun ustun ustiga olib boring.",
+  "Total screen time per device for this time.": "Shu davrda har bir qurilmaning jami ekran vaqti.",
+  "Time in each app. The same app on two devices is added up.": "Har bir ilovadagi vaqt. Ikki qurilmadagi bir xil ilova qo‘shib hisoblanadi.",
+  "Curbox screen time report": "Curbox ekran vaqti hisoboti", "Total screen time": "Jami ekran vaqti", "Daily average": "Kunlik o‘rtacha",
+  "No data": "Ma’lumot yo‘q", "Devices with data": "Ma’lumoti bor qurilmalar", "No data for this time yet.": "Bu vaqt uchun ma’lumot hali yo‘q.",
+  "No devices match.": "Mos qurilma yo‘q.", "Mon": "Du", "Tue": "Se", "Wed": "Ch", "Thu": "Pa", "Fri": "Ju", "Sat": "Sh", "Sun": "Ya",
+  "Received": "Qabul qilindi", "Every day": "Har kuni", "Mon to Fri": "Dushanbadan Jumagacha", "Sat and Sun": "Shanba va Yakshanba",
+  "No limit": "Limit yo‘q", "Daily limit": "Kunlik limit",
+  "When a device reaches its limit, everything except calls, emergency calls, alarms and settings is blocked until midnight. Times use the device's own clock.": "Qurilma limitga yetganda qo‘ng‘iroq, favqulodda chaqiruv, budilnik va sozlamalardan boshqa hammasi yarim tungacha bloklanadi. Vaqt qurilmaning o‘z soati bo‘yicha.",
+  "Warn at these minutes left": "Shuncha daqiqa qolganda ogohlantirish", "Phones warn the user when this many minutes are left:": "Telefon shuncha daqiqa qolganda ogohlantiradi:",
+  "Save for all devices": "Barcha qurilmalar uchun saqlash", "Used today": "Bugun ishlatildi", "Left today": "Bugun qoldi",
+  "30 min": "30 daqiqa", "1 h": "1 soat", "2 h": "2 soat", "3 h": "3 soat",
+  "Minutes a day, from 1 to 1440. For example 90 is an hour and a half.": "Kuniga daqiqa, 1 dan 1440 gacha. Masalan 90 bir yarim soat.",
+  "Save": "Saqlash", "Type a whole number from 1 to 1440.": "1 dan 1440 gacha butun son yozing.",
+  "Needs usage from this computer. It starts after someone signs in to Windows.": "Bu kompyuterdan foydalanish ma’lumoti kerak. U kimdir Windows ga kirgandan keyin boshlanadi.",
+  "No data yet": "Hali ma’lumot yo‘q", "Limit reached": "Limitga yetdi",
+  "Type up to five whole numbers from 1 to 600, like 60, 30, 10.": "1 dan 600 gacha beshtagacha butun son yozing, masalan 60, 30, 10.",
+  "Warnings saved for all devices.": "Ogohlantirishlar barcha qurilmalar uchun saqlandi.", "Study mode": "O‘qish rejimi", "Sleep": "Uyqu",
+  "Add schedule": "Jadval qo‘shish", "This week": "Shu hafta", "Shaded hours have a schedule on. Times are the device's own local time.": "Bo‘yalgan soatlarda jadval ishlaydi. Vaqt qurilmaning o‘z soati bo‘yicha.",
+  "No devices yet. Connect one first.": "Hali qurilma yo‘q. Avval bittasini ulang.",
+  "No schedules yet. Add one, or start from Study mode or Sleep.": "Hali jadval yo‘q. Bittasini qo‘shing yoki O‘qish rejimi yoki Uyqudan boshlang.",
+  "Blocks all apps except calls and settings": "Qo‘ng‘iroq va sozlamalardan boshqa barcha ilovalarni bloklaydi", "Edit": "Tahrirlash", "Delete": "O‘chirish",
+  "Schedule deleted.": "Jadval o‘chirildi.", "Could not save. Check the schedule and try again.": "Saqlab bo‘lmadi. Jadvalni tekshirib qayta urinib ko‘ring.",
+  "Like Homework": "Masalan Uy vazifasi", "Start": "Boshlanish", "End": "Tugash",
+  "Block all apps (calls, emergency, alarms and settings stay open)": "Barcha ilovalarni bloklash (qo‘ng‘iroq, favqulodda chaqiruv, budilnik va sozlamalar ochiq qoladi)",
+  "The app list shows up after the device connects.": "Ilovalar ro‘yxati qurilma ulangandan keyin chiqadi.", "Programs to block": "Bloklanadigan dasturlar",
+  "Apps to block": "Bloklanadigan ilovalar", "Name": "Nomi", "Days": "Kunlar", "What to block": "Nimani bloklash", "Websites to block": "Bloklanadigan saytlar",
+  "New schedule": "Yangi jadval", "Give the schedule a name.": "Jadvalga nom bering.", "Pick at least one day.": "Kamida bitta kunni tanlang.",
+  "Pick a start and an end time that are not the same.": "Bir xil bo‘lmagan boshlanish va tugash vaqtini tanlang.",
+  "Choose what to block: all apps, some apps, or websites.": "Nimani bloklashni tanlang: barcha ilovalar, ba’zi ilovalar yoki saytlar.",
+  "A device can have up to 20 schedules.": "Bitta qurilmada 20 tagacha jadval bo‘lishi mumkin.",
+  "These devices signed in. Nothing applies to them until you approve.": "Bu qurilmalar kirdi. Siz tasdiqlamaguningizcha ularga hech narsa qo‘llanmaydi.",
+  "Approve": "Tasdiqlash", "Could not approve. Try again.": "Tasdiqlab bo‘lmadi. Qayta urinib ko‘ring.", "Deny": "Rad etish", "None": "Yo‘q",
+  "Not in any group.": "Hech qaysi guruhda emas.", "Waiting for approval. None of these rules apply yet.": "Tasdiqlash kutilmoqda. Bu qoidalarning hech biri hali qo‘llanmaydi.",
+  "Blocked programs": "Bloklangan dasturlar", "Only these websites": "Faqat shu saytlar", "Allow lists only work on phones.": "Ruxsat ro‘yxati faqat telefonda ishlaydi.",
+  "Every other website is blocked.": "Boshqa barcha saytlar bloklanadi.", "New group": "Yangi guruh",
+  "Put devices in groups, like a class, then give a group a profile. A device can be in several groups.": "Qurilmalarni guruhlarga qo‘ying, masalan sinf bo‘yicha, keyin guruhga profil bering. Qurilma bir nechta guruhda bo‘lishi mumkin.",
+  "No groups yet. Make one, like Class 8A.": "Hali guruh yo‘q. Bittasini yarating, masalan 8A sinf.", "No devices yet": "Hali qurilma yo‘q",
+  "No profile": "Profil yo‘q", "Its devices stay. Profiles given to this group stop applying to them.": "Qurilmalari qoladi. Shu guruhga berilgan profillar ularga qo‘llanmay qoladi.",
+  "Group deleted.": "Guruh o‘chirildi.", "Rename": "Nomini o‘zgartirish", "Another group already has this name.": "Bu nomli guruh allaqachon bor.",
+  "For example Class 8A.": "Masalan 8A sinf.", "Group name": "Guruh nomi", "Create": "Yaratish", "Group created.": "Guruh yaratildi.",
+  "Type a name.": "Nom yozing.", "Group renamed.": "Guruh nomi o‘zgartirildi.", "Nothing to choose yet.": "Hozircha tanlash uchun hech narsa yo‘q.",
+  "New profile": "Yangi profil", "Not given to anyone yet": "Hali hech kimga berilmagan", "No rules yet": "Hali qoida yo‘q",
+  "No profiles yet. Make one, like Study Mode, and give it to a group.": "Hali profil yo‘q. Bittasini yarating, masalan Study Mode, va uni guruhga bering.",
+  "Its rules stop on every device it was given to.": "Uning qoidalari berilgan barcha qurilmalarda to‘xtaydi.", "Profile deleted.": "Profil o‘chirildi.",
+  "Duplicate": "Nusxa olish", "Copy made. It is not given to anyone yet.": "Nusxa olindi. U hali hech kimga berilmagan.",
+  "Could not save. Check the profile and try again.": "Saqlab bo‘lmadi. Profilni tekshirib qayta urinib ko‘ring.", "Also block all other apps": "Boshqa barcha ilovalarni ham bloklash",
+  "Like Study Mode": "Masalan Study Mode", "App name": "Ilova nomi", "Android package, like com.example.game": "Android paketi, masalan com.example.game",
+  "Windows program, like game.exe": "Windows dasturi, masalan game.exe", "Type a name and a package or a program.": "Nom va paket yoki dastur nomini yozing.",
+  "Add a time": "Vaqt qo‘shish", "Always": "Doim", "Only at set times": "Faqat belgilangan vaqtda",
+  "Apps to block (works on phones and computers)": "Bloklanadigan ilovalar (telefon va kompyuterda ishlaydi)",
+  "Not in the list? Add it with its Android package, its Windows program, or both:": "Ro‘yxatda yo‘qmi? Uni Android paketi, Windows dasturi yoki ikkalasi bilan qo‘shing:",
+  "When": "Qachon", "Give to groups": "Guruhlarga berish", "Give to users (all their devices)": "Foydalanuvchilarga berish (barcha qurilmalari)",
+  "Give to single devices": "Alohida qurilmalarga berish", "Give the profile a name.": "Profilga nom bering.",
+  "Add at least one time, or choose Always.": "Kamida bitta vaqt qo‘shing yoki Doim ni tanlang.",
+  "Each time needs days, a start and a different end.": "Har bir vaqtda kunlar, boshlanish va boshqa tugash bo‘lishi kerak.",
+  "Saved. Devices get it within 10 seconds.": "Saqlandi. Qurilmalar uni 10 soniya ichida oladi.",
+  "New device or approval request": "Yangi qurilma yoki tasdiqlash so‘rovi", "Device offline for over 10 minutes": "Qurilma 10 daqiqadan ko‘p oflayn",
+  "New app found": "Yangi ilova topildi", "Daily limit reached": "Kunlik limitga yetdi", "Device could not reach this computer": "Qurilma bu kompyuterga ulana olmadi",
+  "Notifications": "Bildirishnomalar", "Mark all as read": "Hammasini o‘qilgan deb belgilash", "Nothing new.": "Yangi narsa yo‘q.",
+  "Curbox service": "Curbox xizmati", "Block messages": "Blok xabarlari", "Background running": "Fonda ishlash", "Uninstall protection": "O‘chirishdan himoya",
+  "Fully managed (device owner)": "To‘liq boshqariladi (device owner)", "Curbox for PC agent": "Curbox for PC agenti", "Usage helper": "Foydalanish yordamchisi",
+  "Website blocking (hosts file)": "Sayt bloklash (hosts fayli)", "Protection on this device": "Bu qurilmadagi himoya",
+  "Read from the device itself every few minutes.": "Har bir necha daqiqada qurilmaning o‘zidan o‘qiladi.", "Protection events": "Himoya hodisalari",
+  "Links, approvals, removals and release attempts.": "Ulanishlar, tasdiqlar, olib tashlashlar va bo‘shatish urinishlari.", "Sync": "Sinxronlash", "Online now": "Hozir onlayn",
+  "No report yet. Computers send one with their program list, about every 10 minutes.": "Hali ma’lumot yo‘q. Kompyuterlar uni dasturlar ro‘yxati bilan taxminan har 10 daqiqada yuboradi.",
+  "No report yet. Phones with the newest Curbox send one every 5 minutes.": "Hali ma’lumot yo‘q. Eng yangi Curbox o‘rnatilgan telefonlar uni har 5 daqiqada yuboradi.",
+  "On": "Yoqilgan", "Off": "O‘chiq", "Choose what shows in the bell, and what also shows as a Windows message.": "Qo‘ng‘iroqchada nima chiqishini va nima Windows xabari sifatida ham chiqishini tanlang.",
+  "Event": "Hodisa", "In the bell": "Qo‘ng‘iroqchada", "Windows message": "Windows xabari", "This computer": "Bu kompyuter", "Backup": "Zaxira nusxa",
+  "Keep a copy of users, devices, rules and settings.": "Foydalanuvchilar, qurilmalar, qoidalar va sozlamalar nusxasini saqlang.",
+  "Download backup": "Zaxira nusxani yuklab olish", "Download a backup?": "Zaxira nusxa yuklab olinsinmi?",
+  "The file holds password hashes and every device's link. Keep it somewhere safe and do not send it to anyone.": "Faylda parol xeshlari va har bir qurilmaning ulanishi bor. Uni xavfsiz joyda saqlang va hech kimga yubormang.",
+  "Download": "Yuklab olish", "Restore from a file": "Fayldan tiklash",
+  "Restoring replaces everything with the file. The current data is kept next to it as curbox-admin-data.before-restore.json.": "Tiklash hamma narsani fayldagisi bilan almashtiradi. Hozirgi ma’lumot yonida curbox-admin-data.before-restore.json nomi bilan saqlanadi.",
+  "This file is not a Curbox backup.": "Bu fayl Curbox zaxira nusxasi emas.", "Restore this backup?": "Bu zaxira nusxa tiklansinmi?", "Restore": "Tiklash",
+  "Backup restored.": "Zaxira nusxa tiklandi.", "Port": "Port", "Addresses": "Manzillar", "Data file": "Ma’lumot fayli", "Start with Windows": "Windows bilan ishga tushish",
+  "Curbox for PC starts with Windows.": "Curbox for PC Windows bilan ishga tushadi.", "Curbox for PC no longer starts with Windows.": "Curbox for PC endi Windows bilan ishga tushmaydi.",
+  "Only the installed app can start with Windows.": "Faqat o‘rnatilgan ilova Windows bilan ishga tusha oladi.",
+  "Start with Windows and keep running in the tray": "Windows bilan ishga tushish va trayda ishlab turish",
+  "Closing the window keeps Curbox for PC running in the tray, so devices stay managed. Use Quit in the tray menu to stop it.": "Oynani yopsangiz ham Curbox for PC trayda ishlayveradi, qurilmalar boshqaruvda qoladi. To‘xtatish uchun tray menyusidagi Quit ni bosing.",
+  "People who sign in on phones and computers.": "Telefon va kompyuterlarga kiradigan odamlar.", "Add a user": "Foydalanuvchi qo‘shish",
+  "They use this login on their device.": "Ular shu loginni o‘z qurilmasida ishlatadi.", "Like anvarov": "Masalan anvarov", "Login": "Login", "Password": "Parol",
+  "Add user": "Qo‘shish", "No users yet. Add one on the right.": "Hali foydalanuvchi yo‘q. O‘ngda qo‘shing.", "1 device": "1 ta qurilma", "New password": "Yangi parol",
+  "User added.": "Foydalanuvchi qo‘shildi.", "Use 3 to 32 letters, numbers, dots or underscores.": "3 dan 32 gacha harf, raqam, nuqta yoki pastki chiziq ishlating.",
+  "Use at least 4 characters for the password.": "Parol uchun kamida 4 ta belgi ishlating.", "This login is already taken.": "Bu login band.",
+  "Could not add the user.": "Foydalanuvchini qo‘shib bo‘lmadi.", "Use at least 4 characters. Their devices ask for it at the next sign in.": "Kamida 4 ta belgi ishlating. Qurilmalari keyingi kirishda uni so‘raydi.",
+  "Password changed.": "Parol o‘zgartirildi.", "Use at least 4 characters.": "Kamida 4 ta belgi ishlating.", "These devices stop following your blocks:": "Bu qurilmalar bloklaringizga amal qilmay qo‘yadi:",
+  "This user has no devices.": "Bu foydalanuvchida qurilma yo‘q.", "User deleted.": "Foydalanuvchi o‘chirildi.", "Admin account": "Admin hisobi",
+  "Current password": "Joriy parol", "New password again": "Yangi parol yana", "Change password": "Parolni o‘zgartirish", "Release code": "Bo‘shatish kodi",
+  "A device needs this six digit code to leave management from inside Curbox.": "Qurilma Curbox ichidan boshqaruvdan chiqishi uchun shu olti xonali kod kerak.",
+  "6 digits": "6 ta raqam", "New release code": "Yangi bo‘shatish kodi", "Remove code": "Kodni olib tashlash", "Save code": "Kodni saqlash",
+  "New devices": "Yangi qurilmalar", "New devices now wait for your approval.": "Endi yangi qurilmalar tasdiqlashingizni kutadi.",
+  "New devices are now accepted right away.": "Endi yangi qurilmalar darhol qabul qilinadi.", "Approve new devices before rules apply": "Qoidalardan oldin yangi qurilmalarni tasdiqlash",
+  "When this is on, a device that signs in for the first time waits on the Dashboard until you approve it. Devices you already have are not affected.": "Bu yoqilganda birinchi marta kirgan qurilma siz tasdiqlamaguningizcha Bosh sahifada kutib turadi. Bor qurilmalarga ta’sir qilmaydi.",
+  "Connection": "Ulanish", "Phones and computers on the same WiFi use this address.": "Bir xil WiFi dagi telefon va kompyuterlar shu manzildan foydalanadi.", "About": "Ilova haqida",
+  "Curbox for PC, version 1.0.0": "Curbox for PC, versiya 1.0.0", "Curbox for PC manages phones and computers on your own network. Nothing goes to the internet.": "Curbox for PC telefon va kompyuterlarni o‘z tarmog‘ingizda boshqaradi. Internetga hech narsa ketmaydi.",
+  "Sessions end after 12 hours without use. Five wrong passwords lock that login for 5 minutes.": "Seans 12 soat ishlatilmasa tugaydi. Besh marta noto‘g‘ri parol shu loginni 5 daqiqaga bloklaydi.",
+  "Code is set": "Kod o‘rnatilgan", "No code yet. Devices cannot release themselves until you set one.": "Hali kod yo‘q. Kod o‘rnatmaguningizcha qurilmalar o‘zini bo‘shata olmaydi.",
+  "Remove the release code?": "Bo‘shatish kodi olib tashlansinmi?", "Devices can no longer release themselves. You can still remove a device here.": "Qurilmalar endi o‘zini bo‘shata olmaydi. Qurilmani bu yerdan baribir olib tashlashingiz mumkin.",
+  "Release code removed.": "Bo‘shatish kodi olib tashlandi.", "Release code saved.": "Bo‘shatish kodi saqlandi.",
+  "This code is too easy to guess. Avoid 123456 or the same digit six times.": "Bu kodni topish juda oson. 123456 yoki bir xil raqamni olti marta ishlatmang.",
+  "Type exactly six digits.": "Aynan olti ta raqam yozing.", "The new passwords are not the same.": "Yangi parollar bir xil emas.",
+  "Password changed. Other sessions were signed out.": "Parol o‘zgartirildi. Boshqa seanslardan chiqildi.", "The current password is wrong.": "Joriy parol noto‘g‘ri.",
+  "Sign in to manage phones and computers": "Telefon va kompyuterlarni boshqarish uchun kiring", "Sign in": "Kirish",
+  "Sessions end after 12 hours without use.": "Seans 12 soat ishlatilmasa tugaydi.", "Loading…": "Yuklanmoqda…",
+  "Waiting for the device": "Qurilma kutilmoqda", "Total screen time per device": "Har bir qurilmaning jami ekran vaqti",
+  "Device removed": "Qurilma olib tashlandi", "Language": "Til",
+  "Curbox for PC is not answering. Check that it is still running.": "Curbox for PC javob bermayapti. U ishlab turganini tekshiring."
+};
+
+/** Texts with names or numbers inside. Each pattern matches the whole text. */
+const UZ_PATTERNS = [
+  [/^(\d+) min ago$/, "$1 daqiqa oldin"], [/^(\d+) h ago$/, "$1 soat oldin"],
+  [/^Too many wrong tries\. Wait (\d+) min and try again\.$/, "Juda ko‘p noto‘g‘ri urinish. $1 daqiqa kutib qayta urinib ko‘ring."],
+  [/^Devices connect at (.+)$/, "Qurilmalar $1 manzilga ulanadi"], [/^See all (\d+) devices$/, "Barcha $1 ta qurilmani ko‘rish"],
+  [/^(\d+) devices selected$/, "$1 ta qurilma tanlandi"], [/^(.+) · Removed (.+)$/, "$1 · Olib tashlandi: $2"], [/^Released (.+)$/, "Bo‘shatildi: $1"],
+  [/^Block websites on (.+)$/, "$1 da saytlarni bloklash"], [/^Blocked on (\d+) devices?\.$/, "$1 ta qurilmada bloklandi."],
+  [/^Remove (\d+) devices\?$/, "$1 ta qurilma olib tashlansinmi?"], [/^Remove (.+)\?$/, "$1 olib tashlansinmi?"], [/^(\d+) devices removed\.$/, "$1 ta qurilma olib tashlandi."],
+  [/^Offline, last seen (.+)$/, "Oflayn, oxirgi marta $1"], [/^(\d+) listed, (\d+) blocked$/, "$1 ta ro‘yxatda, $2 ta bloklangan"], [/^(\d+) blocked$/, "$1 ta bloklangan"],
+  [/^(\d+) selected$/, "$1 ta tanlandi"], [/^Block all (apps|programs) on (.+)\?$/, "$2 da barcha ilovalar bloklansinmi?"],
+  [/^(\d+) (apps|programs) will be blocked\. These always stay allowed so the device keeps working:$/, "$1 ta bloklanadi. Qurilma ishlashi uchun bular doim ruxsatda qoladi:"],
+  [/^Only (.+)$/, "Faqat $1"], [/^Ticked devices \((\d+)\)$/, "Belgilangan qurilmalar ($1)"], [/^All devices \((\d+)\)$/, "Barcha qurilmalar ($1)"],
+  [/^Block (.+) websites\?$/, "$1 saytlari bloklansinmi?"], [/^Added user (.+)$/, "$1 foydalanuvchisi qo‘shildi"], [/^Deleted user (.+)$/, "$1 foydalanuvchisi o‘chirildi"],
+  [/^Set a new password for (.+)$/, "$1 uchun yangi parol o‘rnatildi"], [/^Blocked website (.+)$/, "Bloklangan sayt: $1"], [/^Unblocked website (.+)$/, "Blokdan chiqarilgan sayt: $1"],
+  [/^Blocked (.+)$/, "Bloklandi: $1"], [/^Allowed (.+)$/, "Ruxsat berildi: $1"], [/^New app found: (.+), blocked$/, "Yangi ilova topildi va bloklandi: $1"],
+  [/^New app found: (.+)$/, "Yangi ilova topildi: $1"], [/^Daily limit: (.+)$/, "Kunlik limit: $1"], [/^Added schedule (.+)$/, "Jadval qo‘shildi: $1"],
+  [/^Changed schedule (.+)$/, "Jadval o‘zgartirildi: $1"], [/^Deleted schedule (.+)$/, "Jadval o‘chirildi: $1"], [/^Turned on schedule (.+)$/, "Jadval yoqildi: $1"],
+  [/^Turned off schedule (.+)$/, "Jadval o‘chirildi: $1"], [/^Created group (.+)$/, "Guruh yaratildi: $1"], [/^Changed group (.+)$/, "Guruh o‘zgartirildi: $1"],
+  [/^Deleted group (.+)$/, "Guruh o‘chirildi: $1"], [/^Created profile (.+)$/, "Profil yaratildi: $1"], [/^Changed profile (.+)$/, "Profil o‘zgartirildi: $1"],
+  [/^Deleted profile (.+)$/, "Profil o‘chirildi: $1"], [/^Max (.+)$/, "Eng ko‘p $1"], [/^(\d+) of (\d+)$/, "$1 / $2"], [/^User (.+)$/, "Foydalanuvchi $1"],
+  [/^(\d+) h a day$/, "Kuniga $1 soat"], [/^(\d+) h (\d+) min a day$/, "Kuniga $1 soat $2 daqiqa"], [/^(\d+) min a day$/, "Kuniga $1 daqiqa"],
+  [/^Daily limit for (.+)$/, "$1 uchun kunlik limit"], [/^(.+) \((computer|phone)\)$/, (m, a, b) => a + (b === "computer" ? " (kompyuter)" : " (telefon)")],
+  [/^(.+) · (\d+) schedules$/, "$1 · $2 ta jadval"], [/^(.+) and (.+) overlap, for example (.+)\. Both apply then\.$/, "$1 va $2 ustma ust tushadi, masalan $3. Unda ikkalasi ham ishlaydi."],
+  [/^(.+) is on\.$/, "$1 yoqildi."], [/^(.+) is off\.$/, "$1 o‘chirildi."], [/^Turn off (.+)$/, "$1 ni o‘chirish"], [/^Turn on (.+)$/, "$1 ni yoqish"],
+  [/^Delete (.+)\?$/, "$1 o‘chirilsinmi?"], [/^It stops on (.+) at the next sync\.$/, "$1 da keyingi sinxronlashda to‘xtaydi."], [/^Edit (.+)$/, "Tahrirlash: $1"],
+  [/^(.+) is approved\.$/, "$1 tasdiqlandi."], [/^Groups: (.+)$/, "Guruhlar: $1"], [/^(\d+) devices?: (.+)$/, "$1 ta qurilma: $2"], [/^Profiles: (.+)$/, "Profillar: $1"],
+  [/^Rename (.+)$/, "Nomini o‘zgartirish: $1"], [/^Devices in (.+)$/, "$1 dagi qurilmalar"], [/^Given to (.+)$/, "Berilgan: $1"],
+  [/^(\d+) unread notifications$/, "$1 ta o‘qilmagan bildirishnoma"], [/^Last seen (.+)$/, "Oxirgi marta $1"], [/^Checked (.+)\.$/, "Tekshirildi: $1."],
+  [/^Login: (.+)$/, "Login: $1"], [/^Code is set on (.+)$/, "Kod o‘rnatilgan: $1"], [/^New password for (.+)$/, "$1 uchun yangi parol"],
+  [/^(\d+) devices$/, "$1 ta qurilma"], [/^(.+) · Curbox for PC$/, "$1 · Curbox for PC"],
+  [/^(.+) was linked by (.+)\.$/, "$1 ni $2 uladi."], [/^(.+) is waiting for your approval\.$/, "$1 tasdiqlashingizni kutmoqda."],
+  [/^(.+) has been offline for over 10 minutes\.$/, "$1 10 daqiqadan ko‘p oflayn."], [/^New app on (.+): (.+)$/, "$1 da yangi ilova: $2"],
+  [/^(\d+) new apps on (.+)\.$/, "$2 da $1 ta yangi ilova."], [/^(.+) reached today's limit of (\d+) minutes\.$/, "$1 bugungi $2 daqiqalik limitga yetdi."],
+  [/^(.+) could not reach this computer (\d+) times in a row before it got through\.$/, "$1 ulanishdan oldin bu kompyuterga ketma ket $2 marta ulana olmadi."],
+  [/^“(.+)” is not a website\. Type a domain like youtube\.com or a path like youtube\.com\/shorts\.$/, "“$1” sayt emas. youtube.com kabi domen yoki youtube.com/shorts kabi yo‘l yozing."]
+];
+
+let lang = localStorage.getItem("curboxLang") || ((navigator.language || "").toLowerCase().startsWith("uz") ? "uz" : "en");
+
+function tr(text) {
+  if (lang !== "uz" || !text) return text;
+  const key = text.trim();
+  if (!key) return text;
+  let out = UZ[key];
+  if (out === undefined) {
+    for (const [re, rep] of UZ_PATTERNS) {
+      if (re.test(key)) { out = key.replace(re, rep); break; }
+    }
+  }
+  return out === undefined ? text : text.replace(key, out);
 }
+
+function translateTree(root) {
+  if (lang !== "uz") return;
+  if (root.nodeType === Node.TEXT_NODE) {
+    const next = tr(root.nodeValue);
+    if (next !== root.nodeValue) root.nodeValue = next;
+    return;
+  }
+  if (root.nodeType !== Node.ELEMENT_NODE) return;
+  for (const attr of ["placeholder", "title", "aria-label"]) {
+    const v = root.getAttribute(attr);
+    if (v) {
+      const next = tr(v);
+      if (next !== v) root.setAttribute(attr, next);
+    }
+  }
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT);
+  let node = walker.nextNode();
+  while (node) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      const next = tr(node.nodeValue);
+      if (next !== node.nodeValue) node.nodeValue = next;
+    } else if (node.tagName !== "SCRIPT" && node.tagName !== "STYLE") {
+      for (const attr of ["placeholder", "title", "aria-label"]) {
+        const v = node.getAttribute(attr);
+        if (v) {
+          const next = tr(v);
+          if (next !== v) node.setAttribute(attr, next);
+        }
+      }
+    }
+    node = walker.nextNode();
+  }
+}
+
+function startTranslation() {
+  document.documentElement.lang = lang === "uz" ? "uz" : "en";
+  if (lang !== "uz") return;
+  translateTree(document.body);
+  document.title = tr(document.title);
+  new MutationObserver((changes) => {
+    for (const c of changes) {
+      if (c.type === "characterData") translateTree(c.target);
+      else if (c.type === "attributes") translateTree(c.target);
+      else c.addedNodes.forEach((n) => translateTree(n));
+    }
+    const t = tr(document.title);
+    if (t !== document.title) document.title = t;
+  }).observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ["placeholder", "title", "aria-label"] });
+}
+
+function langButton() {
+  const b = el("button", "ghost small langbtn", lang === "uz" ? "English" : "O‘zbekcha");
+  b.setAttribute("aria-label", "Language");
+  b.onclick = () => {
+    localStorage.setItem("curboxLang", lang === "uz" ? "en" : "uz");
+    location.reload();
+  };
+  return b;
+}
+
+async function api(path, body) {
+  const options = body === undefined ? { method: "GET" } : {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body)
+  };
+  let res;
+  try {
+    res = await fetch(path, options);
+  } catch (e) {
+    // The app was closed or restarted; say so once instead of failing silently.
+    if (!offlineShown) toast(tr("Curbox for PC is not answering. Check that it is still running."));
+    offlineShown = true;
+    return { status: 0, data: {} };
+  }
+  offlineShown = false;
+  let data = {};
+  try { data = await res.json(); } catch (e) { /* empty body */ }
+  if (res.status === 401 && path !== "/api/admin/login") showLogin();
+  return { status: res.status, data };
+}
+let offlineShown = false;
+
+function timeAgo(ms) {
+  if (!ms) return "Never";
+  const s = Math.round((Date.now() - ms) / 1000);
+  if (s < 60) return lang === "uz" ? "Hozirgina" : "Just now";
+  if (s < 3600) return Math.round(s / 60) + (lang === "uz" ? " daqiqa oldin" : " min ago");
+  if (s < 86400) return Math.round(s / 3600) + (lang === "uz" ? " soat oldin" : " h ago");
+  return new Date(ms).toLocaleDateString();
+}
+
+function isPc(d) { return d.platform === "windows"; }
+
+let toastTimer = 0;
+function toast(text) {
+  const t = $("toast");
+  t.textContent = text;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 2400);
+}
+
+/**
+ * A small dialog. Resolves to the typed text (with input or field), the picked choice,
+ * true (confirmed) or null. onConfirm may return an error text to keep it open.
+ */
+function modal({ title, message, list, input, field: givenField, body, choices, confirmText, danger, onConfirm, wide }) {
+  return new Promise((resolve) => {
+    const back = el("div", "backdrop");
+    const box = el("div", "card modal" + (wide ? " wide" : ""));
+    box.setAttribute("role", "dialog");
+    box.setAttribute("aria-modal", "true");
+    box.appendChild(el("h2", "", title));
+    if (message) box.appendChild(el("p", "muted", message));
+    if (list && list.length) {
+      const ul = el("ul");
+      list.forEach((item) => ul.appendChild(el("li", "", item)));
+      box.appendChild(ul);
+    }
+    let field = givenField || null;
+    if (input) {
+      field = el("input");
+      field.type = input.type || "text";
+      field.placeholder = input.placeholder || "";
+    }
+    if (field) box.appendChild(field);
+    if (body) box.appendChild(body);
+    let picked = choices && choices.length ? choices[0].value : null;
+    if (picked !== null) {
+      const group = el("div", "choices");
+      group.setAttribute("role", "radiogroup");
+      const name = "choice" + Date.now();
+      choices.forEach((c, i) => {
+        const row = el("label", "choice");
+        const radio = el("input");
+        radio.type = "radio";
+        radio.name = name;
+        radio.checked = i === 0;
+        radio.onchange = () => { picked = c.value; };
+        row.append(radio, document.createTextNode(c.label));
+        group.appendChild(row);
+      });
+      box.appendChild(group);
+    }
+    const err = el("div", "error");
+    box.appendChild(err);
+    const actions = el("div", "actions");
+    const close = (value) => { back.remove(); resolve(value); };
+    const okButton = button(confirmText || "OK", danger ? "danger" : "primary", null, () => confirm());
+    const confirm = async () => {
+      if (okButton.disabled) return;
+      const value = field ? field.value : (picked !== null ? picked : true);
+      if (onConfirm) {
+        okButton.disabled = true;
+        err.textContent = "";
+        const problem = await onConfirm(value);
+        okButton.disabled = false;
+        if (problem) { err.textContent = problem; return; }
+      }
+      close(value);
+    };
+    actions.append(button("Cancel", "ghost", null, () => close(null)), okButton);
+    box.appendChild(actions);
+    back.appendChild(box);
+    back.onclick = (e) => { if (e.target === back) close(null); };
+    back.onkeydown = (e) => {
+      if (e.key === "Escape") close(null);
+      if (e.key === "Enter" && field) confirm();
+    };
+    document.body.appendChild(back);
+    (field || actions.lastChild).focus();
+  });
+}
+
+// ---------------------------------------------------------------- login
+function showLogin() {
+  clearInterval(pollTimer);
+  $("app").classList.add("hidden");
+  $("login").classList.remove("hidden");
+  $("loginUser").focus();
+}
+
+let passVisible = false;
+function renderPassToggle() {
+  const b = $("togglePass");
+  b.replaceChildren(icon(passVisible ? "eyeOff" : "eye"));
+  b.setAttribute("aria-label", passVisible ? "Hide password" : "Show password");
+  $("loginPass").type = passVisible ? "text" : "password";
+}
+$("togglePass").onclick = () => { passVisible = !passVisible; renderPassToggle(); };
 
 async function doLogin() {
   $("loginBtn").disabled = true;
-  const { status } = await api("/api/admin/login", { username: $("loginUser").value, password: $("loginPass").value });
+  $("loginError").textContent = "";
+  const { status, data } = await api("/api/admin/login", { username: $("loginUser").value, password: $("loginPass").value });
   $("loginBtn").disabled = false;
-  if (status === 200) { $("loginPass").value = ""; $("loginError").textContent = ""; start(); }
-  else $("loginError").textContent = "Wrong login or password.";
+  if (status === 200) {
+    $("loginPass").value = "";
+    start();
+    return;
+  }
+  $("loginError").textContent = status === 429
+    ? "Too many wrong tries. Wait " + Math.ceil((data.retryAfter || 300) / 60) + " min and try again."
+    : "Wrong login or password.";
 }
 $("loginBtn").onclick = doLogin;
 $("loginPass").onkeydown = (e) => { if (e.key === "Enter") doLogin(); };
 $("loginUser").onkeydown = (e) => { if (e.key === "Enter") $("loginPass").focus(); };
 
+// ---------------------------------------------------------------- shell
+const PAGES = [
+  { id: "dashboard", label: "Dashboard", icon: "dashboard" },
+  { id: "devices", label: "Devices", icon: "devices" },
+  { id: "groups", label: "Groups", icon: "users" },
+  { id: "profiles", label: "Profiles", icon: "shield" },
+  { id: "screentime", label: "Screen time", icon: "clock" },
+  { id: "schedules", label: "Schedules", icon: "calendar" },
+  { id: "reports", label: "Reports", icon: "chart" },
+  { id: "users", label: "Users", icon: "users" },
+  { id: "activity", label: "Activity log", icon: "history" },
+  { id: "settings", label: "Settings", icon: "settings" }
+];
+
+let overview = null;
+let route = { page: "dashboard", id: null, tab: "overview" };
+let pollTimer = 0;
+// Lists redraw only when their data changed, so focus and scrolling stay put between polls.
+let memo = {};
+function changed(id, data) {
+  const key = JSON.stringify(data);
+  if (memo[id] === key) return false;
+  memo[id] = key;
+  return true;
+}
+// Only what the lists show; lastSeen moves on every sync and would redraw every poll.
+function visibleDevices() {
+  return overview.devices.map((d) => [d.id, d.name, d.user, d.platform, d.online, d.blockedApps.length, d.blockedSites.length, d.appVersion, d.osVersion, d.pending]);
+}
+// Changes every 30 s, so "2 min ago" labels still move on.
+function tick() { return Math.floor(Date.now() / 30000); }
+
+function buildNav() {
+  const nav = $("nav");
+  nav.replaceChildren();
+  for (const p of PAGES) {
+    const a = el("a");
+    a.href = "#/" + p.id;
+    a.dataset.page = p.id;
+    a.append(icon(p.icon), document.createTextNode(p.label));
+    nav.appendChild(a);
+  }
+  $("logoutBtn").replaceChildren(icon("logout"), document.createTextNode("Log out"));
+}
+
 $("logoutBtn").onclick = async () => {
   clearInterval(pollTimer);
   await api("/api/admin/logout", {});
-  start();
+  showLogin();
 };
+
+async function start() {
+  const { data } = await api("/api/admin/state");
+  if (!data.loggedIn) { showLogin(); return; }
+  $("login").classList.add("hidden");
+  $("app").classList.remove("hidden");
+  await refresh();
+  mount();
+  clearInterval(pollTimer);
+  pollTimer = setInterval(async () => { await refresh(); update(); }, 5000);
+}
 
 async function refresh() {
   const { status, data } = await api("/api/admin/overview");
-  if (status === 401) { clearInterval(pollTimer); start(); return; }
-  if (status !== 200) return;
-  overview = data;
-  $("adminName").textContent = data.adminUser;
-  const addr = $("addresses");
-  addr.replaceChildren();
-  if (data.addresses.length === 0) addr.textContent = "This computer is not on a network.";
-  for (const a of data.addresses) {
-    const line = el("div");
-    line.appendChild(el("span", "addr", a));
-    addr.appendChild(line);
+  if (status === 200) overview = data;
+  if (!overview) return;
+  const addresses = overview.addresses || [];
+  $("addrChip").replaceChildren(icon("link"), document.createTextNode(addresses[0] || "No network"));
+  $("addrChip").title = addresses.length ? "Devices connect at " + addresses.join(", ") : "Connect this computer to WiFi";
+  $("adminChip").textContent = overview.adminUser;
+  renderBell();
+}
+
+function parseRoute() {
+  const parts = location.hash.replace(/^#\/?/, "").split("/");
+  const page = PAGES.some((p) => p.id === parts[0]) ? parts[0] : "dashboard";
+  const tab = DEVICE_TABS.includes(parts[2]) ? parts[2] : "overview";
+  return { page, id: parts[1] ? decodeURIComponent(parts[1]) : null, tab };
+}
+
+window.onhashchange = () => { if (overview) mount(); };
+
+/** Builds the page frame once per route; update() fills it and runs on every poll. */
+function mount() {
+  route = parseRoute();
+  for (const a of $("nav").children) a.classList.toggle("active", a.dataset.page === route.page);
+  const content = $("content");
+  content.replaceChildren();
+  memo = {};
+  if (route.page === "devices" && route.id) mountDevice(content);
+  else ({ dashboard: mountDashboard, devices: mountDevices, users: mountUsers, activity: mountActivity, reports: mountReports, screentime: mountScreenTime, schedules: mountSchedules, groups: mountGroups, profiles: mountProfiles, settings: mountSettings })[route.page](content);
+  update();
+}
+
+function update() {
+  if (!overview || $("app").classList.contains("hidden")) return;
+  if (route.page === "devices" && route.id) updateDevice();
+  else ({ dashboard: updateDashboard, devices: updateDevices, users: updateUsers, activity: updateActivity, reports: updateReports, screentime: updateScreenTime, schedules: updateSchedules, groups: updateGroups, profiles: updateProfiles, settings: updateSettings })[route.page]();
+}
+
+function setTitle(text) {
+  $("pageTitle").textContent = text;
+  document.title = text + " · Curbox for PC";
+}
+
+function card(title, iconName, subText) {
+  const c = el("section", "card");
+  const h = el("h2");
+  if (iconName) h.appendChild(icon(iconName));
+  const t = el("span", "", title);
+  h.appendChild(t);
+  c.appendChild(h);
+  if (subText) c.appendChild(el("p", "sub muted small", subText));
+  return c;
+}
+
+function emptyState(iconName, text) {
+  const box = el("div", "empty");
+  box.appendChild(icon(iconName));
+  box.appendChild(el("div", "", text));
+  return box;
+}
+
+function typeIcon(d) {
+  const type = el("div", "typeicon");
+  type.appendChild(icon(isPc(d) ? "computer" : "phone"));
+  return type;
+}
+
+function statusBadge(d) {
+  const s = el("span", "status");
+  s.appendChild(el("span", "dot" + (d.online ? " on" : "")));
+  s.appendChild(document.createTextNode(d.online ? "Online" : timeAgo(d.lastSeen)));
+  return s;
+}
+
+function deviceRow(d) {
+  const row = el("div", "row click");
+  const info = el("div", "grow");
+  info.append(el("div", "title", d.name), el("div", "tiny", d.user + (isPc(d) ? " · Computer" : " · Phone")));
+  row.append(typeIcon(d), info, statusBadge(d));
+  row.onclick = () => { location.hash = "#/devices/" + encodeURIComponent(d.id); };
+  return row;
+}
+
+function connectSteps(box) {
+  const addresses = overview.addresses || [];
+  box.replaceChildren();
+  if (!addresses.length) {
+    box.appendChild(el("p", "muted", "This computer is not on a network. Connect it to WiFi, then use Restart server in the tray."));
+    return;
   }
-  renderUsers();
-  renderDevices();
-  renderDetail();
+  addresses.forEach((a) => box.appendChild(el("div", "addr", a)));
+  const ol = el("ol", "steps muted");
+  ol.append(
+    el("li", "", "Phone: install Curbox, open it and tap User."),
+    el("li", "", "Computer: install Curbox for PC and pick User."),
+    el("li", "", "Type the address above, then a login from Users."),
+    el("li", "", "The device asks its owner for permission, then shows up here.")
+  );
+  box.appendChild(ol);
+  box.appendChild(el("p", "small muted", "Every device must use the same WiFi as this computer."));
 }
 
-function timeAgo(ms) {
-  if (!ms) return "never";
-  const s = Math.round((Date.now() - ms) / 1000);
-  if (s < 60) return "just now";
-  if (s < 3600) return Math.round(s / 60) + " min ago";
-  if (s < 86400) return Math.round(s / 3600) + " h ago";
-  return new Date(ms).toLocaleString();
+// ---------------------------------------------------------------- dashboard
+const STAT_DEFS = [
+  { key: "total", label: "Total devices", icon: "devices", color: "--primary", soft: "--primary-soft" },
+  { key: "online", label: "Online", icon: "online", color: "--ok", soft: "--ok-soft" },
+  { key: "offline", label: "Offline", icon: "offline", color: "--muted", soft: "--bg" },
+  { key: "users", label: "Users", icon: "users", color: "--primary", soft: "--primary-soft" },
+  { key: "apps", label: "Blocked apps", icon: "ban", color: "--err", soft: "--err-soft" },
+  { key: "sites", label: "Blocked websites", icon: "globe", color: "--warn", soft: "--warn-soft" }
+];
+
+function mountDashboard(content) {
+  setTitle("Dashboard");
+  const stats = el("div", "stats");
+  for (const s of STAT_DEFS) {
+    const c = el("div", "card stat");
+    const i = el("div", "icon");
+    i.style.background = "var(" + s.soft + ")";
+    i.style.color = "var(" + s.color + ")";
+    i.appendChild(icon(s.icon));
+    const value = el("div", "value", "0");
+    value.id = "stat_" + s.key;
+    c.append(i, value, el("div", "muted small", s.label));
+    stats.appendChild(c);
+  }
+  const grid = el("div", "grid2");
+  const devicesCard = card("Devices", "devices", "Phones and computers, online first.");
+  const list = el("div");
+  list.id = "dashDevices";
+  devicesCard.appendChild(list);
+  const connectCard = card("Connect a device", "link", "Use this address on the phone or computer.");
+  const steps = el("div");
+  steps.id = "dashConnect";
+  connectCard.appendChild(steps);
+  grid.append(devicesCard, connectCard);
+
+  const usage = el("div", "grid2");
+  const left = el("div", "stack");
+  const chart = card("Screen time, last 7 days", "chart", "All devices added together.");
+  const chartBox = el("div");
+  chartBox.id = "dashChart";
+  chartBox.appendChild(el("p", "muted small", "Loading…"));
+  chart.appendChild(chartBox);
+  const today = card("Today per device", "devices");
+  const todayBox = el("div");
+  todayBox.id = "dashToday";
+  today.appendChild(todayBox);
+  left.append(chart, today);
+  const right = el("div", "stack");
+  const apps = card("Top apps today", "apps");
+  const appsBox = el("div");
+  appsBox.id = "dashApps";
+  apps.appendChild(appsBox);
+  const events = card("Recent events", "history");
+  const eventsBox = el("div");
+  eventsBox.id = "dashEvents";
+  const more = button("Open the activity log", "link", null, () => { location.hash = "#/activity"; });
+  events.append(eventsBox, more);
+  right.append(apps, events);
+  usage.append(left, right);
+  dashUsageAt = 0;
+  content.append(approvalCard(), stats, usage, grid);
 }
 
-function renderUsers() {
-  const list = $("userList");
+function updateDashboard() {
+  const devices = overview.devices;
+  const online = devices.filter((d) => d.online).length;
+  const values = {
+    total: devices.length, online, offline: devices.length - online, users: overview.users.length,
+    apps: devices.reduce((n, d) => n + d.blockedApps.length, 0),
+    sites: devices.reduce((n, d) => n + d.blockedSites.length, 0)
+  };
+  for (const [k, v] of Object.entries(values)) $("stat_" + k).textContent = v;
+  updateApprovals();
+  loadDashUsage(false);
+
+  if (!changed("dash", [visibleDevices(), overview.addresses, tick()])) return;
+  const list = $("dashDevices");
   list.replaceChildren();
-  if (overview.users.length === 0) list.appendChild(el("div", "muted", "No users yet."));
-  for (const u of overview.users) {
-    const phones = overview.devices.filter((d) => d.user === u.username).length;
-    const row = el("div", "user");
+  const sorted = [...devices].sort((a, b) => (b.online - a.online) || (b.lastSeen - a.lastSeen));
+  if (!sorted.length) list.appendChild(emptyState("devices", "No devices yet. Connect one with the address on the right."));
+  sorted.slice(0, 8).forEach((d) => list.appendChild(deviceRow(d)));
+  if (sorted.length > 8) {
+    list.appendChild(button("See all " + sorted.length + " devices", "link", null, () => { location.hash = "#/devices"; }));
+  }
+  connectSteps($("dashConnect"));
+}
+
+// ---------------------------------------------------------------- devices
+const devFilter = { q: "", type: "all", state: "all", sort: "name", group: "" };
+// Ticked devices, kept while moving between pages so a category can go to all of them.
+const selected = new Set();
+
+function platformOf(d) { return d.platform === "windows" ? "windows" : "android"; }
+function osText(d) { return d.osVersion || (isPc(d) ? "Windows" : "Android"); }
+
+function selectBox(options, value, label, onChange) {
+  const s = el("select");
+  s.setAttribute("aria-label", label);
+  for (const [v, text] of options) {
+    const o = el("option", "", text);
+    o.value = v;
+    s.appendChild(o);
+  }
+  s.value = value;
+  s.onchange = () => onChange(s.value);
+  return s;
+}
+
+function checkbox(checked, label, onChange) {
+  const box = el("input");
+  box.type = "checkbox";
+  box.checked = checked;
+  box.setAttribute("aria-label", label);
+  box.onclick = (e) => e.stopPropagation();
+  box.onchange = () => onChange(box.checked);
+  return box;
+}
+
+function pill(text, kind, iconName) {
+  const p = el("span", "pill " + kind);
+  if (iconName) p.appendChild(icon(iconName));
+  p.appendChild(document.createTextNode(text));
+  return p;
+}
+
+function filteredDevices() {
+  const q = devFilter.q.trim().toLowerCase();
+  return overview.devices
+    .filter((d) => devFilter.type === "all" || platformOf(d) === devFilter.type)
+    .filter((d) => devFilter.state === "all" || (devFilter.state === "online") === d.online)
+    .filter((d) => !q || d.name.toLowerCase().includes(q) || d.user.includes(q))
+    .filter((d) => !devFilter.group || ((overview.groups || []).find((g) => g.id === devFilter.group) || { deviceIds: [] }).deviceIds.includes(d.id))
+    .sort((a, b) => devFilter.sort === "seen" ? (b.lastSeen - a.lastSeen) : a.name.localeCompare(b.name));
+}
+
+function redrawDevices() { memo.devices = ""; memo.bulk = ""; updateDevices(); }
+
+function mountDevices(content) {
+  setTitle("Devices");
+  const c = card("All devices", "devices", "Click a device to manage it. Tick devices to change several at once.");
+  const bar = el("div", "toolbar");
+  const search = el("input");
+  search.placeholder = "Search by device or user";
+  search.setAttribute("aria-label", "Search devices");
+  search.value = devFilter.q;
+  search.oninput = () => { devFilter.q = search.value; redrawDevices(); };
+  bar.append(
+    search,
+    selectBox([["all", "All types"], ["android", "Phones"], ["windows", "Computers"]], devFilter.type, "Device type",
+      (v) => { devFilter.type = v; redrawDevices(); }),
+    selectBox([["all", "Online and offline"], ["online", "Online"], ["offline", "Offline"]], devFilter.state, "Status",
+      (v) => { devFilter.state = v; redrawDevices(); }),
+    selectBox([["name", "Sort by name"], ["seen", "Sort by last seen"]], devFilter.sort, "Sort",
+      (v) => { devFilter.sort = v; redrawDevices(); })
+  );
+  const groupSel = selectBox([["", "All groups"]].concat((overview.groups || []).map((g) => [g.id, g.name])), devFilter.group, "Group",
+    (v) => { devFilter.group = v; redrawDevices(); });
+  if ((overview.groups || []).length) bar.appendChild(groupSel);
+  const bulk = el("div", "bulkbar hidden");
+  bulk.id = "devBulk";
+
+  const wrap = el("div", "tablewrap");
+  const table = el("table");
+  const head = el("thead");
+  const hr = el("tr");
+  const allCell = el("th", "check");
+  const all = checkbox(false, "Select all shown devices", (on) => {
+    for (const d of filteredDevices()) on ? selected.add(d.id) : selected.delete(d.id);
+    redrawDevices();
+  });
+  all.id = "devAll";
+  allCell.appendChild(all);
+  hr.appendChild(allCell);
+  ["Device", "User", "System", "Status", "Curbox"].forEach((h) => hr.appendChild(el("th", "", h)));
+  head.appendChild(hr);
+  const body = el("tbody");
+  body.id = "devTable";
+  table.append(head, body);
+  wrap.appendChild(table);
+  const empty = el("div");
+  empty.id = "devEmpty";
+  c.append(bar, bulk, wrap, empty);
+
+  const removed = card("Removed devices", "trash", "A removed device is released the next time it checks in.");
+  removed.id = "removedCard";
+  const list = el("div");
+  list.id = "removedList";
+  removed.appendChild(list);
+  content.append(c, removed);
+}
+
+function updateDevices() {
+  for (const id of [...selected]) if (!overview.devices.some((d) => d.id === id)) selected.delete(id);
+  renderBulk();
+  updateRemoved();
+  if (!changed("devices", [visibleDevices(), tick(), devFilter, [...selected]])) return;
+  const body = $("devTable");
+  body.replaceChildren();
+  const devices = filteredDevices();
+  $("devEmpty").replaceChildren();
+  if (!overview.devices.length) $("devEmpty").appendChild(emptyState("devices", "No devices yet. See Dashboard for how to connect one."));
+  else if (!devices.length) $("devEmpty").appendChild(emptyState("devices", "No devices match these filters."));
+  const all = $("devAll");
+  all.checked = devices.length > 0 && devices.every((d) => selected.has(d.id));
+  all.indeterminate = !all.checked && devices.some((d) => selected.has(d.id));
+
+  for (const d of devices) {
+    const tr = el("tr");
+    if (selected.has(d.id)) tr.className = "picked";
+    const checkCell = el("td", "check");
+    checkCell.appendChild(checkbox(selected.has(d.id), "Select " + d.name, (on) => {
+      on ? selected.add(d.id) : selected.delete(d.id);
+      redrawDevices();
+    }));
+    checkCell.onclick = (e) => e.stopPropagation();
+    const nameCell = el("td");
+    const inner = el("div", "inline");
+    const info = el("div");
+    info.append(el("div", "title", d.name), el("div", "tiny", isPc(d) ? "Computer" : "Phone"));
+    inner.append(typeIcon(d), info);
+    nameCell.appendChild(inner);
+    const statusCell = el("td");
+    statusCell.appendChild(d.pending ? pill("Waiting for approval", "warn") : statusBadge(d));
+    tr.append(
+      checkCell,
+      nameCell,
+      el("td", "", d.user),
+      el("td", "small", osText(d)),
+      statusCell,
+      el("td", "small muted", d.appVersion || "")
+    );
+    tr.tabIndex = 0;
+    const open = () => { location.hash = "#/devices/" + encodeURIComponent(d.id); };
+    tr.onclick = open;
+    tr.onkeydown = (e) => { if (e.key === "Enter") open(); };
+    body.appendChild(tr);
+  }
+}
+
+function renderBulk() {
+  const bar = $("devBulk");
+  if (!bar) return;
+  bar.classList.toggle("hidden", !selected.size);
+  if (!changed("bulk", [selected.size])) return;
+  bar.replaceChildren(
+    el("span", "title", selected.size === 1 ? "1 device selected" : selected.size + " devices selected"),
+    button("Block websites", "primary", "globe", () => bulkSites([...selected])),
+    button("Remove", "danger", "trash", () => removeDevices([...selected])),
+    button("Clear", "ghost", null, () => { selected.clear(); redrawDevices(); })
+  );
+}
+
+function updateRemoved() {
+  const box = $("removedList");
+  if (!box) return;
+  const now = Date.now();
+  const recent = (overview.removed || [])
+    .filter((r) => now - (r.releasedAt || r.removedAt) < 7 * 86400000)
+    .sort((a, b) => b.removedAt - a.removedAt);
+  $("removedCard").classList.toggle("hidden", !recent.length);
+  if (!changed("removed", [recent, tick()])) return;
+  box.replaceChildren();
+  for (const r of recent) {
+    const row = el("div", "row");
     const info = el("div", "grow");
-    info.append(el("div", "title", u.username), el("div", "sub", phones === 1 ? "1 phone" : phones + " phones"));
-    const pass = el("button", "ghost small", "New password");
-    pass.onclick = async () => {
-      const value = prompt("New password for " + u.username + " (at least 4 characters):");
-      if (value === null) return;
-      const { status } = await api("/api/admin/users/password", { username: u.username, password: value });
-      alert(status === 200 ? "Password changed." : "Could not change it. Use at least 4 characters.");
+    info.append(el("div", "title", r.name), el("div", "tiny", r.user + " · Removed " + timeAgo(r.removedAt).toLowerCase()));
+    let state;
+    if (r.releasedAt) state = pill("Released " + timeAgo(r.releasedAt).toLowerCase(), "ok", "check");
+    else if (r.wasOnline && now - r.removedAt < 60000) state = pill("Waiting for the device", "warn");
+    else state = pill("Device is offline, it will release when it comes back", "muted");
+    row.append(typeIcon(r), info, state);
+    box.appendChild(row);
+  }
+}
+
+function siteError(data) {
+  if (data && data.error === "bad_site") {
+    return "“" + data.site + "” is not a website. Type a domain like youtube.com or a path like youtube.com/shorts.";
+  }
+  return "Could not save. Try again.";
+}
+
+function splitSites(text) { return text.split(/[\s,]+/).map((s) => s.trim()).filter(Boolean); }
+
+const CATEGORY_LABELS = { social: "Social media", video: "Video", gaming: "Gaming" };
+
+/** Block websites on several devices; the category buttons fill in popular ones. */
+async function bulkSites(ids) {
+  const names = overview.devices.filter((d) => ids.includes(d.id)).map((d) => d.name);
+  const quick = el("div", "chips");
+  const field = el("input");
+  field.placeholder = "youtube.com, tiktok.com";
+  for (const [key, sites] of Object.entries(overview.categories || {})) {
+    quick.appendChild(button(CATEGORY_LABELS[key] || key, "ghost small", "plus", () => {
+      const current = new Set(splitSites(field.value));
+      sites.forEach((s) => current.add(s));
+      field.value = [...current].join(", ");
+      field.focus();
+    }));
+  }
+  let updated = 0;
+  const done = await modal({
+    title: "Block websites on " + (ids.length === 1 ? names[0] : ids.length + " devices"),
+    message: "Type websites separated by commas, or add a group below.",
+    field, body: quick, confirmText: "Block",
+    onConfirm: async (value) => {
+      const add = splitSites(value);
+      if (!add.length) return "Type at least one website.";
+      const { status, data } = await api("/api/admin/sites/bulk", { deviceIds: ids, add });
+      updated = data.updated || 0;
+      return status === 200 ? null : siteError(data);
+    }
+  });
+  if (done === null) return;
+  toast(updated ? "Blocked on " + updated + (updated === 1 ? " device." : " devices.") : "Those websites were already blocked.");
+  await refresh();
+  update();
+}
+
+async function removeDevices(ids) {
+  const chosen = overview.devices.filter((d) => ids.includes(d.id));
+  if (!chosen.length) return false;
+  const ok = await modal({
+    title: chosen.length === 1 ? "Remove " + chosen[0].name + "?" : "Remove " + chosen.length + " devices?",
+    message: "Management stops and every block is lifted the next time the device checks in. A device that is off releases when it comes back. To manage it again, sign in on the device.",
+    list: chosen.length > 1 ? chosen.map((d) => d.name) : null,
+    confirmText: "Remove", danger: true
+  });
+  if (!ok) return false;
+  await api("/api/admin/remove", { deviceIds: chosen.map((d) => d.id) });
+  chosen.forEach((d) => selected.delete(d.id));
+  toast(chosen.length === 1 ? "Device removed." : chosen.length + " devices removed.");
+  await refresh();
+  if (route.page === "devices" && !route.id) redrawDevices();
+  return true;
+}
+
+// ---------------------------------------------------------------- device detail
+const DEVICE_TABS = ["overview", "apps", "sites", "protection", "activity"];
+const appView = { device: null, q: "", blockedOnly: false, sel: new Set() };
+
+function currentDevice() {
+  return overview && overview.devices.find((d) => d.id === route.id);
+}
+
+function mountDevice(content) {
+  setTitle("Device");
+  if (appView.device !== route.id) {
+    appView.device = route.id;
+    appView.q = "";
+    appView.blockedOnly = false;
+    appView.sel.clear();
+  }
+  const back = el("a", "back");
+  back.href = "#/devices";
+  back.append(icon("back"), document.createTextNode("All devices"));
+  const headCard = el("section", "card");
+  headCard.id = "devHead";
+
+  const tabs = el("div", "tabs");
+  tabs.id = "devTabs";
+  const labels = { overview: "Overview", apps: "Apps", sites: "Websites", protection: "Protection", activity: "Activity" };
+  for (const t of DEVICE_TABS) {
+    const a = el("a", t === route.tab ? "active" : "", labels[t]);
+    a.href = "#/devices/" + encodeURIComponent(route.id) + "/" + t;
+    a.dataset.tab = t;
+    tabs.appendChild(a);
+  }
+  const panel = el("div", "stack");
+  panel.id = "devPanel";
+  ({ overview: mountDevOverview, apps: mountDevApps, sites: mountDevSites, protection: mountDevProtection, activity: mountDevActivity })[route.tab](panel);
+  content.append(back, headCard, tabs, panel);
+}
+
+function updateDevice() {
+  const d = currentDevice();
+  const head = $("devHead");
+  if (!head) return;
+  if (!d) {
+    head.replaceChildren(emptyState("devices", "This device is no longer linked. Removed devices are listed on the Devices page."));
+    $("devTabs").classList.add("hidden");
+    $("devPanel").classList.add("hidden");
+    return;
+  }
+  setTitle(d.name);
+  $("devTabs").querySelector('[data-tab="apps"]').textContent = isPc(d) ? "Programs" : "Apps";
+  if (changed("deviceHead", [d.name, d.user, d.online, d.appVersion, d.osVersion, tick()])) {
+    head.replaceChildren();
+    const row = el("div", "head");
+    const info = el("div", "grow");
+    info.append(
+      el("div", "title", d.name),
+      el("div", "tiny", d.user + " · " + osText(d) + (d.appVersion ? " · Curbox " + d.appVersion : ""))
+    );
+    row.append(typeIcon(d), info, statusBadge(d), button("Remove", "danger", "trash", async () => {
+      if (await removeDevices([d.id])) location.hash = "#/devices";
+    }));
+    head.appendChild(row);
+  }
+  ({ overview: updateDevOverview, apps: updateDevApps, sites: updateDevSites, protection: updateDevProtection, activity: updateDevActivity })[route.tab](d);
+}
+
+async function saveRules(d, patch, message) {
+  const { status, data } = await api("/api/admin/rules", Object.assign({ deviceId: d.id }, patch));
+  if (status === 200) toast(message || "Saved. The device gets it within 10 seconds.");
+  else if (status !== 400) toast("Could not save. Try again.");
+  await refresh();
+  update();
+  return { status, data };
+}
+
+// Overview tab
+function mountDevOverview(panel) {
+  const grid = el("div", "grid2");
+  const about = card("About this device", "devices");
+  const facts = el("dl", "kv");
+  facts.id = "devFacts";
+  about.appendChild(facts);
+  const right = el("div", "stack");
+  const can = card("What Curbox can do here", "shield");
+  const capList = el("div");
+  capList.id = "devCan";
+  can.appendChild(capList);
+  const fresh = card("New apps", "sparkle", "What happens to apps installed after this device was linked.");
+  const seg = el("div");
+  seg.id = "devNewApps";
+  fresh.appendChild(seg);
+  right.append(can, fresh);
+  grid.append(about, right);
+  const rules = card("Rules on this device", "shield", "Everything this device follows, and where each rule comes from.");
+  const rulesBox = el("div");
+  rulesBox.id = "devRules";
+  rules.appendChild(rulesBox);
+  panel.append(grid, rules);
+}
+
+const CAPABILITIES = {
+  android: [
+    [true, "Block apps. When a blocked app opens, Curbox sends the phone back to the home screen."],
+    [true, "Block whole websites, like youtube.com, in supported browsers."],
+    [true, "Block parts of a website, like youtube.com/shorts."],
+    [true, "Send the list of installed apps."],
+    [false, "On a normal phone the owner can still turn Curbox off in Android settings. If that happens, the phone goes offline here."]
+  ],
+  windows: [
+    [true, "Close blocked programs within two seconds."],
+    [true, "Block whole websites, like youtube.com, for the whole computer."],
+    [false, "Parts of a website, like youtube.com/shorts, cannot be blocked on a computer."],
+    [false, "A browser with secure DNS turned on can skip website blocks."]
+  ]
+};
+
+function updateDevOverview(d) {
+  if (changed("devRules", [d.effective, d.pending, overview.groups])) renderRuleSources(d);
+  if (!changed("devOverview", [d.name, d.user, d.osVersion, d.appVersion, d.online, d.linkedAt, d.apps.length,
+    d.blockedApps.length, d.blockedSites.length, d.newAppPolicy, tick()])) return;
+  const facts = $("devFacts");
+  facts.replaceChildren();
+  const rows = [
+    ["Type", isPc(d) ? "Windows computer" : "Android phone"],
+    ["User", d.user],
+    ["System", osText(d)],
+    ["Curbox", d.appVersion || "Unknown"],
+    ["Status", d.online ? "Online" : "Offline, last seen " + timeAgo(d.lastSeen).toLowerCase()],
+    ["Linked", d.linkedAt ? new Date(d.linkedAt).toLocaleString() : "Unknown"],
+    [isPc(d) ? "Programs" : "Apps", d.apps.length + " listed, " + d.blockedApps.length + " blocked"],
+    ["Websites", d.blockedSites.length + " blocked"]
+  ];
+  for (const [k, v] of rows) facts.append(el("dt", "", k), el("dd", "", v));
+
+  const capList = $("devCan");
+  capList.replaceChildren();
+  for (const [yes, text] of CAPABILITIES[platformOf(d)]) {
+    const row = el("div", "cap" + (yes ? "" : " no"));
+    row.append(icon(yes ? "check" : "info"), el("span", "", text));
+    capList.appendChild(row);
+  }
+
+  const seg = el("div", "seg");
+  for (const [value, text] of [["allow", "Allow new apps"], ["block", "Block new apps"]]) {
+    const b = button(text, value === d.newAppPolicy ? "on" : "", null, async () => {
+      if (value === d.newAppPolicy) return;
+      const { status } = await api("/api/admin/device/settings", { deviceId: d.id, newAppPolicy: value });
+      toast(status === 200 ? (value === "block" ? "New apps will be blocked." : "New apps will be allowed.") : "Could not save. Try again.");
+      await refresh();
+      update();
+    });
+    b.setAttribute("aria-pressed", String(value === d.newAppPolicy));
+    seg.appendChild(b);
+  }
+  $("devNewApps").replaceChildren(seg, el("p", "small muted", "New apps are tagged New for one day and written to the activity log."));
+}
+
+// Apps tab
+function mountDevApps(panel) {
+  const c = card("Apps", "apps");
+  c.id = "appsCard";
+  const bar = el("div", "toolbar");
+  const search = el("input");
+  search.id = "appSearch";
+  search.value = appView.q;
+  search.oninput = () => { appView.q = search.value; memo.apps = ""; updateDevice(); };
+  const onlyBlocked = el("label", "choice");
+  onlyBlocked.append(checkbox(appView.blockedOnly, "Show blocked only", (on) => {
+    appView.blockedOnly = on;
+    memo.apps = "";
+    updateDevice();
+  }), document.createTextNode("Show blocked only"));
+  const blockAll = button("Block all", "ghost", "ban", () => blockAllApps(currentDevice()));
+  blockAll.id = "blockAllBtn";
+  bar.append(search, onlyBlocked, blockAll);
+  const bulk = el("div", "bulkbar hidden");
+  bulk.id = "appBulk";
+  const list = el("div", "applist");
+  list.id = "appList";
+  c.append(bar, bulk, list);
+  panel.appendChild(c);
+}
+
+function updateDevApps(d) {
+  const pc = isPc(d);
+  $("appsCard").querySelector("h2 span").textContent = pc ? "Programs on this computer" : "Apps on this phone";
+  $("appSearch").placeholder = pc ? "Search programs" : "Search apps";
+  $("blockAllBtn").lastChild.textContent = pc ? "Block all programs" : "Block all apps";
+  const known = new Set(d.apps.map((a) => a.p));
+  for (const p of [...appView.sel]) if (!known.has(p)) appView.sel.delete(p);
+
+  const bulk = $("appBulk");
+  bulk.classList.toggle("hidden", !appView.sel.size);
+  if (changed("appBulk", [appView.sel.size, d.id])) {
+    bulk.replaceChildren(
+      el("span", "title", appView.sel.size + " selected"),
+      button("Block", "danger", "ban", () => {
+        const next = new Set(d.blockedApps);
+        appView.sel.forEach((p) => next.add(p));
+        appView.sel.clear();
+        saveRules(d, { blockedApps: [...next] });
+      }),
+      button("Allow", "primary", "check", () => {
+        const next = d.blockedApps.filter((p) => !appView.sel.has(p));
+        appView.sel.clear();
+        saveRules(d, { blockedApps: next });
+      }),
+      button("Clear", "ghost", null, () => { appView.sel.clear(); memo.apps = ""; memo.appBulk = ""; updateDevice(); })
+    );
+  }
+
+  if (!changed("apps", [d.id, d.apps, d.blockedApps, appView.q, appView.blockedOnly, [...appView.sel]])) return;
+  const list = $("appList");
+  list.replaceChildren();
+  if (!d.apps.length) {
+    list.appendChild(emptyState("apps", pc
+      ? "The program list shows up a minute after the computer connects."
+      : "The app list shows up a few seconds after the phone connects."));
+    return;
+  }
+  const q = appView.q.trim().toLowerCase();
+  const blocked = new Set(d.blockedApps);
+  const apps = d.apps
+    .filter((a) => !q || a.l.toLowerCase().includes(q) || a.p.toLowerCase().includes(q))
+    .filter((a) => !appView.blockedOnly || blocked.has(a.p))
+    .sort((a, b) => (!!b.n - !!a.n) || (blocked.has(b.p) - blocked.has(a.p)) || a.l.localeCompare(b.l));
+  if (!apps.length) list.appendChild(el("div", "empty", appView.blockedOnly ? "Nothing is blocked here." : "Nothing matches your search."));
+  for (const a of apps) {
+    const row = el("div", "row");
+    const pick = checkbox(appView.sel.has(a.p), "Select " + a.l, (on) => {
+      on ? appView.sel.add(a.p) : appView.sel.delete(a.p);
+      memo.apps = "";
+      updateDevice();
+    });
+    pick.disabled = !!a.e;
+    const info = el("div", "grow");
+    const title = el("div", "inline");
+    title.appendChild(el("span", "title", a.l));
+    if (a.n) title.appendChild(pill("New", "new", "sparkle"));
+    info.append(title, el("div", "tiny", a.p));
+    const isBlocked = blocked.has(a.p) && !a.e;
+    const state = a.e ? pill("Always allowed", "muted", "shield")
+      : pill(isBlocked ? "Blocked" : "Allowed", isBlocked ? "blocked" : "allowed", isBlocked ? "ban" : "check");
+    const sw = el("label", "switch");
+    const box = el("input");
+    box.type = "checkbox";
+    box.checked = isBlocked;
+    box.disabled = !!a.e;
+    box.setAttribute("aria-label", "Block " + a.l);
+    box.onchange = () => {
+      const next = new Set(d.blockedApps);
+      if (box.checked) next.add(a.p); else next.delete(a.p);
+      saveRules(d, { blockedApps: [...next] });
     };
-    const del = el("button", "danger small", "Delete");
-    del.onclick = async () => {
-      if (!confirm("Delete " + u.username + "? Their phones stop following your blocks.")) return;
-      await api("/api/admin/users/delete", { username: u.username });
-      refresh();
-    };
-    row.append(info, pass, del);
+    sw.append(box, el("span"));
+    row.append(pick, info, state, sw);
     list.appendChild(row);
   }
 }
 
-$("addUserBtn").onclick = async () => {
+async function blockAllApps(d) {
+  if (!d || !d.apps.length) return;
+  const pc = isPc(d);
+  const keep = d.apps.filter((a) => a.e).map((a) => a.l);
+  const toBlock = d.apps.filter((a) => !a.e).map((a) => a.p);
+  const ok = await modal({
+    title: (pc ? "Block all programs on " : "Block all apps on ") + d.name + "?",
+    message: toBlock.length + (pc ? " programs" : " apps") + " will be blocked. These always stay allowed so the device keeps working:",
+    list: keep.length ? keep : [pc ? "Windows system programs and Curbox" : "Curbox, the home screen, phone, settings and the keyboard"],
+    confirmText: "Block all", danger: true
+  });
+  if (!ok) return;
+  saveRules(d, { blockedApps: [...new Set([...d.blockedApps, ...toBlock])] }, "All blocked. The device gets it within 10 seconds.");
+}
+
+// Websites tab
+function mountDevSites(panel) {
+  const grid = el("div", "grid2");
+  const sites = card("Blocked websites", "globe");
+  const hint = el("p", "sub muted small");
+  hint.id = "siteHint";
+  const form = el("div", "inline");
+  const siteInput = el("input");
+  siteInput.id = "siteInput";
+  siteInput.placeholder = "Website, like youtube.com";
+  siteInput.onkeydown = (e) => { if (e.key === "Enter") addSite(); };
+  form.append(siteInput, button("Block", "primary", "plus", addSite));
+  const err = el("div", "error");
+  err.id = "siteError";
+  const list = el("div");
+  list.id = "siteList";
+  sites.append(hint, form, err, list);
+
+  const quick = card("Quick add", "sparkle", "Block a group of popular websites on this device, the ticked devices, or every device.");
+  for (const [key, members] of Object.entries(overview.categories || {})) {
+    const row = el("div", "row");
+    const info = el("div", "grow");
+    info.append(el("div", "title", CATEGORY_LABELS[key] || key), el("div", "tiny", members.join(", ")));
+    row.append(info, button("Add", "ghost", "plus", () => categoryDialog(key, currentDevice())));
+    quick.appendChild(row);
+  }
+  grid.append(sites, quick);
+  panel.appendChild(grid);
+}
+
+function updateDevSites(d) {
+  if (!changed("sites", [d.id, d.blockedSites, d.platform])) return;
+  const pc = isPc(d);
+  $("siteHint").textContent = pc
+    ? "On a computer the whole website is blocked. Paths like youtube.com/shorts only work on phones."
+    : "Block a whole website, or a path like youtube.com/shorts.";
+  const list = $("siteList");
+  list.replaceChildren();
+  if (!d.blockedSites.length) list.appendChild(el("p", "muted small", "No blocked websites."));
+  for (const site of d.blockedSites) {
+    const isPath = site.includes("/");
+    const row = el("div", "row");
+    const info = el("div", "grow");
+    info.appendChild(el("div", "title wrap", site));
+    if (isPath && pc) info.appendChild(el("div", "tiny", "Not used on this computer."));
+    const kind = isPath ? pill("Path (phones only)", pc ? "warn" : "muted") : pill("Whole domain", "allowed");
+    const remove = button("Remove", "link", null, () => saveRules(d, { blockedSites: d.blockedSites.filter((s) => s !== site) }));
+    remove.setAttribute("aria-label", "Remove " + site);
+    row.append(info, kind, remove);
+    list.appendChild(row);
+  }
+}
+
+async function addSite() {
+  const d = currentDevice();
+  const add = splitSites($("siteInput").value);
+  if (!d || !add.length) return;
+  $("siteError").textContent = "";
+  const { status, data } = await saveRules(d, { blockedSites: [...d.blockedSites, ...add] });
+  if (status === 200) $("siteInput").value = "";
+  else if ($("siteError")) $("siteError").textContent = siteError(data);
+}
+
+async function categoryDialog(key, d) {
+  if (!d) return;
+  const sites = overview.categories[key];
+  const choices = [{ value: "one", label: "Only " + d.name }];
+  if (selected.size) choices.push({ value: "selected", label: "Ticked devices (" + selected.size + ")" });
+  choices.push({ value: "all", label: "All devices (" + overview.devices.length + ")" });
+  let updated = 0;
+  const done = await modal({
+    title: "Block " + (CATEGORY_LABELS[key] || key).toLowerCase() + " websites?",
+    message: "These websites will be blocked:",
+    list: sites, choices, confirmText: "Block",
+    onConfirm: async (target) => {
+      const body = { add: sites };
+      if (target === "all") body.all = true;
+      else body.deviceIds = target === "one" ? [d.id] : [...selected];
+      const { status, data } = await api("/api/admin/sites/bulk", body);
+      updated = data.updated || 0;
+      return status === 200 ? null : siteError(data);
+    }
+  });
+  if (done === null) return;
+  toast(updated ? "Blocked on " + updated + (updated === 1 ? " device." : " devices.") : "Those websites were already blocked.");
+  await refresh();
+  update();
+}
+
+// Activity tab
+function mountDevActivity(panel) {
+  const c = card("Activity", "history", "Changes and events for this device, newest first.");
+  const list = el("div");
+  list.id = "devLog";
+  list.appendChild(el("p", "muted small", "Loading…"));
+  c.appendChild(list);
+  panel.appendChild(c);
+}
+
+async function updateDevActivity(d) {
+  const { status, data } = await api("/api/admin/activity?range=all&device=" + encodeURIComponent(d.id));
+  const box = $("devLog");
+  if (status !== 200 || !box || route.id !== d.id) return;
+  const entries = data.entries.slice(0, 200);
+  if (!changed("devLog", [entries, tick()])) return;
+  renderLog(box, entries, false);
+}
+
+// ---------------------------------------------------------------- activity log
+const logView = { range: "7d", q: "" };
+let logSearchTimer = 0;
+
+const LOG_TEXT = {
+  admin_login: (e) => e.result === "ok" ? "Signed in to the admin panel" : "Wrong admin login or password",
+  admin_password: (e) => e.result === "ok" ? "Changed the admin password" : "Wrong current password while changing the admin password",
+  user_add: (e) => "Added user " + e.target,
+  user_delete: (e) => "Deleted user " + e.target,
+  user_password: (e) => "Set a new password for " + e.target,
+  app_block: (e) => "Blocked " + e.target,
+  app_unblock: (e) => "Allowed " + e.target,
+  site_add: (e) => "Blocked website " + e.target,
+  site_remove: (e) => "Unblocked website " + e.target,
+  device_linked: () => "Linked the device",
+  device_removed: () => "Removed the device",
+  device_released: () => "The device checked in and was released",
+  device_released_by_code: () => "Released the device with the release code",
+  release_attempt: () => "Typed a wrong release code",
+  release_code_set: () => "Set the release code",
+  release_code_clear: () => "Removed the release code",
+  new_app: (e) => "New app found: " + e.target + (e.result === "blocked" ? ", blocked" : ""),
+  new_app_policy: (e) => e.target === "block" ? "New apps are now blocked" : "New apps are now allowed",
+  device_pending: () => "Signed in and is waiting for approval",
+  device_approved: () => "Approved the device",
+  approval_setting: (e) => e.target === "on" ? "New devices now need approval" : "New devices no longer need approval",
+  limit_set: (e) => "Daily limit: " + e.target,
+  schedule_add: (e) => "Added schedule " + e.target,
+  schedule_edit: (e) => "Changed schedule " + e.target,
+  schedule_remove: (e) => "Deleted schedule " + e.target,
+  schedule_on: (e) => "Turned on schedule " + e.target,
+  schedule_off: (e) => "Turned off schedule " + e.target,
+  group_add: (e) => "Created group " + e.target,
+  group_edit: (e) => "Changed group " + e.target,
+  group_remove: (e) => "Deleted group " + e.target,
+  profile_add: (e) => "Created profile " + e.target,
+  profile_edit: (e) => "Changed profile " + e.target,
+  profile_remove: (e) => "Deleted profile " + e.target,
+  backup: () => "Downloaded a backup",
+  restore: () => "Restored a backup"
+};
+const LOG_ICON = {
+  admin_login: "key", admin_password: "key", user_add: "users", user_delete: "users", user_password: "key",
+  app_block: "ban", app_unblock: "check", site_add: "globe", site_remove: "globe", device_linked: "link",
+  device_removed: "trash", device_released: "check", device_released_by_code: "shield", release_attempt: "shield",
+  release_code_set: "shield", release_code_clear: "shield", new_app: "sparkle", new_app_policy: "sparkle",
+  device_pending: "devices", device_approved: "check", approval_setting: "shield", limit_set: "clock",
+  schedule_add: "calendar", schedule_edit: "calendar", schedule_remove: "calendar", schedule_on: "calendar", schedule_off: "calendar",
+  group_add: "users", group_edit: "users", group_remove: "users", profile_add: "shield", profile_edit: "shield", profile_remove: "shield",
+  backup: "download", restore: "history"
+};
+
+function logTime(ms) {
+  const d = new Date(ms);
+  const time = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  return d.toDateString() === new Date().toDateString() ? time : d.toLocaleDateString() + " " + time;
+}
+
+function renderLog(box, entries, showDevice) {
+  box.replaceChildren();
+  if (!entries.length) {
+    box.appendChild(emptyState("history", "Nothing here yet."));
+    return;
+  }
+  for (const e of entries) {
+    const row = el("div", "row");
+    const failed = e.result === "failed";
+    const ic = el("div", "logicon" + (failed ? " fail" : ""));
+    ic.appendChild(icon(LOG_ICON[e.action] || "history"));
+    const info = el("div", "grow");
+    const text = (LOG_TEXT[e.action] || (() => e.action + " " + e.target))(e);
+    info.append(
+      el("div", "title wrap", text),
+      el("div", "tiny", (e.actor === "system" ? "Curbox" : e.actor) + (showDevice && e.deviceName ? " · " + e.deviceName : ""))
+    );
+    row.append(ic, info);
+    if (failed) row.appendChild(pill("Failed", "blocked"));
+    row.appendChild(el("span", "time", logTime(e.t)));
+    box.appendChild(row);
+  }
+}
+
+function mountActivity(content) {
+  setTitle("Activity log");
+  const c = card("Activity log", "history", "Admin changes and device events, newest first. Kept on this computer only.");
+  const bar = el("div", "toolbar");
+  const seg = el("div", "seg");
+  seg.id = "logRange";
+  for (const [value, text] of [["today", "Today"], ["7d", "7 days"], ["all", "All"]]) {
+    const b = button(text, value === logView.range ? "on" : "", null, () => {
+      logView.range = value;
+      for (const other of seg.children) {
+        other.classList.toggle("on", other === b);
+        other.setAttribute("aria-pressed", String(other === b));
+      }
+      memo.log = "";
+      updateActivity();
+    });
+    b.setAttribute("aria-pressed", String(value === logView.range));
+    seg.appendChild(b);
+  }
+  const search = el("input");
+  search.placeholder = "Search the log";
+  search.setAttribute("aria-label", "Search the log");
+  search.value = logView.q;
+  search.oninput = () => {
+    clearTimeout(logSearchTimer);
+    logSearchTimer = setTimeout(() => { logView.q = search.value; memo.log = ""; updateActivity(); }, 250);
+  };
+  bar.append(seg, search);
+  const list = el("div");
+  list.id = "logList";
+  c.append(bar, list);
+  content.appendChild(c);
+}
+
+async function updateActivity() {
+  const want = [logView.range, logView.q];
+  const { status, data } = await api("/api/admin/activity?range=" + logView.range + "&q=" + encodeURIComponent(logView.q));
+  const box = $("logList");
+  // A newer filter may have started while this one was loading.
+  if (status !== 200 || !box || want[0] !== logView.range || want[1] !== logView.q) return;
+  if (!changed("log", [data.entries, tick()])) return;
+  renderLog(box, data.entries, true);
+}
+
+// ---------------------------------------------------------------- usage helpers
+function isoDay(date) {
+  const d = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+  return d.toISOString().slice(0, 10);
+}
+function daysBack(n) { const d = new Date(); d.setDate(d.getDate() - n); return isoDay(d); }
+
+function fmtDur(ms) {
+  if (!ms) return "0m";
+  if (ms < 60000) return "<1m";
+  const m = Math.round(ms / 60000);
+  const h = Math.floor(m / 60);
+  return h ? h + "h " + (m % 60) + "m" : m + "m";
+}
+
+function dayLabel(iso, many) {
+  const d = new Date(iso + "T12:00:00");
+  return many ? String(d.getDate()) : d.toLocaleDateString([], { weekday: "short" });
+}
+
+/** Simple bar chart drawn here, so the panel needs no chart library. values may hold null (no report). */
+function barChart(values, labels, titles) {
+  const n = values.length;
+  // Wide enough to fill a card; bars stay slim when there are only a few days.
+  const slot = Math.max(28, 640 / n), h = 150, top = 18, bottom = 22;
+  const max = Math.max(1, ...values.map((v) => v || 0));
+  const svg = document.createElementNS(SVG, "svg");
+  svg.setAttribute("viewBox", "0 0 " + (n * slot) + " " + (h + top + bottom));
+  svg.setAttribute("class", "chart");
+  svg.setAttribute("role", "img");
+  svg.setAttribute("aria-label", "Screen time per day");
+  const every = n > 16 ? Math.ceil(n / 10) : 1;
+  values.forEach((v, i) => {
+    const w = Math.min(44, slot * 0.62);
+    const x = i * slot + (slot - w) / 2;
+    const barH = v ? Math.max(3, (v / max) * h) : 0;
+    const g = document.createElementNS(SVG, "g");
+    const track = document.createElementNS(SVG, "rect");
+    Object.entries({ x, y: top, width: w, height: h, rx: 6, class: "track" }).forEach(([k, val]) => track.setAttribute(k, val));
+    g.appendChild(track);
+    if (barH) {
+      const bar = document.createElementNS(SVG, "rect");
+      Object.entries({ x, y: top + h - barH, width: w, height: barH, rx: 6, class: "bar" }).forEach(([k, val]) => bar.setAttribute(k, val));
+      g.appendChild(bar);
+    }
+    const title = document.createElementNS(SVG, "title");
+    title.textContent = titles[i] + ": " + (v === null ? "no data" : fmtDur(v));
+    g.appendChild(title);
+    if (i % every === 0 || i === n - 1) {
+      const t = document.createElementNS(SVG, "text");
+      Object.entries({ x: x + w / 2, y: h + top + 16, "text-anchor": "middle", class: "label" }).forEach(([k, val]) => t.setAttribute(k, val));
+      t.textContent = labels[i];
+      g.appendChild(t);
+    }
+    svg.appendChild(g);
+  });
+  const peak = document.createElementNS(SVG, "text");
+  Object.entries({ x: 2, y: 11, class: "label" }).forEach(([k, val]) => peak.setAttribute(k, val));
+  peak.textContent = "Max " + fmtDur(max);
+  svg.appendChild(peak);
+  return svg;
+}
+
+/** Device total (or a reason there is none) with a bar scaled to [max]. */
+function usageRow(d, ms, max, noDataText) {
+  const row = el("div", "row");
+  const info = el("div", "grow");
+  info.appendChild(el("div", "title", d.name));
+  if (ms === null) {
+    info.appendChild(el("div", "tiny", noDataText));
+  } else {
+    const meter = el("div", "meter");
+    const fill = el("span");
+    fill.style.width = Math.max(2, Math.round((ms / Math.max(max, 1)) * 100)) + "%";
+    meter.appendChild(fill);
+    info.appendChild(meter);
+  }
+  row.append(typeIcon(d), info, el("span", "value", ms === null ? "" : fmtDur(ms)));
+  return row;
+}
+
+function noUsageText(d) {
+  if (!d.hasData) {
+    return isPc(d)
+      ? "Usage is not available on this computer yet. It starts after someone signs in to Windows."
+      : "No usage yet. The phone sends it every 5 minutes.";
+  }
+  return "No report for this time.";
+}
+
+function appTable(apps, limit) {
+  const total = apps.reduce((n, a) => n + a.ms, 0);
+  const wrap = el("div", "tablewrap");
+  if (!apps.length) {
+    wrap.appendChild(emptyState("apps", "No app usage for this time yet."));
+    return wrap;
+  }
+  const table = el("table", "plain");
+  const head = el("tr");
+  ["App", "Type", "Devices", "Time", "Share"].forEach((h) => head.appendChild(el("th", "", h)));
+  const thead = el("thead");
+  thead.appendChild(head);
+  const body = el("tbody");
+  for (const a of apps.slice(0, limit)) {
+    const tr = el("tr");
+    const name = el("td");
+    name.append(el("div", "title", a.l), el("div", "tiny", a.p));
+    const share = el("td");
+    const meter = el("div", "meter");
+    const fill = el("span");
+    fill.style.width = Math.max(2, Math.round((a.ms / Math.max(total, 1)) * 100)) + "%";
+    meter.appendChild(fill);
+    share.appendChild(meter);
+    tr.append(name, el("td", "small", a.platform === "windows" ? "Computer" : "Phone"),
+      el("td", "small", String(a.devices)), el("td", "small strong", fmtDur(a.ms)), share);
+    body.appendChild(tr);
+  }
+  table.append(thead, body);
+  wrap.appendChild(table);
+  return wrap;
+}
+
+// ---------------------------------------------------------------- dashboard usage
+let dashUsageAt = 0;
+
+async function loadDashUsage(force) {
+  if (!force && Date.now() - dashUsageAt < 30000) return;
+  dashUsageAt = Date.now();
+  const today = daysBack(0);
+  const [week, day, log] = await Promise.all([
+    api("/api/admin/usage?from=" + daysBack(6) + "&to=" + today),
+    api("/api/admin/usage?from=" + today + "&to=" + today),
+    api("/api/admin/activity?range=7d")
+  ]);
+  if (!$("dashChart") || route.page !== "dashboard") return;
+  if (week.status === 200) {
+    const w = week.data;
+    const anyData = w.devices.some((d) => d.hasData);
+    $("dashChart").replaceChildren(anyData
+      ? barChart(w.dailyTotal, w.dates.map((x) => dayLabel(x, false)), w.dates)
+      : emptyState("chart", "No data yet. Phones send usage every 5 minutes after they link."));
+    const list = $("dashToday");
+    list.replaceChildren();
+    const rows = w.devices.map((d) => ({ d, ms: d.daily[d.daily.length - 1] }))
+      .sort((a, b) => (b.ms || -1) - (a.ms || -1));
+    const max = Math.max(1, ...rows.map((r) => r.ms || 0));
+    if (!rows.length) list.appendChild(emptyState("devices", "No devices yet."));
+    rows.forEach((r) => list.appendChild(usageRow(r.d, r.ms, max, noUsageText(r.d))));
+  }
+  if (day.status === 200) {
+    const box = $("dashApps");
+    box.replaceChildren();
+    const apps = day.data.apps.slice(0, 6);
+    if (!apps.length) box.appendChild(emptyState("apps", "No app usage today yet."));
+    const max = Math.max(1, ...apps.map((a) => a.ms));
+    for (const a of apps) {
+      const row = el("div", "row");
+      const info = el("div", "grow");
+      const meter = el("div", "meter");
+      const fill = el("span");
+      fill.style.width = Math.max(2, Math.round((a.ms / max) * 100)) + "%";
+      meter.appendChild(fill);
+      info.append(el("div", "title", a.l), meter);
+      row.append(info, el("span", "value", fmtDur(a.ms)));
+      box.appendChild(row);
+    }
+  }
+  if (log.status === 200) renderLog($("dashEvents"), log.data.entries.slice(0, 8), true);
+}
+
+// ---------------------------------------------------------------- reports
+const rep = { range: "7d", from: daysBack(29), to: daysBack(0), device: "", user: "" };
+let repKey = "";
+
+function repDates() {
+  if (rep.range === "today") return [daysBack(0), daysBack(0)];
+  if (rep.range === "7d") return [daysBack(6), daysBack(0)];
+  if (rep.range === "30d") return [daysBack(29), daysBack(0)];
+  return [rep.from, rep.to];
+}
+
+function repQuery() {
+  const [from, to] = repDates();
+  let q = "from=" + from + "&to=" + to;
+  if (rep.device) q += "&device=" + encodeURIComponent(rep.device);
+  if (rep.user) q += "&user=" + encodeURIComponent(rep.user);
+  return q;
+}
+
+function mountReports(content) {
+  setTitle("Reports");
+  const bar = el("div", "toolbar noprint");
+  const seg = el("div", "seg");
+  for (const [value, text] of [["today", "Today"], ["7d", "7 days"], ["30d", "30 days"], ["custom", "Custom"]]) {
+    const b = button(text, value === rep.range ? "on" : "", null, () => {
+      rep.range = value;
+      for (const other of seg.children) other.classList.toggle("on", other === b);
+      $("repCustom").classList.toggle("hidden", value !== "custom");
+      loadReport(true);
+    });
+    seg.appendChild(b);
+  }
+  const custom = el("div", "inline" + (rep.range === "custom" ? "" : " hidden"));
+  custom.id = "repCustom";
+  for (const key of ["from", "to"]) {
+    const input = el("input");
+    input.type = "date";
+    input.value = rep[key];
+    input.max = daysBack(0);
+    input.setAttribute("aria-label", key === "from" ? "From" : "To");
+    input.onchange = () => { if (input.value) { rep[key] = input.value; loadReport(true); } };
+    custom.appendChild(input);
+  }
+  const deviceSel = selectBox([["", "All devices"]], rep.device, "Device", (v) => { rep.device = v; loadReport(true); });
+  deviceSel.id = "repDevice";
+  const userSel = selectBox([["", "All users"]], rep.user, "User", (v) => { rep.user = v; loadReport(true); });
+  userSel.id = "repUser";
+  const csv = el("a", "btnlink ghost");
+  csv.id = "repCsv";
+  csv.append(icon("download"), document.createTextNode("Export CSV"));
+  const print = button("Print or save as PDF", "ghost", "print", () => window.print());
+  bar.append(seg, custom, deviceSel, userSel, csv, print);
+
+  const printHead = el("div", "printonly");
+  printHead.id = "repPrintHead";
+
+  const stats = el("div", "stats");
+  stats.id = "repStats";
+  const chart = card("Daily screen time", "chart", "All chosen devices added together. Hover a bar for the exact time.");
+  const chartBox = el("div");
+  chartBox.id = "repChart";
+  chart.appendChild(chartBox);
+  const devicesCard = card("Devices", "devices", "Total screen time per device for this time.");
+  const devBox = el("div");
+  devBox.id = "repDevices";
+  devicesCard.appendChild(devBox);
+  const appsCard = card("Apps", "apps", "Time in each app. The same app on two devices is added up.");
+  const appBox = el("div");
+  appBox.id = "repApps";
+  appsCard.appendChild(appBox);
+  content.append(bar, printHead, stats, chart, devicesCard, appsCard);
+}
+
+function updateReports() {
+  // Device and user lists follow the overview; the numbers reload once a minute.
+  const devSel = $("repDevice");
+  if (changed("repOptions", [overview.devices.map((d) => [d.id, d.name]), overview.users.map((u) => u.username)])) {
+    devSel.replaceChildren(new Option("All devices", ""), ...overview.devices.map((d) => new Option(d.name, d.id)));
+    devSel.value = overview.devices.some((d) => d.id === rep.device) ? rep.device : "";
+    rep.device = devSel.value;
+    const userSel = $("repUser");
+    userSel.replaceChildren(new Option("All users", ""), ...overview.users.map((u) => new Option(u.username, u.username)));
+    userSel.value = overview.users.some((u) => u.username === rep.user) ? rep.user : "";
+    rep.user = userSel.value;
+  }
+  loadReport(false);
+}
+
+async function loadReport(force) {
+  const key = repQuery() + "|" + (force ? Date.now() : Math.floor(Date.now() / 60000));
+  if (key === repKey) return;
+  repKey = key;
+  const q = repQuery();
+  $("repCsv").href = "/api/admin/usage.csv?" + q;
+  const { status, data } = await api("/api/admin/usage?" + q);
+  if (status !== 200 || !$("repStats") || repQuery() !== q) return;
+
+  const [from, to] = [data.from, data.to];
+  const scope = rep.device ? (overview.devices.find((d) => d.id === rep.device) || {}).name
+    : rep.user ? "User " + rep.user : "All devices";
+  $("repPrintHead").replaceChildren(
+    el("h1", "", "Curbox screen time report"),
+    el("p", "muted", scope + " · " + (from === to ? from : from + " to " + to) + " · Printed " + new Date().toLocaleString())
+  );
+
+  const total = data.devices.reduce((n, d) => n + d.totalMs, 0);
+  const withData = data.devices.filter((d) => d.daysReported > 0).length;
+  const reportedDays = data.dailyTotal.filter((v, i) => data.devices.some((d) => d.daily[i] !== null)).length;
+  const stats = $("repStats");
+  stats.replaceChildren();
+  for (const [label, value, iconName] of [
+    ["Total screen time", fmtDur(total), "chart"],
+    ["Daily average", reportedDays ? fmtDur(total / reportedDays) : "No data", "history"],
+    ["Devices with data", withData + " of " + data.devices.length, "devices"]
+  ]) {
+    const c = el("div", "card stat");
+    const i = el("div", "icon");
+    i.style.background = "var(--primary-soft)";
+    i.style.color = "var(--primary)";
+    i.appendChild(icon(iconName));
+    c.append(i, el("div", "value", value), el("div", "muted small", label));
+    stats.appendChild(c);
+  }
+
+  const many = data.dates.length > 7;
+  $("repChart").replaceChildren(withData
+    ? barChart(data.dailyTotal, data.dates.map((x) => dayLabel(x, many)), data.dates)
+    : emptyState("chart", "No data for this time yet."));
+
+  const devBox = $("repDevices");
+  devBox.replaceChildren();
+  if (!data.devices.length) devBox.appendChild(emptyState("devices", "No devices match."));
+  const max = Math.max(1, ...data.devices.map((d) => d.totalMs));
+  [...data.devices].sort((a, b) => b.totalMs - a.totalMs).forEach((d) => {
+    devBox.appendChild(usageRow(d, d.daysReported ? d.totalMs : null, max, noUsageText(d)));
+  });
+
+  $("repApps").replaceChildren(appTable(data.apps, 50));
+}
+
+// ---------------------------------------------------------------- shared rule helpers
+const DAY_NAMES = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+function receivedPill(d) {
+  return d.received ? pill("Received", "ok", "check") : pill("Waiting for the device", "warn");
+}
+
+function daysText(days) {
+  const set = [...new Set(days)].sort((a, b) => a - b);
+  if (set.length === 7) return "Every day";
+  if (set.join() === "1,2,3,4,5") return "Mon to Fri";
+  if (set.join() === "6,7") return "Sat and Sun";
+  const run = set.length > 2 && set.every((d, i) => i === 0 || d === set[i - 1] + 1);
+  if (run) return DAY_NAMES[set[0] - 1] + " to " + DAY_NAMES[set[set.length - 1] - 1];
+  return set.map((d) => DAY_NAMES[d - 1]).join(", ");
+}
+
+function toMinute(hhmm) { const [h, m] = hhmm.split(":").map(Number); return h * 60 + m; }
+
+/** Minutes of the week (0 = Monday 00:00) a schedule covers; an end before the start runs past midnight. */
+function scheduleMinutes(s) {
+  const week = new Uint8Array(7 * 1440);
+  const start = toMinute(s.start), end = toMinute(s.end);
+  for (const day of s.days) {
+    const base = (day - 1) * 1440;
+    const length = end > start ? end - start : 1440 - start + end;
+    for (let i = 0; i < length; i++) week[(base + start + i) % week.length] = 1;
+  }
+  return week;
+}
+
+function limitText(min) {
+  if (!min) return "No limit";
+  return min % 60 === 0 ? (min / 60) + " h a day" : min >= 60 ? Math.floor(min / 60) + " h " + (min % 60) + " min a day" : min + " min a day";
+}
+
+// ---------------------------------------------------------------- screen time
+let limitUsage = null;
+let limitUsageAt = 0;
+
+function mountScreenTime(content) {
+  setTitle("Screen time");
+  const top = card("Daily limit", "history", "When a device reaches its limit, everything except calls, emergency calls, alarms and settings is blocked until midnight. Times use the device's own clock.");
+  const warn = el("div", "inline");
+  warn.style.flexWrap = "wrap";
+  const warnInput = el("input");
+  warnInput.id = "warnInput";
+  warnInput.placeholder = "60, 30, 10";
+  warnInput.setAttribute("aria-label", "Warn at these minutes left");
+  warnInput.style.maxWidth = "200px";
+  warn.append(el("span", "small muted", "Phones warn the user when this many minutes are left:"), warnInput,
+    button("Save for all devices", "ghost", "check", saveWarnings));
+  const warnErr = el("div", "error");
+  warnErr.id = "warnError";
+  top.append(warn, warnErr);
+
+  const c = card("Devices", "devices");
+  const wrap = el("div", "tablewrap");
+  const table = el("table", "plain");
+  const head = el("tr");
+  ["Device", "Daily limit", "Used today", "Left today", "Status"].forEach((h) => head.appendChild(el("th", "", h)));
+  const thead = el("thead");
+  thead.appendChild(head);
+  const body = el("tbody");
+  body.id = "limitTable";
+  table.append(thead, body);
+  wrap.appendChild(table);
+  const empty = el("div");
+  empty.id = "limitEmpty";
+  c.append(wrap, empty);
+  content.append(top, c);
+  limitUsageAt = 0;
+}
+
+async function updateScreenTime() {
+  if (Date.now() - limitUsageAt > 30000) {
+    limitUsageAt = Date.now();
+    const { status, data } = await api("/api/admin/usage?from=" + daysBack(0) + "&to=" + daysBack(0));
+    if (status === 200) limitUsage = data;
+    memo.limits = "";
+  }
+  if (!$("limitTable")) return;
+  const first = overview.devices[0];
+  if (first && document.activeElement !== $("warnInput") && changed("warnInput", [first.warningMinutes])) {
+    $("warnInput").value = first.warningMinutes.join(", ");
+  }
+  const usageById = {};
+  (limitUsage ? limitUsage.devices : []).forEach((d) => { usageById[d.id] = d; });
+  const rows = overview.devices.map((d) => [d.id, d.name, d.platform, d.dailyLimitMinutes, d.received, (usageById[d.id] || {}).daily]);
+  if (!changed("limits", [rows, tick()])) return;
+  const body = $("limitTable");
+  body.replaceChildren();
+  $("limitEmpty").replaceChildren();
+  if (!overview.devices.length) $("limitEmpty").appendChild(emptyState("devices", "No devices yet."));
+  for (const d of overview.devices) {
+    const u = usageById[d.id];
+    const used = u ? u.daily[0] : null;
+    const tr = el("tr");
+    const name = el("td");
+    const inner = el("div", "inline");
+    const info = el("div");
+    info.append(el("div", "title", d.name), el("div", "tiny", d.user));
+    inner.append(typeIcon(d), info);
+    name.appendChild(inner);
+
+    const limitCell = el("td");
+    const presets = [[0, "No limit"], [30, "30 min"], [60, "1 h"], [120, "2 h"], [180, "3 h"]];
+    const options = presets.map(([v, t]) => [String(v), t]);
+    if (!presets.some(([v]) => v === d.dailyLimitMinutes)) options.push([String(d.dailyLimitMinutes), limitText(d.dailyLimitMinutes)]);
+    options.push(["custom", "Custom…"]);
+    const sel = selectBox(options, String(d.dailyLimitMinutes), "Daily limit for " + d.name, async (v) => {
+      let minutes = Number(v);
+      if (v === "custom") {
+        const typed = await modal({
+          title: "Daily limit for " + d.name, message: "Minutes a day, from 1 to 1440. For example 90 is an hour and a half.",
+          input: { type: "number", placeholder: "90" }, confirmText: "Save"
+        });
+        minutes = Number(typed);
+        if (typed === null || !Number.isInteger(minutes) || minutes < 1 || minutes > 1440) {
+          if (typed !== null) toast("Type a whole number from 1 to 1440.");
+          memo.limits = "";
+          updateScreenTime();
+          return;
+        }
+      }
+      const { status } = await api("/api/admin/limits", { deviceIds: [d.id], dailyLimitMinutes: minutes });
+      toast(status === 200 ? "Saved. The device gets it within 10 seconds." : "Could not save. Try again.");
+      await refresh();
+      update();
+    });
+    limitCell.appendChild(sel);
+    if (isPc(d) && d.dailyLimitMinutes && !(u && u.hasData)) {
+      limitCell.appendChild(el("div", "tiny", "Needs usage from this computer. It starts after someone signs in to Windows."));
+    }
+
+    const left = d.dailyLimitMinutes && used !== null ? Math.max(0, d.dailyLimitMinutes * 60000 - used) : null;
+    const leftCell = el("td", "small");
+    if (!d.dailyLimitMinutes) leftCell.textContent = "";
+    else if (left === null) leftCell.textContent = "No data yet";
+    else if (left === 0) leftCell.appendChild(pill("Limit reached", "blocked", "ban"));
+    else leftCell.textContent = fmtDur(left);
+
+    const status = el("td");
+    status.appendChild(receivedPill(d));
+    tr.append(name, limitCell, el("td", "small strong", used === null ? "No data" : fmtDur(used)), leftCell, status);
+    body.appendChild(tr);
+  }
+}
+
+async function saveWarnings() {
+  const parts = $("warnInput").value.split(/[\s,]+/).filter(Boolean).map(Number);
+  $("warnError").textContent = "";
+  if (!parts.length || parts.length > 5 || parts.some((n) => !Number.isInteger(n) || n < 1 || n > 600)) {
+    $("warnError").textContent = "Type up to five whole numbers from 1 to 600, like 60, 30, 10.";
+    return;
+  }
+  const { status } = await api("/api/admin/limits", { all: true, warningMinutes: parts });
+  toast(status === 200 ? "Warnings saved for all devices." : "Could not save. Try again.");
+  await refresh();
+  update();
+}
+
+// ---------------------------------------------------------------- schedules
+let scheduleDevice = "";
+const TEMPLATES = {
+  study: { name: "Study mode", days: [1, 2, 3, 4, 5], start: "08:00", end: "14:00", blockAllApps: true, blockApps: [], blockSites: [] },
+  sleep: { name: "Sleep", days: [1, 2, 3, 4, 5, 6, 7], start: "22:00", end: "07:00", blockAllApps: true, blockApps: [], blockSites: [] }
+};
+
+function currentScheduleDevice() {
+  const d = overview.devices.find((x) => x.id === scheduleDevice) || overview.devices[0];
+  scheduleDevice = d ? d.id : "";
+  return d;
+}
+
+function mountSchedules(content) {
+  setTitle("Schedules");
+  if (route.id) scheduleDevice = route.id;
+  const bar = el("div", "toolbar");
+  const sel = selectBox([], "", "Device", (v) => { scheduleDevice = v; memo.schedules = ""; updateSchedules(); });
+  sel.id = "schedDevice";
+  bar.append(sel,
+    button("Add schedule", "primary", "plus", () => editSchedule(null)),
+    button("Study mode", "ghost", "sparkle", () => editSchedule(null, TEMPLATES.study)),
+    button("Sleep", "ghost", "sparkle", () => editSchedule(null, TEMPLATES.sleep)));
+  const head = el("div");
+  head.id = "schedHead";
+  const week = card("This week", "chart", "Shaded hours have a schedule on. Times are the device's own local time.");
+  const grid = el("div", "weekgrid");
+  grid.id = "schedGrid";
+  const overlap = el("div");
+  overlap.id = "schedOverlap";
+  week.append(grid, overlap);
+  const list = card("Schedules", "history");
+  const box = el("div");
+  box.id = "schedList";
+  list.appendChild(box);
+  content.append(bar, head, week, list);
+}
+
+function updateSchedules() {
+  const sel = $("schedDevice");
+  if (!sel) return;
+  const d = currentScheduleDevice();
+  if (changed("schedOptions", overview.devices.map((x) => [x.id, x.name]))) {
+    sel.replaceChildren(...overview.devices.map((x) => new Option(x.name + (isPc(x) ? " (computer)" : " (phone)"), x.id)));
+  }
+  sel.value = scheduleDevice;
+  if (!d) {
+    $("schedList").replaceChildren(emptyState("devices", "No devices yet. Connect one first."));
+    return;
+  }
+  if (!changed("schedules", [d.id, d.schedules, d.received, d.apps.length])) return;
+
+  const head = el("div", "row");
+  const info = el("div", "grow");
+  info.append(el("div", "title", d.name), el("div", "tiny", d.user + " · " + osText(d) + " · " + d.schedules.length + " schedules"));
+  head.append(typeIcon(d), info, receivedPill(d));
+  const headCard = el("section", "card");
+  headCard.appendChild(head);
+  $("schedHead").replaceChildren(headCard);
+
+  // Week grid: 7 rows of 24 hours; an hour is shaded when any minute of it is covered.
+  const enabled = d.schedules.filter((s) => s.enabled);
+  const maps = enabled.map((s) => ({ s, week: scheduleMinutes(s) }));
+  const grid = $("schedGrid");
+  grid.replaceChildren(el("span", "corner"));
+  for (let h = 0; h < 24; h++) grid.appendChild(el("span", "hour", h % 3 === 0 ? String(h).padStart(2, "0") : ""));
+  for (let day = 0; day < 7; day++) {
+    grid.appendChild(el("span", "dayname", DAY_NAMES[day]));
+    for (let h = 0; h < 24; h++) {
+      const from = day * 1440 + h * 60;
+      const names = maps.filter(({ week }) => week.subarray(from, from + 60).some((v) => v)).map(({ s }) => s.name);
+      const cell = el("span", "cell" + (names.length > 1 ? " both" : names.length ? " on" : ""));
+      cell.title = DAY_NAMES[day] + " " + String(h).padStart(2, "0") + ":00" + (names.length ? ": " + names.join(", ") : "");
+      grid.appendChild(cell);
+    }
+  }
+
+  // Overlaps are allowed, but the admin should know.
+  const notes = [];
+  for (let i = 0; i < maps.length; i++) {
+    for (let j = i + 1; j < maps.length; j++) {
+      const at = maps[i].week.findIndex((v, k) => v && maps[j].week[k]);
+      if (at >= 0) {
+        notes.push(maps[i].s.name + " and " + maps[j].s.name + " overlap, for example " + DAY_NAMES[Math.floor(at / 1440)] + " " +
+          String(Math.floor((at % 1440) / 60)).padStart(2, "0") + ":" + String(at % 60).padStart(2, "0") + ". Both apply then.");
+      }
+    }
+  }
+  $("schedOverlap").replaceChildren(...notes.map((n) => el("p", "small warntext", n)));
+
+  const box = $("schedList");
+  box.replaceChildren();
+  if (!d.schedules.length) box.appendChild(emptyState("history", "No schedules yet. Add one, or start from Study mode or Sleep."));
+  const labels = Object.fromEntries(d.apps.map((a) => [a.p, a.l]));
+  d.schedules.forEach((s, index) => {
+    const row = el("div", "row");
+    const sw = el("label", "switch on");
+    const box2 = el("input");
+    box2.type = "checkbox";
+    box2.checked = s.enabled;
+    box2.setAttribute("aria-label", (s.enabled ? "Turn off " : "Turn on ") + s.name);
+    box2.onchange = () => {
+      const next = d.schedules.map((x, i) => i === index ? Object.assign({}, x, { enabled: box2.checked }) : x);
+      saveSchedules(d, next, box2.checked ? s.name + " is on." : s.name + " is off.");
+    };
+    sw.append(box2, el("span"));
+    const info2 = el("div", "grow");
+    const what = s.blockAllApps ? "Blocks all apps except calls and settings"
+      : [s.blockApps.length ? s.blockApps.map((p) => labels[p] || p).slice(0, 3).join(", ") + (s.blockApps.length > 3 ? " and " + (s.blockApps.length - 3) + " more" : "") : "",
+        s.blockSites.length ? s.blockSites.slice(0, 3).join(", ") + (s.blockSites.length > 3 ? " and more" : "") : ""].filter(Boolean).join(" · ");
+    info2.append(el("div", "title", s.name), el("div", "tiny", daysText(s.days) + ", " + s.start + " to " + s.end + (toMinute(s.end) < toMinute(s.start) ? " (next day)" : "")),
+      el("div", "tiny", what + (s.blockAllApps && s.blockSites.length ? " · " + s.blockSites.join(", ") : "")));
+    const edit = button("Edit", "ghost small", null, () => editSchedule(index));
+    const del = button("", "danger small", "trash", async () => {
+      const ok = await modal({ title: "Delete " + s.name + "?", message: "It stops on " + d.name + " at the next sync.", confirmText: "Delete", danger: true });
+      if (ok) saveSchedules(d, d.schedules.filter((_, i) => i !== index), "Schedule deleted.");
+    });
+    del.setAttribute("aria-label", "Delete " + s.name);
+    row.append(sw, info2, edit, del);
+    box.appendChild(row);
+  });
+}
+
+async function saveSchedules(d, schedules, message) {
+  const { status, data } = await api("/api/admin/schedules/save", { deviceId: d.id, schedules });
+  if (status !== 200) toast(data.error === "bad_site" ? siteError(data) : "Could not save. Check the schedule and try again.");
+  else toast(message || "Saved. The device gets it within 10 seconds.");
+  await refresh();
+  memo.schedules = "";
+  update();
+  return status === 200;
+}
+
+/** The schedule editor: name, days, times, what it blocks, and (for a new one) which devices get it. */
+async function editSchedule(index, template) {
+  const d = currentScheduleDevice();
+  if (!d) return;
+  const base = index === null ? Object.assign({ name: "", days: [1, 2, 3, 4, 5], start: "08:00", end: "14:00", blockAllApps: false, blockApps: [], blockSites: [] }, template || {})
+    : d.schedules[index];
+  const form = el("div", "form");
+  const name = el("input");
+  name.value = base.name;
+  name.placeholder = "Like Homework";
+  name.maxLength = 40;
+  const dayBox = el("div", "seg days");
+  const days = new Set(base.days);
+  DAY_NAMES.forEach((label, i) => {
+    const b = button(label, days.has(i + 1) ? "on" : "", null, () => {
+      days.has(i + 1) ? days.delete(i + 1) : days.add(i + 1);
+      b.classList.toggle("on", days.has(i + 1));
+      b.setAttribute("aria-pressed", String(days.has(i + 1)));
+    });
+    b.setAttribute("aria-pressed", String(days.has(i + 1)));
+    dayBox.appendChild(b);
+  });
+  const times = el("div", "inline");
+  const start = el("input");
+  start.type = "time";
+  start.value = base.start;
+  start.setAttribute("aria-label", "Start");
+  const end = el("input");
+  end.type = "time";
+  end.value = base.end;
+  end.setAttribute("aria-label", "End");
+  times.append(start, el("span", "muted", "to"), end);
+  const allRow = el("label", "choice");
+  const all = el("input");
+  all.type = "checkbox";
+  all.checked = base.blockAllApps;
+  allRow.append(all, document.createTextNode("Block all apps (calls, emergency, alarms and settings stay open)"));
+
+  const pick = new Set(base.blockApps);
+  const appSearch = el("input");
+  appSearch.placeholder = isPc(d) ? "Search programs" : "Search apps";
+  const appList = el("div", "picklist");
+  const drawApps = () => {
+    appList.replaceChildren();
+    const q = appSearch.value.trim().toLowerCase();
+    const apps = d.apps.filter((a) => !a.e && (!q || a.l.toLowerCase().includes(q) || a.p.toLowerCase().includes(q)))
+      .sort((a, b) => (pick.has(b.p) - pick.has(a.p)) || a.l.localeCompare(b.l));
+    if (!d.apps.length) appList.appendChild(el("p", "small muted", "The app list shows up after the device connects."));
+    for (const a of apps) {
+      const row = el("label", "choice");
+      const c = el("input");
+      c.type = "checkbox";
+      c.checked = pick.has(a.p);
+      c.onchange = () => { c.checked ? pick.add(a.p) : pick.delete(a.p); };
+      row.append(c, document.createTextNode(a.l));
+      appList.appendChild(row);
+    }
+  };
+  appSearch.oninput = drawApps;
+  drawApps();
+  const appsBlock = el("div");
+  appsBlock.append(el("label", "field", isPc(d) ? "Programs to block" : "Apps to block"), appSearch, appList);
+  const syncAll = () => appsBlock.classList.toggle("hidden", all.checked);
+  all.onchange = syncAll;
+  syncAll();
+  const sites = el("input");
+  sites.value = base.blockSites.join(", ");
+  sites.placeholder = "youtube.com, tiktok.com";
+
+  form.append(el("label", "field", "Name"), name, el("label", "field", "Days"), dayBox,
+    el("label", "field", "Time (the device's local time; an end before the start means the next day)"), times,
+    el("label", "field", "What to block"), allRow, appsBlock, el("label", "field", "Websites to block"), sites);
+
+  const isNew = index === null;
+  const done = await modal({
+    title: isNew ? "New schedule" : "Edit " + base.name,
+    body: form, wide: true,
+    choices: isNew && overview.devices.length > 1 ? [{ value: "one", label: "Only " + d.name }, { value: "all", label: "All devices (" + overview.devices.length + ")" }] : null,
+    confirmText: "Save",
+    onConfirm: async (target) => {
+      const schedule = Object.assign({}, isNew ? {} : base, {
+        name: name.value.trim(), days: [...days].sort(), start: start.value, end: end.value,
+        blockAllApps: all.checked, blockApps: all.checked ? [] : [...pick], blockSites: splitSites(sites.value),
+        enabled: isNew ? true : base.enabled
+      });
+      if (!schedule.name) return "Give the schedule a name.";
+      if (!schedule.days.length) return "Pick at least one day.";
+      if (!schedule.start || !schedule.end || schedule.start === schedule.end) return "Pick a start and an end time that are not the same.";
+      if (!schedule.blockAllApps && !schedule.blockApps.length && !schedule.blockSites.length) return "Choose what to block: all apps, some apps, or websites.";
+      let res;
+      if (isNew && target === "all") {
+        res = await api("/api/admin/schedules/add", { all: true, schedule });
+      } else {
+        const list = isNew ? [...d.schedules, schedule] : d.schedules.map((x, i) => i === index ? schedule : x);
+        res = await api("/api/admin/schedules/save", { deviceId: d.id, schedules: list });
+      }
+      if (res.status === 200) return null;
+      if (res.data.error === "bad_site") return siteError(res.data);
+      if (res.data.error === "too_many") return "A device can have up to 20 schedules.";
+      return "Could not save. Check the schedule and try again.";
+    }
+  });
+  if (done === null) return;
+  toast("Saved. The device gets it within 10 seconds.");
+  await refresh();
+  memo.schedules = "";
+  update();
+}
+
+// ---------------------------------------------------------------- approvals
+function pendingDevices() { return overview.devices.filter((d) => d.pending); }
+
+function approvalCard() {
+  const c = card("Waiting for approval", "shield", "These devices signed in. Nothing applies to them until you approve.");
+  c.id = "approvals";
+  const box = el("div");
+  box.id = "approvalList";
+  c.appendChild(box);
+  return c;
+}
+
+function updateApprovals() {
+  const cardEl = $("approvals");
+  if (!cardEl) return;
+  const waiting = pendingDevices();
+  cardEl.classList.toggle("hidden", !waiting.length);
+  if (!changed("approvals", waiting.map((d) => [d.id, d.name, d.user, d.linkedAt]))) return;
+  const box = $("approvalList");
+  box.replaceChildren();
+  for (const d of waiting) {
+    const row = el("div", "row");
+    const info = el("div", "grow");
+    info.append(el("div", "title", d.name), el("div", "tiny", d.user + " · " + osText(d) + " · " + timeAgo(d.linkedAt)));
+    row.append(typeIcon(d), info,
+      button("Approve", "primary small", "check", async () => {
+        const { status } = await api("/api/admin/devices/approve", { deviceId: d.id });
+        toast(status === 200 ? d.name + " is approved." : "Could not approve. Try again.");
+        await refresh();
+        update();
+      }),
+      button("Deny", "danger small", null, () => removeDevices([d.id])));
+    box.appendChild(row);
+  }
+}
+
+// ---------------------------------------------------------------- rule sources (device overview)
+function sourceList(title, rows, labelOf, note) {
+  const box = el("div", "rulegroup");
+  box.appendChild(el("div", "small strong", title));
+  if (note) box.appendChild(el("div", "tiny", note));
+  if (!rows.length) box.appendChild(el("div", "tiny", "None"));
+  for (const r of rows) {
+    const line = el("div", "ruleline");
+    line.append(el("span", "", labelOf(r)), el("span", "tiny", (r.sources || [r.source]).join(", ")));
+    box.appendChild(line);
+  }
+  return box;
+}
+
+function renderRuleSources(d) {
+  const box = $("devRules");
+  if (!box) return;
+  const e = d.effective.explain;
+  const groups = (overview.groups || []).filter((g) => g.deviceIds.includes(d.id)).map((g) => g.name);
+  box.replaceChildren(el("p", "small muted", groups.length ? "Groups: " + groups.join(", ") : "Not in any group."));
+  if (d.pending) box.appendChild(el("p", "small warntext", "Waiting for approval. None of these rules apply yet."));
+  for (const c of e.conflicts) box.appendChild(el("p", "small warntext", c));
+  box.append(
+    sourceList(isPc(d) ? "Blocked programs" : "Blocked apps", e.apps, (r) => r.label),
+    sourceList("Blocked websites", e.sites, (r) => r.site),
+    sourceList("Only these websites", e.allowSites, (r) => r.site, isPc(d) ? "Allow lists only work on phones." : "Every other website is blocked."),
+    sourceList("Daily limit", e.limit.minutes ? [{ minutes: e.limit.minutes, source: e.limit.source }] : [], (r) => limitText(r.minutes)),
+    sourceList("Schedules", e.schedules, (r) => r.name + ", " + daysText(r.days) + " " + r.start + " to " + r.end)
+  );
+}
+
+// ---------------------------------------------------------------- groups
+function mountGroups(content) {
+  setTitle("Groups");
+  const bar = el("div", "toolbar");
+  bar.appendChild(button("New group", "primary", "plus", newGroup));
+  const c = card("Groups", "users", "Put devices in groups, like a class, then give a group a profile. A device can be in several groups.");
+  const box = el("div");
+  box.id = "groupList";
+  c.appendChild(box);
+  content.append(bar, c);
+}
+
+function updateGroups() {
+  if (!changed("groups", [overview.groups, overview.devices.map((d) => [d.id, d.name]), overview.profiles.map((p) => [p.name, p.assign])])) return;
+  const box = $("groupList");
+  box.replaceChildren();
+  if (!overview.groups.length) box.appendChild(emptyState("users", "No groups yet. Make one, like Class 8A."));
+  overview.groups.forEach((g, index) => {
+    const names = overview.devices.filter((d) => g.deviceIds.includes(d.id)).map((d) => d.name);
+    const usedBy = overview.profiles.filter((p) => p.assign.groups.includes(g.id)).map((p) => p.name);
+    const row = el("div", "row");
+    const info = el("div", "grow");
+    info.append(el("div", "title", g.name),
+      el("div", "tiny", names.length ? names.length + (names.length === 1 ? " device: " : " devices: ") + names.join(", ") : "No devices yet"),
+      el("div", "tiny", usedBy.length ? "Profiles: " + usedBy.join(", ") : "No profile"));
+    const del = button("", "danger small", "trash", async () => {
+      const ok = await modal({ title: "Delete " + g.name + "?", message: "Its devices stay. Profiles given to this group stop applying to them.", confirmText: "Delete", danger: true });
+      if (ok) saveGroups(overview.groups.filter((_, i) => i !== index), "Group deleted.");
+    });
+    del.setAttribute("aria-label", "Delete " + g.name);
+    row.append(el("div", "typeicon", g.name.slice(0, 1).toUpperCase()), info,
+      button("Devices", "ghost small", "devices", () => groupMembers(index)),
+      button("Rename", "ghost small", null, () => renameGroup(index)), del);
+    box.appendChild(row);
+  });
+}
+
+async function saveGroups(list, message) {
+  const { status, data } = await api("/api/admin/groups/save", { groups: list });
+  if (status === 200) toast(message);
+  await refresh();
+  memo.groups = "";
+  update();
+  return status === 200 ? null : (data.error === "duplicate_name" ? "Another group already has this name." : "Could not save. Try again.");
+}
+
+async function newGroup() {
+  await modal({
+    title: "New group", message: "For example Class 8A.", input: { placeholder: "Group name" }, confirmText: "Create",
+    onConfirm: async (name) => name.trim() ? saveGroups([...overview.groups, { name: name.trim(), deviceIds: [] }], "Group created.") : "Type a name."
+  });
+}
+
+async function renameGroup(index) {
+  const g = overview.groups[index];
+  const field = el("input");
+  field.value = g.name;
+  await modal({
+    title: "Rename " + g.name, field, confirmText: "Save",
+    onConfirm: async (name) => name.trim()
+      ? saveGroups(overview.groups.map((x, i) => i === index ? Object.assign({}, x, { name: name.trim() }) : x), "Group renamed.")
+      : "Type a name."
+  });
+}
+
+function checklist(items, chosen) {
+  const list = el("div", "picklist");
+  for (const [value, label] of items) {
+    const row = el("label", "choice");
+    const c = el("input");
+    c.type = "checkbox";
+    c.checked = chosen.has(value);
+    c.onchange = () => { c.checked ? chosen.add(value) : chosen.delete(value); };
+    row.append(c, document.createTextNode(label));
+    list.appendChild(row);
+  }
+  if (!items.length) list.appendChild(el("p", "small muted", "Nothing to choose yet."));
+  return list;
+}
+
+async function groupMembers(index) {
+  const g = overview.groups[index];
+  const chosen = new Set(g.deviceIds);
+  await modal({
+    title: "Devices in " + g.name,
+    body: checklist(overview.devices.map((d) => [d.id, d.name + " (" + d.user + ")"]), chosen),
+    confirmText: "Save",
+    onConfirm: () => saveGroups(overview.groups.map((x, i) => i === index ? Object.assign({}, x, { deviceIds: [...chosen] }) : x), "Saved.")
+  });
+}
+
+// ---------------------------------------------------------------- profiles
+function mountProfiles(content) {
+  setTitle("Profiles");
+  const bar = el("div", "toolbar");
+  bar.appendChild(button("New profile", "primary", "plus", () => editProfile(null)));
+  const c = card("Profiles", "shield", "A profile is a set of rules you can give to devices, users or groups. Blocks add up; the smallest daily limit wins.");
+  const box = el("div");
+  box.id = "profileList";
+  c.appendChild(box);
+  content.append(bar, c);
+}
+
+function assignText(p) {
+  const parts = [];
+  const groupNames = overview.groups.filter((g) => p.assign.groups.includes(g.id)).map((g) => "group " + g.name);
+  const deviceNames = overview.devices.filter((d) => p.assign.devices.includes(d.id)).map((d) => d.name);
+  parts.push(...groupNames, ...p.assign.users.map((u) => "user " + u), ...deviceNames);
+  return parts.length ? "Given to " + parts.join(", ") : "Not given to anyone yet";
+}
+
+function profileSummary(p) {
+  const parts = [];
+  if (p.apps.length) parts.push(p.apps.map((a) => a.name).slice(0, 4).join(", ") + (p.apps.length > 4 ? " and " + (p.apps.length - 4) + " more" : ""));
+  if (p.sites.length) parts.push(p.sites.length + (p.sites.length === 1 ? " website" : " websites"));
+  if (p.allowSites.length) parts.push("only " + p.allowSites.length + " websites allowed (phones)");
+  if (p.dailyLimitMinutes) parts.push(limitText(p.dailyLimitMinutes));
+  if (p.mode === "schedule") parts.push(p.windows.map((w) => daysText(w.days) + " " + w.start + " to " + w.end + (w.blockAllApps ? ", all apps" : "")).join("; "));
+  return parts.join(" · ") || "No rules yet";
+}
+
+function updateProfiles() {
+  if (!changed("profiles", [overview.profiles, overview.groups, overview.devices.map((d) => [d.id, d.name])])) return;
+  const box = $("profileList");
+  box.replaceChildren();
+  if (!overview.profiles.length) box.appendChild(emptyState("shield", "No profiles yet. Make one, like Study Mode, and give it to a group."));
+  overview.profiles.forEach((p, index) => {
+    const row = el("div", "row");
+    const sw = el("label", "switch on");
+    const c = el("input");
+    c.type = "checkbox";
+    c.checked = p.enabled;
+    c.setAttribute("aria-label", (p.enabled ? "Turn off " : "Turn on ") + p.name);
+    c.onchange = () => saveProfiles(overview.profiles.map((x, i) => i === index ? Object.assign({}, x, { enabled: c.checked }) : x),
+      p.name + (c.checked ? " is on." : " is off."));
+    sw.append(c, el("span"));
+    const info = el("div", "grow");
+    info.append(el("div", "title", p.name), el("div", "tiny wraptext", profileSummary(p)), el("div", "tiny", assignText(p)));
+    const del = button("", "danger small", "trash", async () => {
+      const ok = await modal({ title: "Delete " + p.name + "?", message: "Its rules stop on every device it was given to.", confirmText: "Delete", danger: true });
+      if (ok) saveProfiles(overview.profiles.filter((_, i) => i !== index), "Profile deleted.");
+    });
+    del.setAttribute("aria-label", "Delete " + p.name);
+    row.append(sw, info, button("Edit", "ghost small", null, () => editProfile(index)),
+      button("Duplicate", "ghost small", null, () => {
+        const copy = JSON.parse(JSON.stringify(p));
+        delete copy.id;
+        copy.name = (p.name + " copy").slice(0, 40);
+        copy.assign = { devices: [], users: [], groups: [] };
+        saveProfiles([...overview.profiles, copy], "Copy made. It is not given to anyone yet.");
+      }), del);
+    box.appendChild(row);
+  });
+}
+
+async function saveProfiles(list, message) {
+  const { status, data } = await api("/api/admin/profiles/save", { profiles: list });
+  if (status === 200 && message) toast(message);
+  await refresh();
+  memo.profiles = "";
+  update();
+  if (status === 200) return null;
+  return data.error === "bad_site" ? siteError(data) : "Could not save. Check the profile and try again.";
+}
+
+function windowEditor(w, onRemove) {
+  const row = el("div", "windowrow");
+  const days = new Set(w.days);
+  const seg = el("div", "seg days");
+  DAY_NAMES.forEach((label, i) => {
+    const b = button(label, days.has(i + 1) ? "on" : "", null, () => {
+      days.has(i + 1) ? days.delete(i + 1) : days.add(i + 1);
+      b.classList.toggle("on", days.has(i + 1));
+    });
+    seg.appendChild(b);
+  });
+  const start = el("input");
+  start.type = "time";
+  start.value = w.start;
+  start.setAttribute("aria-label", "Start");
+  const end = el("input");
+  end.type = "time";
+  end.value = w.end;
+  end.setAttribute("aria-label", "End");
+  const allRow = el("label", "choice");
+  const all = el("input");
+  all.type = "checkbox";
+  all.checked = !!w.blockAllApps;
+  allRow.append(all, document.createTextNode("Also block all other apps"));
+  const remove = button("Remove", "link", null, () => { row.remove(); onRemove(); });
+  const times = el("div", "inline");
+  times.append(start, el("span", "muted", "to"), end, remove);
+  row.append(seg, times, allRow);
+  row.read = () => ({ days: [...days].sort(), start: start.value, end: end.value, blockAllApps: all.checked });
+  return row;
+}
+
+/** The profile editor: apps by name (Android and Windows), websites, allow list, limit, timing and who gets it. */
+async function editProfile(index) {
+  const isNew = index === null;
+  const base = isNew
+    ? { name: "", enabled: true, apps: [], sites: [], allowSites: [], dailyLimitMinutes: 0, mode: "always", windows: [], assign: { devices: [], users: [], groups: [] } }
+    : JSON.parse(JSON.stringify(overview.profiles[index]));
+  const form = el("div", "form");
+  const name = el("input");
+  name.value = base.name;
+  name.maxLength = 40;
+  name.placeholder = "Like Study Mode";
+
+  // Apps: a built in list names each app once for phones and computers; custom ones can be added.
+  const apps = base.apps.map((a) => Object.assign({}, a));
+  const chips = el("div", "chips");
+  const drawChips = () => {
+    chips.replaceChildren();
+    const known = overview.knownApps.map((k) => k.name);
+    for (const k of overview.knownApps) {
+      const on = apps.some((a) => a.name === k.name);
+      const b = button(k.name, "chipbtn" + (on ? " on" : ""), on ? "check" : "plus", () => {
+        const at = apps.findIndex((a) => a.name === k.name);
+        if (at >= 0) apps.splice(at, 1); else apps.push({ name: k.name, android: k.android, windows: k.windows });
+        drawChips();
+      });
+      b.title = [k.android.length ? "Android: " + k.android.join(", ") : "", k.windows.length ? "Windows: " + k.windows.join(", ") : ""].filter(Boolean).join(" · ");
+      chips.appendChild(b);
+    }
+    for (const a of apps.filter((x) => !known.includes(x.name))) {
+      const b = button(a.name, "chipbtn on", "check", () => { apps.splice(apps.indexOf(a), 1); drawChips(); });
+      b.title = [...a.android, ...a.windows].join(", ");
+      chips.appendChild(b);
+    }
+  };
+  drawChips();
+  const custom = el("div", "inline wrap");
+  const cName = el("input");
+  cName.placeholder = "App name";
+  const cAndroid = el("input");
+  cAndroid.placeholder = "Android package, like com.example.game";
+  const cWindows = el("input");
+  cWindows.placeholder = "Windows program, like game.exe";
+  custom.append(cName, cAndroid, cWindows, button("Add", "ghost small", "plus", () => {
+    const n = cName.value.trim();
+    const android = cAndroid.value.trim() ? [cAndroid.value.trim()] : [];
+    const windows = cWindows.value.trim() ? [cWindows.value.trim().toLowerCase()] : [];
+    if (!n || (!android.length && !windows.length)) { toast("Type a name and a package or a program."); return; }
+    apps.push({ name: n, android, windows });
+    cName.value = cAndroid.value = cWindows.value = "";
+    drawChips();
+  }));
+
+  const sites = el("input");
+  sites.value = base.sites.join(", ");
+  sites.placeholder = "tiktok.com, youtube.com/shorts";
+  const allow = el("input");
+  allow.value = base.allowSites.join(", ");
+  allow.placeholder = "kundalik.com, wikipedia.org";
+  const limitSel = selectBox([["0", "No limit"], ["30", "30 min"], ["60", "1 h"], ["120", "2 h"], ["180", "3 h"]].concat(
+    [0, 30, 60, 120, 180].includes(base.dailyLimitMinutes) ? [] : [[String(base.dailyLimitMinutes), limitText(base.dailyLimitMinutes)]]),
+  String(base.dailyLimitMinutes), "Daily limit", () => {});
+
+  // When the rules apply: always, or only inside time windows.
+  let mode = base.mode;
+  const windowsBox = el("div");
+  const windowRows = [];
+  const addWindow = (w) => {
+    const row = windowEditor(w, () => windowRows.splice(windowRows.indexOf(row), 1));
+    windowRows.push(row);
+    windowsBox.appendChild(row);
+  };
+  base.windows.forEach(addWindow);
+  const addWindowBtn = button("Add a time", "ghost small", "plus", () => addWindow({ days: [1, 2, 3, 4, 5], start: "08:00", end: "14:00", blockAllApps: false }));
+  const timing = el("div");
+  timing.append(windowsBox, addWindowBtn);
+  const modeSeg = el("div", "seg");
+  for (const [value, text] of [["always", "Always"], ["schedule", "Only at set times"]]) {
+    const b = button(text, value === mode ? "on" : "", null, () => {
+      mode = value;
+      for (const other of modeSeg.children) other.classList.toggle("on", other === b);
+      timing.classList.toggle("hidden", mode !== "schedule");
+      if (mode === "schedule" && !windowRows.length) addWindowBtn.click();
+    });
+    modeSeg.appendChild(b);
+  }
+  timing.classList.toggle("hidden", mode !== "schedule");
+
+  const assignGroups = new Set(base.assign.groups);
+  const assignUsers = new Set(base.assign.users);
+  const assignDevices = new Set(base.assign.devices);
+
+  form.append(
+    el("label", "field", "Name"), name,
+    el("label", "field", "Apps to block (works on phones and computers)"), chips,
+    el("div", "tiny", "Not in the list? Add it with its Android package, its Windows program, or both:"), custom,
+    el("label", "field", "Websites to block"), sites,
+    el("label", "field", "Only allow these websites (phones only; every other website is blocked)"), allow,
+    el("label", "field", "Daily limit"), limitSel,
+    el("label", "field", "When"), modeSeg, timing,
+    el("label", "field", "Give to groups"), checklist(overview.groups.map((g) => [g.id, g.name]), assignGroups),
+    el("label", "field", "Give to users (all their devices)"), checklist(overview.users.map((u) => [u.username, u.username]), assignUsers),
+    el("label", "field", "Give to single devices"), checklist(overview.devices.map((d) => [d.id, d.name + " (" + d.user + ")"]), assignDevices)
+  );
+
+  await modal({
+    title: isNew ? "New profile" : "Edit " + base.name, body: form, wide: true, confirmText: "Save",
+    onConfirm: async () => {
+      const profile = Object.assign({}, base, {
+        name: name.value.trim(), apps, sites: splitSites(sites.value), allowSites: splitSites(allow.value),
+        dailyLimitMinutes: Number(limitSel.value), mode, windows: mode === "schedule" ? windowRows.map((r) => r.read()) : [],
+        assign: { groups: [...assignGroups], users: [...assignUsers], devices: [...assignDevices] }
+      });
+      if (!profile.name) return "Give the profile a name.";
+      if (mode === "schedule") {
+        if (!profile.windows.length) return "Add at least one time, or choose Always.";
+        if (profile.windows.some((w) => !w.days.length || !w.start || !w.end || w.start === w.end)) return "Each time needs days, a start and a different end.";
+      }
+      const list = isNew ? [...overview.profiles, profile] : overview.profiles.map((x, i) => i === index ? profile : x);
+      return saveProfiles(list, "Saved. Devices get it within 10 seconds.");
+    }
+  });
+}
+
+// ---------------------------------------------------------------- notifications (bell)
+const NOTIFY_LABELS = {
+  new_device: "New device or approval request",
+  offline: "Device offline for over 10 minutes",
+  new_app: "New app found",
+  limit_reached: "Daily limit reached",
+  sync_failed: "Device could not reach this computer"
+};
+const NOTIFY_ICONS = { new_device: "devices", offline: "offline", new_app: "sparkle", limit_reached: "clock", sync_failed: "link" };
+let bellOpen = false;
+
+function renderBell() {
+  const b = $("bellBtn");
+  const count = overview ? overview.unread : 0;
+  b.replaceChildren(icon("bell"));
+  if (count) b.appendChild(el("span", "badge", count > 99 ? "99+" : String(count)));
+  b.setAttribute("aria-label", count ? count + " unread notifications" : "Notifications");
+  if (bellOpen) renderBellPanel();
+}
+
+function renderBellPanel() {
+  let panel = $("bellPanel");
+  if (!panel) {
+    panel = el("div", "card bellpanel");
+    panel.id = "bellPanel";
+    panel.setAttribute("role", "dialog");
+    panel.setAttribute("aria-label", "Notifications");
+    document.body.appendChild(panel);
+  }
+  if (!changed("bell", [overview.notifications])) return;
+  panel.replaceChildren();
+  const head = el("div", "row");
+  head.append(el("div", "grow title", "Notifications"),
+    button("Mark all as read", "link", null, async () => { await api("/api/admin/notifications/read", { all: true }); await refresh(); update(); renderBell(); }),
+    button("Settings", "link", null, () => { closeBell(); location.hash = "#/settings"; }));
+  panel.appendChild(head);
+  if (!overview.notifications.length) panel.appendChild(emptyState("bell", "Nothing new."));
+  for (const n of overview.notifications) {
+    const row = el("div", "row" + (n.device ? " click" : "") + (n.read ? "" : " unread"));
+    const ic = el("div", "logicon");
+    ic.appendChild(icon(NOTIFY_ICONS[n.type] || "bell"));
+    const info = el("div", "grow");
+    info.append(el("div", "title wrap", n.text), el("div", "tiny", logTime(n.t)));
+    row.append(ic, info);
+    if (!n.read) row.appendChild(el("span", "dot on"));
+    if (n.device) {
+      row.tabIndex = 0;
+      const open = async () => {
+        await api("/api/admin/notifications/read", { ids: [n.id] });
+        closeBell();
+        location.hash = "#/devices/" + encodeURIComponent(n.device);
+        await refresh();
+        renderBell();
+      };
+      row.onclick = open;
+      row.onkeydown = (e) => { if (e.key === "Enter") open(); };
+    }
+    panel.appendChild(row);
+  }
+}
+
+function closeBell() {
+  bellOpen = false;
+  const panel = $("bellPanel");
+  if (panel) panel.remove();
+  memo.bell = "";
+}
+
+$("bellBtn").onclick = (e) => {
+  e.stopPropagation();
+  if (bellOpen) { closeBell(); return; }
+  bellOpen = true;
+  memo.bell = "";
+  renderBellPanel();
+};
+document.addEventListener("click", (e) => {
+  const panel = $("bellPanel");
+  if (bellOpen && panel && !panel.contains(e.target)) closeBell();
+});
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && bellOpen) closeBell(); });
+
+// ---------------------------------------------------------------- device protection tab
+const PROTECTION_LABELS = {
+  accessibility: "Curbox service",
+  overlay: "Block messages",
+  notifications: "Notifications",
+  battery: "Background running",
+  uninstallProtection: "Uninstall protection",
+  deviceOwner: "Fully managed (device owner)",
+  agent: "Curbox for PC agent",
+  usageHelper: "Usage helper",
+  hostsFile: "Website blocking (hosts file)"
+};
+const PROTECTION_ACTIONS = new Set(["device_linked", "device_pending", "device_approved", "device_removed", "device_released",
+  "device_released_by_code", "release_attempt", "new_app_policy"]);
+
+function mountDevProtection(panel) {
+  const grid = el("div", "grid2");
+  const state = card("Protection on this device", "shield", "Read from the device itself every few minutes.");
+  const stateBox = el("div");
+  stateBox.id = "devProt";
+  state.appendChild(stateBox);
+  const events = card("Protection events", "history", "Links, approvals, removals and release attempts.");
+  const eventsBox = el("div");
+  eventsBox.id = "devProtLog";
+  eventsBox.appendChild(el("p", "muted small", "Loading…"));
+  events.appendChild(eventsBox);
+  grid.append(state, events);
+  panel.appendChild(grid);
+}
+
+async function updateDevProtection(d) {
+  if (changed("devProt", [d.protection, d.online, d.received, d.pending, tick()])) {
+    const box = $("devProt");
+    box.replaceChildren();
+    const sync = el("div", "row");
+    const syncInfo = el("div", "grow");
+    syncInfo.append(el("div", "title", "Sync"), el("div", "tiny", d.online ? "Online now" : "Last seen " + timeAgo(d.lastSeen).toLowerCase()));
+    sync.append(syncInfo, d.pending ? pill("Waiting for approval", "warn") : receivedPill(d));
+    box.appendChild(sync);
+    const report = d.protection || null;
+    if (!report) {
+      box.appendChild(el("p", "small muted", isPc(d)
+        ? "No report yet. Computers send one with their program list, about every 10 minutes."
+        : "No report yet. Phones with the newest Curbox send one every 5 minutes."));
+    } else {
+      for (const [key, label] of Object.entries(PROTECTION_LABELS)) {
+        if (!(key in report)) continue;
+        const row = el("div", "row");
+        row.append(el("div", "grow title", label), report[key] ? pill("On", "ok", "check") : pill("Off", "warn"));
+        box.appendChild(row);
+      }
+      box.appendChild(el("p", "tiny", "Checked " + timeAgo(report.checkedAt).toLowerCase() + "."));
+    }
+  }
+  const { status, data } = await api("/api/admin/activity?range=all&device=" + encodeURIComponent(d.id));
+  const box = $("devProtLog");
+  if (status !== 200 || !box || route.id !== d.id) return;
+  const entries = data.entries.filter((e) => PROTECTION_ACTIONS.has(e.action)).slice(0, 50);
+  if (changed("devProtLog", [entries, tick()])) renderLog(box, entries, false);
+}
+
+// ---------------------------------------------------------------- settings extras
+function mountSettingsExtras(right) {
+  const alerts = card("Notifications", "bell", "Choose what shows in the bell, and what also shows as a Windows message.");
+  const table = el("table", "plain");
+  const head = el("tr");
+  ["Event", "In the bell", "Windows message"].forEach((h) => head.appendChild(el("th", "", h)));
+  const thead = el("thead");
+  thead.appendChild(head);
+  const body = el("tbody");
+  body.id = "prefsBody";
+  table.append(thead, body);
+  alerts.appendChild(table);
+
+  const pc = card("This computer", "computer");
+  const pcBox = el("div");
+  pcBox.id = "pcSettings";
+  pc.appendChild(pcBox);
+
+  const backup = card("Backup", "download", "Keep a copy of users, devices, rules and settings.");
+  const download = el("a", "btnlink ghost");
+  download.href = "/api/admin/backup";
+  download.append(icon("download"), document.createTextNode("Download backup"));
+  download.onclick = async (e) => {
+    e.preventDefault();
+    const ok = await modal({
+      title: "Download a backup?",
+      message: "The file holds password hashes and every device's link. Keep it somewhere safe and do not send it to anyone.",
+      confirmText: "Download"
+    });
+    if (ok) location.href = "/api/admin/backup";
+  };
+  const file = el("input");
+  file.type = "file";
+  file.accept = "application/json,.json";
+  file.className = "hidden";
+  file.onchange = () => restoreBackup(file);
+  const restore = button("Restore from a file", "ghost", "history", () => file.click());
+  const actions = el("div", "inline wrap");
+  actions.append(download, restore, file);
+  backup.append(actions, el("p", "small muted", "Restoring replaces everything with the file. The current data is kept next to it as curbox-admin-data.before-restore.json."));
+  right.prepend(alerts, pc, backup);
+}
+
+async function restoreBackup(input) {
+  const f = input.files && input.files[0];
+  input.value = "";
+  if (!f) return;
+  let data;
+  try { data = JSON.parse(await f.text()); } catch (e) { toast("This file is not a Curbox backup."); return; }
+  const ok = await modal({
+    title: "Restore this backup?",
+    message: "Everything now in Curbox for PC is replaced by " + f.name + ". Devices linked after the backup will have to sign in again.",
+    confirmText: "Restore", danger: true
+  });
+  if (!ok) return;
+  const { status } = await api("/api/admin/restore", { data });
+  toast(status === 200 ? "Backup restored." : "This file is not a Curbox backup.");
+  await refresh();
+  memo = {};
+  mount();
+}
+
+function updateSettingsExtras() {
+  if (changed("prefs", [overview.notifyPrefs])) {
+    const body = $("prefsBody");
+    body.replaceChildren();
+    for (const [type, label] of Object.entries(NOTIFY_LABELS)) {
+      const pref = overview.notifyPrefs[type] || { panel: true, toast: false };
+      const tr = el("tr");
+      const cells = ["panel", "toast"].map((key) => {
+        const td = el("td");
+        td.appendChild(checkbox(!!pref[key], label + (key === "panel" ? " in the bell" : " as a Windows message"), async (on) => {
+          const prefs = JSON.parse(JSON.stringify(overview.notifyPrefs));
+          prefs[type][key] = on;
+          await api("/api/admin/notifications/prefs", { prefs });
+          await refresh();
+          update();
+        }));
+        return td;
+      });
+      tr.append(el("td", "small", label), ...cells);
+      body.appendChild(tr);
+    }
+  }
+  if (changed("pcSettings", [overview.addresses, overview.port, overview.autostart, overview.installed, overview.dataFile])) {
+    const box = $("pcSettings");
+    box.replaceChildren();
+    const rows = [["Port", String(overview.port)], ["Addresses", (overview.addresses || []).join(", ") || "No network"], ["Data file", overview.dataFile]];
+    const kv = el("dl", "kv");
+    rows.forEach(([k, v]) => kv.append(el("dt", "", k), el("dd", "", v)));
+    box.appendChild(kv);
+    const startRow = el("label", "choice");
+    const start = checkbox(!!overview.autostart, "Start with Windows", async (on) => {
+      const { status } = await api("/api/admin/autostart", { on });
+      toast(status === 200 ? (on ? "Curbox for PC starts with Windows." : "Curbox for PC no longer starts with Windows.") : "Only the installed app can start with Windows.");
+      await refresh();
+      update();
+    });
+    start.disabled = !overview.installed;
+    startRow.append(start, document.createTextNode("Start with Windows and keep running in the tray"));
+    box.appendChild(startRow);
+    if (!overview.installed) box.appendChild(el("p", "tiny", "Only the installed app can start with Windows."));
+    box.appendChild(el("p", "small muted", "Closing the window keeps Curbox for PC running in the tray, so devices stay managed. Use Quit in the tray menu to stop it."));
+  }
+}
+
+// ---------------------------------------------------------------- users
+function mountUsers(content) {
+  setTitle("Users");
+  const grid = el("div", "grid2");
+  const list = card("Users", "users", "People who sign in on phones and computers.");
+  const body = el("div");
+  body.id = "userList";
+  list.appendChild(body);
+
+  const add = card("Add a user", "plus", "They use this login on their device.");
+  const name = el("input");
+  name.id = "newUser";
+  name.placeholder = "Like anvarov";
+  const pass = el("input");
+  pass.id = "newUserPass";
+  pass.type = "password";
+  const err = el("div", "error");
+  err.id = "userError";
+  add.append(
+    el("label", "field", "Login"), name,
+    el("label", "field", "Password"), pass,
+    err, button("Add user", "primary", "plus", addUser)
+  );
+  grid.append(list, add);
+  content.appendChild(grid);
+}
+
+function updateUsers() {
+  if (!changed("users", [overview.users, overview.devices.map((d) => [d.user, d.name, d.platform])])) return;
+  const body = $("userList");
+  body.replaceChildren();
+  if (!overview.users.length) body.appendChild(emptyState("users", "No users yet. Add one on the right."));
+  for (const u of overview.users) {
+    const mine = overview.devices.filter((d) => d.user === u.username);
+    const row = el("div", "row");
+    const badge = el("div", "typeicon", u.username.slice(0, 1).toUpperCase());
+    const info = el("div", "grow");
+    info.append(el("div", "title", u.username), el("div", "tiny", mine.length === 1 ? "1 device" : mine.length + " devices"));
+    const del = button("", "danger", "trash", () => deleteUser(u, mine));
+    del.setAttribute("aria-label", "Delete " + u.username);
+    row.append(badge, info, button("New password", "ghost", "key", () => newPassword(u)), del);
+    body.appendChild(row);
+  }
+}
+
+async function addUser() {
   const username = $("newUser").value.trim().toLowerCase();
   const password = $("newUserPass").value;
   const { status, data } = await api("/api/admin/users/add", { username, password });
   if (status === 200) {
-    $("newUser").value = ""; $("newUserPass").value = ""; $("userError").textContent = "";
-    refresh();
+    $("newUser").value = "";
+    $("newUserPass").value = "";
+    $("userError").textContent = "";
+    toast("User added.");
+    await refresh();
+    update();
     return;
   }
   const messages = {
@@ -291,125 +3227,165 @@ $("addUserBtn").onclick = async () => {
     exists: "This login is already taken."
   };
   $("userError").textContent = messages[data.error] || "Could not add the user.";
-};
+}
 
-$("changePassBtn").onclick = async () => {
-  $("passError").textContent = ""; $("passNote").textContent = "";
-  const { status } = await api("/api/admin/password", { currentPassword: $("curPass").value, newPassword: $("nextPass").value });
-  if (status === 200) { $("curPass").value = ""; $("nextPass").value = ""; $("passNote").textContent = "Saved."; }
-  else if (status === 403) $("passError").textContent = "The current password is wrong.";
-  else $("passError").textContent = "Use at least 4 characters.";
-};
+async function newPassword(u) {
+  const value = await modal({
+    title: "New password for " + u.username,
+    message: "Use at least 4 characters. Their devices ask for it at the next sign in.",
+    input: { type: "password", placeholder: "New password" },
+    confirmText: "Save"
+  });
+  if (value === null) return;
+  const { status } = await api("/api/admin/users/password", { username: u.username, password: value });
+  toast(status === 200 ? "Password changed." : "Use at least 4 characters.");
+}
 
-function renderDevices() {
-  const list = $("deviceList");
-  list.replaceChildren();
-  if (overview.devices.length === 0) list.appendChild(el("div", "muted", "No devices yet."));
-  for (const d of overview.devices) {
-    const row = el("div", "device" + (d.id === selectedId ? " selected" : ""));
-    const info = el("div", "grow");
-    info.append(el("div", "title", d.user), el("div", "sub", (isPc(d) ? "Computer: " : "Phone: ") + d.name));
-    row.append(el("span", "dot" + (d.online ? " on" : "")), info, el("span", "muted", d.online ? "Online" : "Offline"));
-    row.onclick = () => { selectedId = d.id; lastAppsKey = ""; renderDevices(); renderDetail(); };
-    list.appendChild(row);
+async function deleteUser(u, mine) {
+  const ok = await modal({
+    title: "Delete " + u.username + "?",
+    message: mine.length ? "These devices stop following your blocks:" : "This user has no devices.",
+    list: mine.map((d) => d.name + (isPc(d) ? " (computer)" : " (phone)")),
+    confirmText: "Delete", danger: true
+  });
+  if (!ok) return;
+  await api("/api/admin/users/delete", { username: u.username });
+  toast("User deleted.");
+  await refresh();
+  update();
+}
+
+// ---------------------------------------------------------------- settings
+function mountSettings(content) {
+  setTitle("Settings");
+  const grid = el("div", "grid2");
+  const account = card("Admin account", "key");
+  const who = el("p", "sub muted");
+  who.id = "adminName";
+  account.appendChild(who);
+  for (const [id, label] of [["curPass", "Current password"], ["nextPass", "New password"], ["nextPass2", "New password again"]]) {
+    const i = el("input");
+    i.id = id;
+    i.type = "password";
+    account.append(el("label", "field", label), i);
   }
+  const err = el("div", "error");
+  err.id = "passError";
+  account.append(err, button("Change password", "primary", "check", changePassword));
+
+  const code = card("Release code", "shield", "A device needs this six digit code to leave management from inside Curbox.");
+  const codeState = el("p", "sub");
+  codeState.id = "codeState";
+  const codeInput = el("input");
+  codeInput.id = "codeInput";
+  codeInput.type = "password";
+  codeInput.inputMode = "numeric";
+  codeInput.maxLength = 6;
+  codeInput.autocomplete = "off";
+  codeInput.placeholder = "6 digits";
+  codeInput.setAttribute("aria-label", "New release code");
+  codeInput.onkeydown = (e) => { if (e.key === "Enter") saveCode(false); };
+  const codeErr = el("div", "error");
+  codeErr.id = "codeError";
+  const codeButtons = el("div", "inline");
+  const clear = button("Remove code", "ghost", "trash", () => saveCode(true));
+  clear.id = "codeClear";
+  codeButtons.append(button("Save code", "primary", "check", () => saveCode(false)), clear);
+  code.append(codeState, codeInput, codeErr, codeButtons,
+    el("p", "small muted", "The code is saved as a hash, so nobody can read it back, not even you. Five wrong tries lock that device out for 5 minutes. On a normal phone the owner can still uninstall Curbox in Android settings; the code only controls the release inside Curbox."));
+  const approval = card("New devices", "devices");
+  const approvalRow = el("label", "choice");
+  const approvalBox = el("input");
+  approvalBox.type = "checkbox";
+  approvalBox.id = "approveNew";
+  approvalBox.onchange = async () => {
+    const { status } = await api("/api/admin/settings", { approveNewDevices: approvalBox.checked });
+    toast(status === 200 ? (approvalBox.checked ? "New devices now wait for your approval." : "New devices are now accepted right away.") : "Could not save. Try again.");
+    await refresh();
+    update();
+  };
+  approvalRow.append(approvalBox, document.createTextNode("Approve new devices before rules apply"));
+  approval.append(approvalRow, el("p", "small muted", "When this is on, a device that signs in for the first time waits on the Dashboard until you approve it. Devices you already have are not affected."));
+  const left = el("div", "stack");
+  left.append(account, approval, code);
+
+  const net = card("Connection", "link", "Phones and computers on the same WiFi use this address.");
+  const box = el("div");
+  box.id = "settingsConnect";
+  net.appendChild(box);
+
+  const about = card("About", null);
+  about.append(
+    el("p", "", "Curbox for PC, version 1.0.0"),
+    el("p", "muted", "Curbox for PC manages phones and computers on your own network. Nothing goes to the internet."),
+    el("p", "muted small", "Sessions end after 12 hours without use. Five wrong passwords lock that login for 5 minutes.")
+  );
+  const right = el("div");
+  right.style.display = "grid";
+  right.style.gap = "16px";
+  right.append(net, about);
+  mountSettingsExtras(right);
+  grid.append(left, right);
+  content.appendChild(grid);
 }
 
-function isPc(d) {
-  return d.platform === "windows";
+function updateSettings() {
+  $("adminName").textContent = "Login: " + overview.adminUser;
+  $("codeState").replaceChildren(overview.releaseCodeSet
+    ? pill("Code is set" + (overview.releaseCodeSetAt ? " on " + new Date(overview.releaseCodeSetAt).toLocaleDateString() : ""), "ok", "check")
+    : pill("No code yet. Devices cannot release themselves until you set one.", "warn"));
+  $("codeClear").classList.toggle("hidden", !overview.releaseCodeSet);
+  $("approveNew").checked = !!overview.approveNewDevices;
+  if (changed("settingsConnect", [overview.addresses])) connectSteps($("settingsConnect"));
+  updateSettingsExtras();
 }
 
-function currentDevice() {
-  return overview && overview.devices.find((d) => d.id === selectedId);
-}
-
-function renderDetail() {
-  const d = currentDevice();
-  $("noDevice").classList.toggle("hidden", !!d);
-  $("deviceDetail").classList.toggle("hidden", !d);
-  if (!d) return;
-  $("dName").textContent = d.user + "  ·  " + d.name;
-  $("appsHeading").textContent = isPc(d) ? "Programs on this computer" : "Apps on this phone";
-  $("siteHint").classList.toggle("hidden", !isPc(d));
-  $("dStatus").textContent = (d.online ? "Online" : "Offline, last seen " + timeAgo(d.lastSeen)) +
-    (d.appVersion ? "  ·  Curbox " + d.appVersion : "");
-  renderSites(d);
-  const key = JSON.stringify([d.id, d.apps, d.blockedApps, $("appSearch").value]);
-  if (key !== lastAppsKey) { lastAppsKey = key; renderApps(d); }
-}
-
-function renderSites(d) {
-  const list = $("siteList");
-  list.replaceChildren();
-  if (d.blockedSites.length === 0) list.appendChild(el("div", "muted", "No blocked websites."));
-  for (const site of d.blockedSites) {
-    const chip = el("span", "chip");
-    const x = el("button", "", "Remove");
-    x.onclick = () => saveRules(d, d.blockedApps, d.blockedSites.filter((s) => s !== site));
-    chip.append(el("span", "", site), x);
-    list.appendChild(chip);
+async function saveCode(clear) {
+  const err = $("codeError");
+  err.textContent = "";
+  if (clear) {
+    const ok = await modal({
+      title: "Remove the release code?",
+      message: "Devices can no longer release themselves. You can still remove a device here.",
+      confirmText: "Remove code", danger: true
+    });
+    if (!ok) return;
   }
-}
-
-function renderApps(d) {
-  const list = $("appList");
-  list.replaceChildren();
-  if (d.apps.length === 0) {
-    list.appendChild(el("div", "empty muted", isPc(d) ? "The program list shows up a minute after the computer connects." : "The app list shows up a few seconds after the phone connects."));
+  const body = clear ? { clear: true } : { code: $("codeInput").value.trim() };
+  const { status, data } = await api("/api/admin/release-code", body);
+  if (status === 200) {
+    $("codeInput").value = "";
+    toast(clear ? "Release code removed." : "Release code saved.");
+    await refresh();
+    update();
     return;
   }
-  const q = $("appSearch").value.trim().toLowerCase();
-  const blocked = new Set(d.blockedApps);
-  const apps = d.apps
-    .filter((a) => !q || a.l.toLowerCase().includes(q) || a.p.toLowerCase().includes(q))
-    .sort((a, b) => (blocked.has(b.p) - blocked.has(a.p)) || a.l.localeCompare(b.l));
-  for (const a of apps) {
-    const row = el("div", "app");
-    const info = el("div", "grow");
-    info.append(el("div", "", a.l), el("div", "pkg", a.p));
-    const sw = el("label", "switch");
-    sw.title = "Block this app";
-    const box = el("input");
-    box.type = "checkbox";
-    box.checked = blocked.has(a.p);
-    box.onchange = () => {
-      const next = new Set(d.blockedApps);
-      if (box.checked) next.add(a.p); else next.delete(a.p);
-      saveRules(d, [...next], d.blockedSites);
-    };
-    sw.append(box, el("span"));
-    row.append(info, sw);
-    list.appendChild(row);
+  err.textContent = data.error === "weak_code"
+    ? "This code is too easy to guess. Avoid 123456 or the same digit six times."
+    : "Type exactly six digits.";
+}
+
+async function changePassword() {
+  const err = $("passError");
+  err.textContent = "";
+  if ($("nextPass").value !== $("nextPass2").value) { err.textContent = "The new passwords are not the same."; return; }
+  const { status } = await api("/api/admin/password", { currentPassword: $("curPass").value, newPassword: $("nextPass").value });
+  if (status === 200) {
+    for (const id of ["curPass", "nextPass", "nextPass2"]) $(id).value = "";
+    toast("Password changed. Other sessions were signed out.");
+  } else if (status === 403) {
+    err.textContent = "The current password is wrong.";
+  } else {
+    err.textContent = "Use at least 4 characters.";
   }
 }
 
-async function saveRules(d, apps, sites) {
-  d.blockedApps = apps;
-  d.blockedSites = sites;
-  await api("/api/admin/rules", { deviceId: d.id, blockedApps: apps, blockedSites: sites });
-  await refresh();
-}
-
-function addSite() {
-  const d = currentDevice();
-  const value = $("siteInput").value.trim();
-  if (!d || !value) return;
-  $("siteInput").value = "";
-  saveRules(d, d.blockedApps, [...d.blockedSites, value]);
-}
-$("addSiteBtn").onclick = addSite;
-$("siteInput").onkeydown = (e) => { if (e.key === "Enter") addSite(); };
-$("appSearch").oninput = () => renderDetail();
-
-$("removeBtn").onclick = async () => {
-  const d = currentDevice();
-  if (!d) return;
-  if (!confirm("Remove " + d.name + "? It stops following your blocks.")) return;
-  await api("/api/admin/remove", { deviceId: d.id });
-  selectedId = null;
-  refresh();
-};
-
+// ---------------------------------------------------------------- go
+buildNav();
+renderPassToggle();
+$("logoutBtn").before(langButton());
+$("loginBtn").after(langButton());
+startTranslation();
 start();
 </script>
 </body>

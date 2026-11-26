@@ -39,6 +39,7 @@ import neth.iecal.curbox.blockers.ReelBlocker
 import neth.iecal.curbox.data.db.AppDatabase
 import neth.iecal.curbox.data.models.ExternalUnlockCondition
 import neth.iecal.curbox.data.models.AppBlockerWarningScreenConfig
+import neth.iecal.curbox.databinding.ActivityAdminBlockBinding
 import neth.iecal.curbox.databinding.DialogWarningOverlayBinding
 import neth.iecal.curbox.utils.DataStoreManager
 import neth.iecal.curbox.utils.FocusGoalProgress
@@ -148,6 +149,8 @@ class WarningActivity : AppCompatActivity() {
     private var isFocusGoalRequired = false
     private var isFocusGoalVerified = true
     private var isPrimaryUnlockActionReady = false
+    /** Shown for Curbox Admin blocks: no way past it, only back home. */
+    private var adminMode = false
 
     private lateinit var binding: DialogWarningOverlayBinding
     private val barcodeLauncher = registerForActivityResult(
@@ -180,6 +183,11 @@ class WarningActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (intent.getIntExtra("mode", 0) == Constants.WARNING_SCREEN_MODE_ADMIN_BLOCK) {
+            adminMode = true
+            showAdminBlock()
+            return
+        }
         mathRetryEndsAtMs = savedInstanceState?.getLong(KEY_MATH_RETRY_ENDS_AT_MS) ?: 0L
         sendWarningScreenVisibility(true)
 
@@ -870,7 +878,8 @@ class WarningActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         externalAttempt.clear()
-        sendWarningScreenVisibility(false)
+        // The admin screen never told AppBlocker it was showing.
+        if (!adminMode) sendWarningScreenVisibility(false)
         super.onDestroy()
         stopNfcUnlockScan()
         proceedTimer?.cancel()
@@ -912,6 +921,85 @@ class WarningActivity : AppCompatActivity() {
         sendWarningScreenVisibility(false)
         dialog?.dismiss()
         finishAffinity()
+    }
+
+    /**
+     * The admin block screen. Extras: "admin_kind" (app, site, limit or schedule),
+     * "launch_package", "admin_site", "admin_schedule_name", "admin_schedule_end".
+     */
+    private fun showAdminBlock() {
+        val view = ActivityAdminBlockBinding.inflate(layoutInflater)
+        setContentView(view.root)
+        val kind = intent.getStringExtra("admin_kind") ?: "app"
+        val pkg = intent.getStringExtra("launch_package").orEmpty()
+        val site = intent.getStringExtra("admin_site").orEmpty()
+
+        view.tvTitle.setText(
+            when (kind) {
+                "site" -> R.string.admin_block_site_title
+                "limit" -> R.string.admin_block_limit_title
+                "schedule" -> R.string.admin_block_schedule_title
+                else -> R.string.admin_block_app_title
+            }
+        )
+        view.tvMessage.setText(
+            when (kind) {
+                "site" -> R.string.admin_block_site_message
+                "limit" -> R.string.admin_block_limit_message
+                "schedule" -> R.string.admin_block_schedule_message
+                else -> R.string.admin_block_app_message
+            }
+        )
+        if (site.isNotEmpty()) {
+            view.ivTargetIcon.setImageResource(R.drawable.ic_curbox_globe)
+            view.ivTargetIcon.imageTintList = android.content.res.ColorStateList.valueOf(getColor(R.color.curbox_primary))
+            view.tvTarget.text = site
+        } else {
+            val app = runCatching { packageManager.getApplicationInfo(pkg, 0) }.getOrNull()
+            if (app == null) {
+                view.targetRow.visibility = View.GONE
+            } else {
+                view.ivTargetIcon.setImageDrawable(packageManager.getApplicationIcon(app))
+                view.tvTarget.text = packageManager.getApplicationLabel(app)
+            }
+        }
+        val detail = when (kind) {
+            "schedule" -> getString(
+                R.string.admin_block_schedule_detail,
+                intent.getStringExtra("admin_schedule_name").orEmpty(),
+                intent.getStringExtra("admin_schedule_end").orEmpty()
+            )
+            "limit" -> {
+                val now = java.time.LocalDateTime.now()
+                val minutes = java.time.Duration.between(now, now.toLocalDate().plusDays(1).atStartOfDay()).toMinutes()
+                getString(R.string.admin_block_limit_detail, if (minutes >= 60) "${minutes / 60}h ${minutes % 60}m" else "${minutes}m")
+            }
+            else -> ""
+        }
+        view.tvDetail.text = detail
+        view.tvDetail.visibility = if (detail.isEmpty()) View.GONE else View.VISIBLE
+
+        view.btnHome.setOnClickListener { goHome() }
+        if (neth.iecal.curbox.BuildConfig.SUPPORTS_ADMIN_LINK) {
+            view.btnDetails.setOnClickListener {
+                startActivity(
+                    Intent(this, UserMainActivity::class.java)
+                        .putExtra(UserMainActivity.EXTRA_OPEN_TAB, UserMainActivity.TAB_RESTRICTIONS)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                )
+                finish()
+            }
+        } else {
+            view.btnDetails.visibility = View.GONE
+        }
+        onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() = goHome()
+        })
+    }
+
+    private fun goHome() {
+        startActivity(Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        finish()
     }
 
     private fun sendWarningScreenVisibility(isVisible: Boolean) {

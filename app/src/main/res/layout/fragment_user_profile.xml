@@ -59,6 +59,19 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/user_profile_managed" />
+
+                    <neth.iecal.curbox.ui.components.ConnectionChip
+                        android:id="@+id/profile_chip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/curbox_space_s" />
+
+                    <TextView
+                        android:id="@+id/tv_last_sync"
+                        style="@style/TextAppearance.Curbox.Caption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/curbox_space_xs" />
                 </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
@@ -94,9 +107,21 @@
                     android:id="@+id/row_protection"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
                     app:rowIcon="@drawable/ic_admin_shield"
                     app:rowIconInCircle="true"
                     app:rowTitle="@string/user_profile_protection" />
+
+                <neth.iecal.curbox.ui.components.AppRowView
+                    android:id="@+id/row_privacy"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    app:rowIcon="@drawable/ic_info"
+                    app:rowIconInCircle="true"
+                    app:rowShowChevron="true"
+                    app:rowSubtitle="@string/user_profile_privacy_short"
+                    app:rowTitle="@string/user_profile_privacy" />
 
                 <neth.iecal.curbox.ui.components.AppRowView
                     android:id="@+id/row_version"
@@ -105,6 +130,16 @@
                     app:rowIcon="@drawable/ic_curbox_check"
                     app:rowIconInCircle="true"
                     app:rowTitle="@string/user_profile_version" />
+
+                <neth.iecal.curbox.ui.components.AppRowView
+                    android:id="@+id/row_sign_out"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    app:rowIcon="@drawable/ic_back_arrow"
+                    app:rowIconInCircle="true"
+                    app:rowSubtitle="@string/user_profile_sign_out_short"
+                    app:rowTitle="@string/user_profile_sign_out" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>

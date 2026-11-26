@@ -95,7 +95,6 @@
     <string name="sample_end_time">17:00</string>
     <string name="all_groups">Все группы</string>
     <string name="value_zero_minutes">0м</string>
-    <string name="value_zero_percent">0%</string>
     <string name="a_few_final_steps">Ещё несколько последних шагов</string>
     <string name="create_a_new_group">Создать новую группу</string>
     <string name="use_a_focus_group_to_instantly">Используйте группу фокусировки, чтобы мгновенно начать сессию с выбранными приложениями и сайтами.</string>

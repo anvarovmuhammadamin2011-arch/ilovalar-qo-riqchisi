@@ -8,6 +8,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:animateLayoutChanges="true"
         android:orientation="vertical"
         android:padding="@dimen/curbox_screen_padding">
 
@@ -15,6 +16,7 @@
             style="@style/TextAppearance.Curbox.Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:accessibilityHeading="true"
             android:text="@string/user_restrictions_title" />
 
         <TextView
@@ -24,15 +26,87 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp" />
 
-        <neth.iecal.curbox.ui.components.SectionHeader
+        <!-- Focus mode, read only -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_focus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/curbox_space_l"
-            app:sectionTitle="@string/user_restrictions_apps" />
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/curbox_screen_padding">
+
+                <TextView
+                    android:id="@+id/tv_focus_title"
+                    style="@style/TextAppearance.Curbox.Section"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="@dimen/curbox_space_s"
+                    app:drawableStartCompat="@drawable/ic_curbox_clock"
+                    app:drawableTint="@color/curbox_primary" />
+
+                <TextView
+                    android:id="@+id/tv_focus_body"
+                    style="@style/TextAppearance.Curbox.Body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/curbox_space_xs" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Daily limit and schedules -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_rules"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/curbox_card_gap"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:id="@+id/rules_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="@dimen/curbox_space_l" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/toggle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/curbox_space_l"
+            app:checkedButton="@id/btn_apps"
+            app:selectionRequired="true"
+            app:singleSelection="true">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_apps"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:minHeight="48dp"
+                android:text="@string/user_restrictions_apps" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_sites"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:minHeight="48dp"
+                android:text="@string/user_restrictions_sites" />
+        </com.google.android.material.button.MaterialButtonToggleGroup>
 
         <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_apps"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/curbox_space_m">
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -42,8 +116,7 @@
                     android:id="@+id/apps_list"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingHorizontal="@dimen/curbox_space_l" />
+                    android:orientation="vertical" />
 
                 <neth.iecal.curbox.ui.components.EmptyStateView
                     android:id="@+id/apps_empty"
@@ -55,19 +128,25 @@
             </FrameLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <neth.iecal.curbox.ui.components.SectionHeader
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_sites"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/curbox_space_xl"
-            app:sectionTitle="@string/user_restrictions_sites" />
+            android:layout_marginTop="@dimen/curbox_space_m"
+            android:visibility="gone">
 
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <FrameLayout
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_allow_note"
+                    style="@style/TextAppearance.Curbox.Caption"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/curbox_space_l"
+                    android:visibility="gone" />
 
                 <LinearLayout
                     android:id="@+id/sites_list"
@@ -83,7 +162,7 @@
                     android:visibility="gone"
                     app:emptyIcon="@drawable/ic_curbox_globe"
                     app:emptyTitle="@string/user_restrictions_no_sites" />
-            </FrameLayout>
+            </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

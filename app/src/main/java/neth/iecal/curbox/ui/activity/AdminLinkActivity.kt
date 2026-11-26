@@ -212,6 +212,8 @@ class AdminLinkActivity : AppCompatActivity(), FixedBrandColors {
                 .put("password", password)
                 .put("deviceId", deviceId)
                 .put("deviceName", Build.MODEL)
+                .put("platform", "android")
+                .put("osVersion", AdminLinkClient.osVersion())
             val response = withContext(Dispatchers.IO) {
                 runCatching { AdminLinkClient.post(url, "/api/device/login", body) }.getOrNull()
             }
@@ -224,6 +226,8 @@ class AdminLinkActivity : AppCompatActivity(), FixedBrandColors {
                 if (response?.code == 403) {
                     binding.inputLayoutPassword.error = getString(R.string.admin_link_wrong_login)
                     shakeForm()
+                } else if (response?.code == 429) {
+                    binding.inputLayoutPassword.error = getString(R.string.admin_link_locked)
                 } else {
                     // A returning user has no address field, so the message goes under the password.
                     val field = if (returningUser) binding.inputLayoutPassword else binding.inputLayoutAddress
@@ -232,6 +236,8 @@ class AdminLinkActivity : AppCompatActivity(), FixedBrandColors {
                 return@launch
             }
 
+            // With approval on, the admin has to say yes before any rule applies.
+            val pending = runCatching { JSONObject(response.body).optBoolean("pending") }.getOrDefault(false)
             if (!returningUser) {
                 val remember = binding.checkRemember.isChecked
                 prefs.edit()
@@ -250,12 +256,17 @@ class AdminLinkActivity : AppCompatActivity(), FixedBrandColors {
                     username = username,
                     passwordHash = AntiUninstallManager.hashPassword(password),
                     blockedApps = if (keepBlocks) old.blockedApps else emptyList(),
-                    blockedSites = if (keepBlocks) old.blockedSites else emptyList()
+                    blockedSites = if (keepBlocks) old.blockedSites else emptyList(),
+                    pendingApproval = pending
                 )
             }
             prefs.edit().putString(AdminPanelActivity.PREF_ADMIN_URL, url).apply()
             sendBroadcast(Intent(AdminLinkBlocker.INTENT_ACTION_REFRESH_ADMIN_LINK).setPackage(packageName))
-            Toast.makeText(this@AdminLinkActivity, R.string.admin_link_connected, Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                this@AdminLinkActivity,
+                if (pending) R.string.admin_link_pending else R.string.admin_link_connected,
+                Toast.LENGTH_LONG
+            ).show()
             openApp()
         }
     }
@@ -270,7 +281,10 @@ class AdminLinkActivity : AppCompatActivity(), FixedBrandColors {
         val userMain = Intent(this, UserMainActivity::class.java).addFlags(clearTask)
         when {
             !prefs.getBoolean("isFirstLaunchComplete", false) ->
-                startActivity(Intent(this, FragmentActivity::class.java).addFlags(clearTask))
+                startActivity(
+                    Intent(this, if (prefs.getBoolean(IntroActivity.PREF_INTRO_SEEN, false)) FragmentActivity::class.java else IntroActivity::class.java)
+                        .addFlags(clearTask)
+                )
             !PermissionUtils.isAccessibilityServiceEnabled(this, AppBlockerService::class.java) ->
                 startActivities(
                     arrayOf(

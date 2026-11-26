@@ -23,6 +23,16 @@
             android:theme="@style/Theme.Curbox.User" />
 
         <activity
+            android:name=".ui.activity.IntroActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Curbox.User" />
+
+        <activity
+            android:name=".ui.activity.ProtectionActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Curbox.User" />
+
+        <activity
             android:name=".ui.activity.AdminPanelActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:exported="false" />

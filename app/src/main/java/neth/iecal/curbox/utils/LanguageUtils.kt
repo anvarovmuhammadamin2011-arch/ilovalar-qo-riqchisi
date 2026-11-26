@@ -22,6 +22,7 @@ object LanguageUtils {
         Locale.forLanguageTag("pt-BR"),
         Locale.forLanguageTag("ru"),
         Locale.forLanguageTag("tr"),
+        Locale.forLanguageTag("uz"),
         Locale.forLanguageTag("zh-CN"),
         Locale.forLanguageTag("vi")
     )

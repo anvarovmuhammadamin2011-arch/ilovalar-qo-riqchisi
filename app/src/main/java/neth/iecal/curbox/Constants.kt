@@ -10,6 +10,8 @@ class Constants {
         const val WARNING_SCREEN_MODE_VIEW_BLOCKER = 1
         const val WARNING_SCREEN_MODE_APP_BLOCKER = 2
         const val WARNING_SCREEN_MODE_KEYWORD_BLOCKER = 3
+        // An app or website blocked by Curbox Admin (see AdminLinkBlocker)
+        const val WARNING_SCREEN_MODE_ADMIN_BLOCK = 4
 
     }
 }

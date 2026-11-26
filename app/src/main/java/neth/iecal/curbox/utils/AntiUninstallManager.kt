@@ -38,6 +38,31 @@ object AntiUninstallManager {
         }
     }
 
+    /**
+     * Checks a typed password against [stored]: the SHA-256 hex this app writes, or the
+     * PBKDF2 verifier Curbox Admin sends for its six digit code. PBKDF2 is slow on
+     * purpose, so call this off the main thread.
+     */
+    fun verifyPassword(password: String, stored: String): Boolean {
+        if (stored.isEmpty()) return false
+        if (!stored.startsWith("pbkdf2$")) {
+            return MessageDigest.isEqual(hashPassword(password).toByteArray(), stored.toByteArray())
+        }
+        val parts = stored.split('$')
+        if (parts.size != 4) return false
+        return try {
+            val iterations = parts[1].toInt()
+            val salt = android.util.Base64.decode(parts[2], android.util.Base64.DEFAULT)
+            val expected = android.util.Base64.decode(parts[3], android.util.Base64.DEFAULT)
+            val spec = javax.crypto.spec.PBEKeySpec(password.toCharArray(), salt, iterations, expected.size * 8)
+            val actual = javax.crypto.SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256").generateSecret(spec).encoded
+            spec.clearPassword()
+            MessageDigest.isEqual(actual, expected)
+        } catch (e: Exception) {
+            false
+        }
+    }
+
     fun hashPassword(password: String): String {
         val bytes = MessageDigest.getInstance("SHA-256").digest(password.toByteArray())
         return bytes.joinToString("") { "%02x".format(it) }

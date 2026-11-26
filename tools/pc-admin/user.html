@@ -42,6 +42,7 @@
   .note.warn { background: var(--warn-soft); color: var(--warn); }
   .note.err { background: var(--err-soft); color: var(--err); }
   .error { color: var(--err); min-height: 1.3em; margin-top: 8px; }
+  .langbtn { display: block; margin: 12px auto 24px; font: inherit; background: none; border: 1px solid var(--line); color: var(--muted); border-radius: 12px; padding: 8px 14px; cursor: pointer; }
   .chip { display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px; border-radius: 99px; font-weight: 700; font-size: 13px; }
   .chip::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
   .chip.ok { background: var(--ok-soft); color: var(--ok); }
@@ -75,6 +76,7 @@
       <span class="circle">U</span>
       <span><b>User</b><span class="muted">An admin manages this computer.</span></span>
     </button>
+    <div id="chooseError" class="error center"></div>
   </section>
 
   <!-- Sign in -->
@@ -146,6 +148,14 @@
       <h2>Blocked websites</h2>
       <div id="aSites"></div>
     </div>
+    <div class="card" id="releaseCard">
+      <h2>Leave management</h2>
+      <div class="muted">This computer is managed by your admin. To stop that, type the six digit code from your admin. Your admin's computer checks it.</div>
+      <input id="releaseCode" type="password" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="Six digit code" aria-label="Six digit code" style="margin-top:12px">
+      <div id="releaseError" class="error"></div>
+      <button class="primary" id="releaseBtn">Leave management</button>
+      <div class="muted" style="margin-top:10px">A Windows administrator account can still stop Curbox for PC. Your admin sees this computer go offline when that happens.</div>
+    </div>
     <p class="muted center">Only your admin can change these rules.</p>
   </section>
 </div>
@@ -156,6 +166,114 @@ const $ = (id) => document.getElementById(id);
 let current = "";
 let agentUrl = "";
 let busy = false;
+
+// ---------------------------------------------------------------- language
+// English is in the page; Uzbek comes from this dictionary and follows the browser
+// language unless the switch at the bottom was used.
+const UZ = {
+  "This computer is managed by an admin. Open Curbox for PC, choose Leave management and type your admin's code first.": "Bu kompyuter admin boshqaruvida. Avval Curbox for PC ni oching, Boshqaruvdan chiqish ni tanlang va admin kodini yozing.",
+  "Type all six digits.": "Olti ta raqamning hammasini yozing.",
+  "Done. Your admin no longer manages this computer, and the blocks are lifted.": "Tayyor. Admin endi bu kompyuterni boshqarmaydi va bloklar olib tashlandi.",
+  "Your admin has not set a release code yet. Ask them to remove this computer in the admin panel.": "Admin hali bo‘shatish kodini o‘rnatmagan. Undan bu kompyuterni admin panelda olib tashlashni so‘rang.",
+  "This computer is not linked.": "Bu kompyuter ulanmagan.",
+  "Waiting for your admin's computer. Nothing has changed yet. Join the same network as your admin and try again.": "Admin kompyuteri kutilmoqda. Hali hech narsa o‘zgarmadi. Admin bilan bir xil tarmoqqa ulanib qayta urinib ko‘ring.",
+  "Could not leave management. Try again.": "Boshqaruvdan chiqib bo‘lmadi. Qayta urinib ko‘ring.",
+  "Open the installed Curbox for PC to protect this computer.": "Bu kompyuterni himoya qilish uchun o‘rnatilgan Curbox for PC ni oching.",
+  "Could not start the protection. Try again.": "Himoyani ishga tushirib bo‘lmadi. Qayta urinib ko‘ring.",
+  "Type the admin computer address, like 192.168.1.94:8787.": "Admin kompyuter manzilini yozing, masalan 192.168.1.94:8787.",
+  "Type your login and password.": "Login va parolingizni yozing.",
+  "Wrong login or password.": "Login yoki parol noto‘g‘ri.",
+  "Too many wrong tries. Wait 5 minutes and try again.": "Juda ko‘p noto‘g‘ri urinish. 5 daqiqa kutib qayta urinib ko‘ring.",
+  "Could not reach the admin computer. Check the address and make sure both use the same WiFi.": "Admin kompyuteriga ulanib bo‘lmadi. Manzilni tekshiring va ikkalasi bir xil WiFi da ekanini aniqlang.",
+  "Something went wrong. Try again.": "Nimadir xato ketdi. Qayta urinib ko‘ring.",
+  "Not linked": "Ulanmagan", "None": "Yo‘q", "Not yet": "Hali yo‘q", "Connected": "Ulangan",
+  "Your admin's rules are up to date.": "Admin qoidalari yangi.", "Waiting for your admin": "Admin kutilmoqda",
+  "Your admin needs to approve this computer in the admin panel. Until then no rules apply.": "Admin bu kompyuterni admin panelda tasdiqlashi kerak. Ungacha hech qanday qoida qo‘llanmaydi.",
+  "Offline": "Oflayn", "The admin computer is out of reach. The last rules still apply.": "Admin kompyuteriga ulanib bo‘lmayapti. Oxirgi qoidalar ishlayveradi.",
+  "Removed": "Olib tashlangan",
+  "Your admin removed this computer, so its blocks are lifted. Open Curbox for PC from the Start menu to sign in again.": "Admin bu kompyuterni olib tashladi, shuning uchun bloklar olib tashlandi. Qayta kirish uchun Start menyusidan Curbox for PC ni oching.",
+  "Open Curbox for PC from the Start menu to sign in.": "Kirish uchun Start menyusidan Curbox for PC ni oching.",
+  "Starting": "Ishga tushmoqda", "Checking with your admin.": "Admin bilan tekshirilmoqda.",
+  "No blocked programs.": "Bloklangan dastur yo‘q.", "No blocked websites.": "Bloklangan sayt yo‘q.", "Blocked": "Bloklangan",
+  "Your digital balance": "Raqamli muvozanatingiz", "Who uses this computer?": "Bu kompyuterdan kim foydalanadi?",
+  "This computer manages phones and computers.": "Bu kompyuter telefon va kompyuterlarni boshqaradi.",
+  "An admin manages this computer.": "Bu kompyuterni admin boshqaradi.", "Sign in as a user": "Foydalanuvchi sifatida kirish",
+  "Ask your admin for your login and password. Both computers must use the same WiFi.": "Login va parolni admindan so‘rang. Ikkala kompyuter bir xil WiFi da bo‘lishi kerak.",
+  "Admin computer address": "Admin kompyuter manzili", "Login": "Login", "Password": "Parol", "If you continue": "Davom etsangiz",
+  "Your admin can see the programs installed on this computer.": "Admin bu kompyuterga o‘rnatilgan dasturlarni ko‘ra oladi.",
+  "Your admin can block programs and websites here.": "Admin bu yerda dastur va saytlarni bloklay oladi.",
+  "Only your admin can remove this link.": "Bu ulanishni faqat admin olib tashlay oladi.",
+  "Windows asks you for permission once.": "Windows bir marta ruxsat so‘raydi.",
+  "Sign in and protect this computer": "Kirish va kompyuterni himoyalash", "Almost done": "Deyarli tayyor",
+  "Windows asks for permission now. Click Yes to finish.": "Windows hozir ruxsat so‘raydi. Tugatish uchun Yes ni bosing.",
+  "Windows permission was not given, so protection is not on yet.": "Windows ruxsati berilmadi, shuning uchun himoya hali yoqilmagan.",
+  "Try again": "Qayta urinish", "This computer is now protected": "Bu kompyuter endi himoyalangan", "Opening the status page.": "Holat sahifasi ochilmoqda.",
+  "Managed by your admin": "Admin boshqaruvida", "This computer": "Bu kompyuter", "Admin computer": "Admin kompyuteri", "Last checked": "Oxirgi tekshiruv",
+  "Blocked programs": "Bloklangan dasturlar", "Blocked websites": "Bloklangan saytlar", "Leave management": "Boshqaruvdan chiqish",
+  "This computer is managed by your admin. To stop that, type the six digit code from your admin. Your admin's computer checks it.": "Bu kompyuter admin boshqaruvida. Buni to‘xtatish uchun admindan olgan olti xonali kodni yozing. Kodni admin kompyuteri tekshiradi.",
+  "A Windows administrator account can still stop Curbox for PC. Your admin sees this computer go offline when that happens.": "Windows administrator hisobi baribir Curbox for PC ni to‘xtata oladi. Shunda admin bu kompyuterni oflayn deb ko‘radi.",
+  "Only your admin can change these rules.": "Bu qoidalarni faqat admin o‘zgartira oladi.", "Like 192.168.1.94:8787": "Masalan 192.168.1.94:8787",
+  "Six digit code": "Olti xonali kod", "Language": "Til"
+};
+const UZ_PATTERNS = [
+  [/^That code is not right\. Tries left: (\d+)\.$/, "Kod noto‘g‘ri. Qolgan urinishlar: $1."],
+  [/^Too many wrong tries\. Wait (\d+) minutes and try again\.$/, "Juda ko‘p noto‘g‘ri urinish. $1 daqiqa kutib qayta urinib ko‘ring."]
+];
+let lang = localStorage.getItem("curboxLang") || ((navigator.language || "").toLowerCase().startsWith("uz") ? "uz" : "en");
+
+function tr(text) {
+  if (lang !== "uz" || !text) return text;
+  const key = text.trim();
+  if (!key) return text;
+  let out = UZ[key];
+  if (out === undefined) {
+    for (const [re, rep] of UZ_PATTERNS) {
+      if (re.test(key)) { out = key.replace(re, rep); break; }
+    }
+  }
+  return out === undefined ? text : text.replace(key, out);
+}
+
+function translateTree(root) {
+  if (root.nodeType === Node.TEXT_NODE) {
+    const next = tr(root.nodeValue);
+    if (next !== root.nodeValue) root.nodeValue = next;
+    return;
+  }
+  if (root.nodeType !== Node.ELEMENT_NODE) return;
+  const nodes = [root];
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT);
+  let n = walker.nextNode();
+  while (n) { nodes.push(n); n = walker.nextNode(); }
+  for (const node of nodes) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      const next = tr(node.nodeValue);
+      if (next !== node.nodeValue) node.nodeValue = next;
+    } else if (node.tagName !== "SCRIPT" && node.tagName !== "STYLE") {
+      for (const attr of ["placeholder", "title", "aria-label"]) {
+        const v = node.getAttribute(attr);
+        if (v && tr(v) !== v) node.setAttribute(attr, tr(v));
+      }
+    }
+  }
+}
+
+function startTranslation() {
+  document.documentElement.lang = lang;
+  const switcher = document.createElement("button");
+  switcher.className = "langbtn";
+  switcher.textContent = lang === "uz" ? "English" : "O‘zbekcha";
+  switcher.onclick = () => { localStorage.setItem("curboxLang", lang === "uz" ? "en" : "uz"); location.reload(); };
+  document.body.appendChild(switcher);
+  if (lang !== "uz") return;
+  translateTree(document.body);
+  new MutationObserver((changes) => {
+    for (const c of changes) {
+      if (c.type === "childList") c.addedNodes.forEach((node) => translateTree(node));
+      else translateTree(c.target);
+    }
+  }).observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ["placeholder", "title", "aria-label"] });
+}
 
 async function call(path, body) {
   const options = body === undefined ? {} : {
@@ -211,6 +329,30 @@ async function refresh() {
 $("chooseAdmin").onclick = async () => {
   const { status, data } = await call("/local/choose", { role: "admin" });
   if (status === 200 && data.next) setTimeout(() => { location.href = data.next; }, 1200);
+  if (status === 409) {
+    $("chooseError").textContent = "This computer is managed by an admin. Open Curbox for PC, choose Leave management and type your admin's code first.";
+  }
+};
+
+$("releaseBtn").onclick = async () => {
+  const code = $("releaseCode").value.trim();
+  $("releaseError").textContent = "";
+  if (!/^[0-9]{6}$/.test(code)) { $("releaseError").textContent = "Type all six digits."; return; }
+  $("releaseBtn").disabled = true;
+  let res;
+  try { res = await call("/local/release", { code }); } catch (e) { res = { status: 0, data: {} }; }
+  $("releaseBtn").disabled = false;
+  $("releaseCode").value = "";
+  const { status, data } = res;
+  const messages = {
+    200: "Done. Your admin no longer manages this computer, and the blocks are lifted.",
+    403: "That code is not right. Tries left: " + (data.attemptsLeft ?? 0) + ".",
+    409: data.error === "no_code" ? "Your admin has not set a release code yet. Ask them to remove this computer in the admin panel." : "This computer is not linked.",
+    429: "Too many wrong tries. Wait " + Math.ceil((data.retryAfter || 900) / 60) + " minutes and try again.",
+    503: "Waiting for your admin's computer. Nothing has changed yet. Join the same network as your admin and try again."
+  };
+  $("releaseError").textContent = messages[status] || "Could not leave management. Try again.";
+  refresh();
 };
 $("chooseUser").onclick = async () => { await call("/local/choose", { role: "user" }); refresh(); };
 
@@ -235,6 +377,7 @@ async function signIn() {
       bad_address: "Type the admin computer address, like 192.168.1.94:8787.",
       missing: "Type your login and password.",
       wrong_login: "Wrong login or password.",
+      locked: "Too many wrong tries. Wait 5 minutes and try again.",
       unreachable: "Could not reach the admin computer. Check the address and make sure both use the same WiFi."
     };
     $("signinError").textContent = messages[data.error] || "Something went wrong. Try again.";
@@ -256,6 +399,7 @@ function renderAgent(s) {
 
   const states = {
     connected: ["ok", "Connected", "Your admin's rules are up to date."],
+    pending: ["warn", "Waiting for your admin", "Your admin needs to approve this computer in the admin panel. Until then no rules apply."],
     offline: ["warn", "Offline", "The admin computer is out of reach. The last rules still apply."],
     removed: ["err", "Removed", "Your admin removed this computer, so its blocks are lifted. Open Curbox for PC from the Start menu to sign in again."],
     not_linked: ["err", "Not linked", "Open Curbox for PC from the Start menu to sign in."],
@@ -265,6 +409,7 @@ function renderAgent(s) {
   $("aChip").className = "chip " + kind;
   $("aChip").textContent = label;
   $("aStateText").textContent = text;
+  $("releaseCard").classList.toggle("hidden", !s.linked);
 
   fillList($("aPrograms"), s.blockedPrograms || [], "No blocked programs.");
   fillList($("aSites"), s.blockedSites || [], "No blocked websites.");
@@ -280,6 +425,7 @@ function fillList(box, items, emptyText) {
   }
 }
 
+startTranslation();
 refresh();
 setInterval(refresh, 3000);
 </script>

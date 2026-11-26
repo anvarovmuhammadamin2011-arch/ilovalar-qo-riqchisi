@@ -124,6 +124,16 @@ object UsageRepository {
         )
     }
 
+    /**
+     * One day for Curbox Admin: the day total and each app's time, with the same filters
+     * as the Usage tab, so the admin sees the numbers this phone shows.
+     */
+    suspend fun dayReport(context: Context, daysAgo: Long): Pair<Long, Map<String, Long>> = withContext(Dispatchers.IO) {
+        val rows = filtered(context, AppDatabase.getInstance(context).appUsageDao().getForDate(dateKey(daysAgo)))
+        val perApp = rows.groupBy { it.packageName }.mapValues { (_, list) -> list.sumOf { it.totalTime } }
+        rows.sumOf { it.totalTime } to perApp
+    }
+
     /** App use and focus sessions per day, newest day first, newest event first. */
     suspend fun loadActivity(context: Context, daysAgo: LongRange): List<ActivityDay> = withContext(Dispatchers.IO) {
         val db = AppDatabase.getInstance(context)

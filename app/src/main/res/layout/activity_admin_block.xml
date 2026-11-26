@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/admin_block_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/curbox_background"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingHorizontal="@dimen/curbox_screen_padding"
+        android:paddingVertical="48dp">
+
+        <ImageView
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:importantForAccessibility="no"
+            android:src="@mipmap/ic_launcher" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <FrameLayout
+            android:layout_width="88dp"
+            android:layout_height="88dp"
+            android:layout_marginTop="40dp"
+            android:background="@drawable/bg_curbox_circle"
+            android:backgroundTint="@color/curbox_error_container">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:importantForAccessibility="no"
+                android:src="@drawable/baseline_lock_24"
+                app:tint="@color/curbox_error" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/tv_title"
+            style="@style/TextAppearance.Curbox.Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/curbox_space_xl"
+            android:accessibilityHeading="true"
+            android:gravity="center"
+            android:textColor="@color/curbox_text" />
+
+        <LinearLayout
+            android:id="@+id/target_row"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/curbox_space_l"
+            android:background="@drawable/bg_curbox_pill"
+            android:backgroundTint="@color/curbox_surface"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="@dimen/curbox_space_l"
+            android:paddingVertical="@dimen/curbox_space_s">
+
+            <ImageView
+                android:id="@+id/iv_target_icon"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:importantForAccessibility="no" />
+
+            <TextView
+                android:id="@+id/tv_target"
+                style="@style/TextAppearance.Curbox.Section"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/curbox_space_m"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:textColor="@color/curbox_text" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_message"
+            style="@style/TextAppearance.Curbox.Body"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/curbox_space_l"
+            android:gravity="center"
+            android:textColor="@color/curbox_text" />
+
+        <TextView
+            android:id="@+id/tv_detail"
+            style="@style/TextAppearance.Curbox.Caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/curbox_space_s"
+            android:gravity="center"
+            android:textColor="@color/curbox_text_secondary"
+            android:visibility="gone" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_home"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="40dp"
+            android:backgroundTint="@color/curbox_primary"
+            android:text="@string/admin_block_home"
+            android:textColor="@color/curbox_on_primary"
+            app:cornerRadius="16dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_details"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/curbox_space_s"
+            android:text="@string/admin_block_details"
+            android:textColor="@color/curbox_primary" />
+    </LinearLayout>
+</ScrollView>

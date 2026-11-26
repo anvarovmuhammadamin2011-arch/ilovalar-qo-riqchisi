@@ -47,6 +47,14 @@
                 android:layout_marginStart="@dimen/curbox_space_s" />
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/tv_sync_note"
+            style="@style/TextAppearance.Curbox.Caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/curbox_space_xs"
+            android:visibility="gone" />
+
         <!-- B. Today's phone time -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"

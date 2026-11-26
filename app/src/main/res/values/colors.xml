@@ -164,4 +164,5 @@
     <!-- Darker amber for warning text on light pills; plain amber is too faint to read. -->
     <color name="curbox_warning_text">#A86100</color>
     <color name="curbox_error">#E05260</color>
+    <color name="curbox_error_container">#FBE7E9</color>
 </resources>

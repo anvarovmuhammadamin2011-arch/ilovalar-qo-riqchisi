@@ -131,7 +131,6 @@
   <string name="sample_end_time">17:00</string>
   <string name="all_groups">Tüm Gruplar</string>
   <string name="value_zero_minutes">0 dk</string>
-  <string name="value_zero_percent">0%</string>
   <string name="a_few_final_steps">Son birkaç adım</string>
   <string name="create_a_new_group">Yeni bir grup oluştur</string>
   <string name="use_a_focus_group_to_instantly">Seçtiğin uygulama ve web siteleriyle anında bir odak oturumu başlatmak için Odak Grubu kullan.</string>

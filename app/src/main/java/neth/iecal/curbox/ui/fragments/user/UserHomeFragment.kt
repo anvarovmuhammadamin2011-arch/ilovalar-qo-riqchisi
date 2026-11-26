@@ -43,6 +43,7 @@ class UserHomeFragment : Fragment() {
     private var _binding: FragmentUserHomeBinding? = null
     private val binding get() = _binding!!
     private var config = AdminLinkConfig()
+    private var focus: UserRules.Focus? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentUserHomeBinding.inflate(inflater, container, false)
@@ -65,10 +66,11 @@ class UserHomeFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 DataStoreManager(requireContext()).settings
-                    .map { it.adminLinkConfig }
+                    .map { it.adminLinkConfig to UserRules.activeFocus(it) }
                     .distinctUntilChanged()
-                    .collect { newConfig ->
+                    .collect { (newConfig, newFocus) ->
                         config = newConfig
+                        focus = newFocus
                         renderConfig()
                     }
             }
@@ -106,6 +108,13 @@ class UserHomeFragment : Fragment() {
             val b = _binding ?: return@launch
             b.tileBlockedApps.value = apps.size.toString()
             b.tileBlockedSites.value = sites.size.toString()
+            // Focus mode wins the tile while it runs; otherwise the schedules on right now.
+            val activeSchedules = config.schedules.count { it.isActive(java.time.LocalDateTime.now()) }
+            b.tileSchedules.value = when {
+                focus != null -> getString(R.string.user_home_focus_on)
+                activeSchedules > 0 -> activeSchedules.toString()
+                else -> getString(R.string.user_home_none)
+            }
 
             b.restrictionsList.removeAllViews()
             val rows = apps.take(RESTRICTION_ROWS).map { app ->
@@ -130,9 +139,20 @@ class UserHomeFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             val usage = UserData.todayUsage(requireContext())
             val b = _binding ?: return@launch
-            b.ring.centerText = UserData.formatDuration(usage.sumOf { it.timeMs })
-            // No admin daily limit exists yet, so the ring shows only its track.
-            b.ring.progress = null
+            val used = usage.sumOf { it.timeMs }
+            b.ring.centerText = UserData.formatDuration(used)
+            val limitMs = config.dailyLimitMinutes * 60_000L
+            if (limitMs > 0) {
+                b.ring.progress = (used.toFloat() / limitMs).coerceIn(0f, 1f)
+                b.ring.caption = if (used >= limitMs) {
+                    getString(R.string.user_home_limit_reached)
+                } else {
+                    getString(R.string.user_home_limit_caption, UserData.formatDuration(limitMs - used), UserData.formatDuration(limitMs))
+                }
+            } else {
+                b.ring.progress = null
+                b.ring.caption = getString(R.string.user_home_no_limit)
+            }
 
             b.topAppsList.removeAllViews()
             val top = usage.take(TOP_APPS)
@@ -154,13 +174,8 @@ class UserHomeFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             val current = DataStoreManager(requireContext()).settings.first().adminLinkConfig
             val link = UserData.checkLink(current)
-            val chip = _binding?.connectionChip ?: return@launch
-            when (link) {
-                UserData.Link.CONNECTED -> chip.setState(ConnectionChip.State.CONNECTED)
-                UserData.Link.OFFLINE -> chip.setState(ConnectionChip.State.OFFLINE)
-                UserData.Link.REMOVED -> chip.setState(ConnectionChip.State.ERROR, getString(R.string.connection_removed))
-                UserData.Link.NOT_LINKED -> chip.setState(ConnectionChip.State.WAITING)
-            }
+            val b = _binding ?: return@launch
+            UserData.showLink(b.connectionChip, link, b.tvSyncNote, current)
         }
     }
 
