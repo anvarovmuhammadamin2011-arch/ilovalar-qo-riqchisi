@@ -572,6 +572,9 @@ public class CurboxAdmin {
                     case "/download/qr.png":
                         downloadQr(ex);
                         return;
+                    case "/api/device/message-image":
+                        deviceMessageImage(ex);
+                        return;
                     case "/api/admin/overview":
                         if (requireAdmin(ex)) adminOverview(ex);
                         return;
@@ -618,6 +621,12 @@ public class CurboxAdmin {
                         return;
                     case "/api/admin/users/add":
                         if (requireAdmin(ex)) adminAddUser(ex);
+                        return;
+                    case "/api/admin/message":
+                        if (requireAdmin(ex)) adminMessage(ex);
+                        return;
+                    case "/api/admin/focus":
+                        if (requireAdmin(ex)) adminFocus(ex);
                         return;
                     case "/api/admin/users/import":
                         if (requireAdmin(ex)) adminImportUsers(ex);
@@ -922,6 +931,11 @@ public class CurboxAdmin {
                 changed = true;
             }
 
+            // Messages the device has shown leave its queue and count as delivered.
+            if (body.get("seenMessages") instanceof List && markMessagesSeen(device, (List<?>) body.get("seenMessages"), now)) {
+                changed = true;
+            }
+
             device.put("lastSeen", now);
             if (changed) save();
             storeUsage(str(device, "id"), body.get("usage"));
@@ -952,7 +966,180 @@ public class CurboxAdmin {
             // A slow PBKDF2 hash of the code, never the code: lets a phone check it for
             // uninstall protection while offline.
             out.put("releaseVerifier", releaseCodeHash);
+            out.put("messages", pendingMessages(device));
+            // Time left, not a clock time, so a phone with a wrong clock still ends on time.
+            long focusLeft = num(device, "focusUntil") - System.currentTimeMillis();
+            out.put("focusLeftMs", Math.max(0L, focusLeft));
             sendJson(ex, 200, out);
+        }
+    }
+
+    // ------------------------------------------------------ admin messages
+
+    static final int MAX_MESSAGE_CHARS = 500;
+    static final int MAX_MESSAGE_IMAGE_BYTES = 1_500_000;
+    static final int MAX_QUEUED_MESSAGES = 10;
+    static final int MESSAGE_LOG_SIZE = 20;
+
+    static Path messageDir() {
+        return DATA_DIR.resolve("messages");
+    }
+
+    /** What a phone still has to show; the picture is fetched on its own. */
+    static List<Object> pendingMessages(Map<String, Object> device) {
+        List<Object> out = new ArrayList<>();
+        for (Map<String, Object> m : mapsOf(device.get("messages"))) {
+            Map<String, Object> copy = new LinkedHashMap<>();
+            copy.put("id", m.get("id"));
+            copy.put("text", m.get("text"));
+            copy.put("image", !str(m, "image").isEmpty());
+            copy.put("sentAt", m.get("sentAt"));
+            out.add(copy);
+        }
+        return out;
+    }
+
+    static boolean markMessagesSeen(Map<String, Object> device, List<?> ids, long now) {
+        Set<String> seen = new LinkedHashSet<>();
+        for (Object o : ids) seen.add(String.valueOf(o));
+        List<Map<String, Object>> queue = mapsOf(device.get("messages"));
+        boolean changed = queue.removeIf(m -> seen.contains(str(m, "id")));
+        if (changed) device.put("messages", new ArrayList<Object>(queue));
+        for (Map<String, Object> m : mapsOf(device.get("messageLog"))) {
+            if (seen.contains(str(m, "id")) && num(m, "deliveredAt") == 0) {
+                m.put("deliveredAt", now);
+                changed = true;
+            }
+        }
+        return changed;
+    }
+
+    /**
+     * POST {deviceIds | all, text, image}: a message the phones show on the whole screen,
+     * like "Get ready for class". image is an optional JPEG or PNG data URL.
+     */
+    static void adminMessage(HttpExchange ex) throws IOException {
+        Map<String, Object> body = readJsonObject(ex);
+        boolean all = Boolean.TRUE.equals(body.get("all"));
+        List<String> ids = cleanList(body.get("deviceIds"), false);
+        String text = str(body, "text").trim();
+        if (text.isEmpty() || text.length() > MAX_MESSAGE_CHARS) {
+            sendJson(ex, 400, error("bad_text"));
+            return;
+        }
+        byte[] image = null;
+        String ext = "";
+        String dataUrl = str(body, "image");
+        if (!dataUrl.isEmpty()) {
+            int comma = dataUrl.indexOf(',');
+            try {
+                image = java.util.Base64.getDecoder().decode(comma >= 0 ? dataUrl.substring(comma + 1) : dataUrl);
+            } catch (IllegalArgumentException e) {
+                image = null;
+            }
+            // Only real JPEG or PNG pictures, checked by their first bytes.
+            if (image != null && image.length > 3 && (image[0] & 0xFF) == 0xFF && (image[1] & 0xFF) == 0xD8) ext = "jpg";
+            else if (image != null && image.length > 8 && (image[0] & 0xFF) == 0x89 && image[1] == 'P' && image[2] == 'N' && image[3] == 'G') ext = "png";
+            if (ext.isEmpty() || image.length > MAX_MESSAGE_IMAGE_BYTES) {
+                sendJson(ex, 400, error("bad_image"));
+                return;
+            }
+        }
+        String id = randomHex(8);
+        if (image != null) {
+            Files.createDirectories(messageDir());
+            Files.write(messageDir().resolve(id + "." + ext), image);
+        }
+        long now = System.currentTimeMillis();
+        int sent = 0;
+        int skipped = 0;
+        synchronized (LOCK) {
+            for (Map<String, Object> device : devices) {
+                if (!all && !ids.contains(str(device, "id"))) continue;
+                // Only the phone app shows messages so far.
+                if ("windows".equals(str(device, "platform"))) {
+                    skipped++;
+                    continue;
+                }
+                Map<String, Object> m = new LinkedHashMap<>();
+                m.put("id", id);
+                m.put("text", text);
+                m.put("image", image == null ? "" : id + "." + ext);
+                m.put("sentAt", now);
+                List<Object> queue = new ArrayList<>(mapsOf(device.get("messages")));
+                queue.add(m);
+                while (queue.size() > MAX_QUEUED_MESSAGES) queue.remove(0);
+                device.put("messages", queue);
+                List<Object> log = new ArrayList<>(mapsOf(device.get("messageLog")));
+                log.add(new LinkedHashMap<>(m));
+                while (log.size() > MESSAGE_LOG_SIZE) log.remove(0);
+                device.put("messageLog", log);
+                logActivity(actor(), "message_sent", limit(text, 80), "ok", device);
+                sent++;
+            }
+            if (sent > 0) save();
+        }
+        Map<String, Object> out = ok();
+        out.put("sent", sent);
+        out.put("skipped", skipped);
+        sendJson(ex, 200, out);
+    }
+
+    /**
+     * POST {deviceIds | all, minutes}: focus time. Until it ends the phone opens only calls,
+     * the clock and emergency screens. minutes 0 ends focus now.
+     */
+    static void adminFocus(HttpExchange ex) throws IOException {
+        Map<String, Object> body = readJsonObject(ex);
+        boolean all = Boolean.TRUE.equals(body.get("all"));
+        List<String> ids = cleanList(body.get("deviceIds"), false);
+        if (!(body.get("minutes") instanceof Number)) throw new IllegalArgumentException();
+        long minutes = ((Number) body.get("minutes")).longValue();
+        if (minutes < 0 || minutes > 600) throw new IllegalArgumentException();
+        long until = minutes == 0 ? 0 : System.currentTimeMillis() + minutes * 60_000L;
+        int updated = 0;
+        synchronized (LOCK) {
+            for (Map<String, Object> device : devices) {
+                if (!all && !ids.contains(str(device, "id"))) continue;
+                if ("windows".equals(str(device, "platform"))) continue;
+                if (until == 0) device.remove("focusUntil");
+                else device.put("focusUntil", until);
+                markChanged(device);
+                logActivity(actor(), "focus_set", minutes == 0 ? "off" : minutes + " min", "ok", device);
+                updated++;
+            }
+            if (updated > 0) save();
+        }
+        Map<String, Object> out = ok();
+        out.put("updated", updated);
+        sendJson(ex, 200, out);
+    }
+
+    /** GET ?id=: the picture of a message, only for a device that was sent it. */
+    static void deviceMessageImage(HttpExchange ex) throws IOException {
+        String token = header(ex, "X-Device-Token");
+        String id = query(ex).getOrDefault("id", "");
+        String file = "";
+        synchronized (LOCK) {
+            Map<String, Object> device = token.isEmpty() ? null : findIn(devices, "token", token);
+            if (device != null) {
+                for (Map<String, Object> m : mapsOf(device.get("messageLog"))) {
+                    if (id.equals(str(m, "id"))) file = str(m, "image");
+                }
+            }
+        }
+        Path path = file.isEmpty() ? null : messageDir().resolve(file);
+        if (path == null || !file.matches("[0-9a-f]{16}\\.(jpg|png)") || !Files.exists(path)) {
+            sendJson(ex, 404, error("no_image"));
+            return;
+        }
+        byte[] bytes = Files.readAllBytes(path);
+        ex.getResponseHeaders().set("Content-Type", file.endsWith(".png") ? "image/png" : "image/jpeg");
+        ex.getResponseHeaders().set("Cache-Control", "no-store");
+        securityHeaders(ex);
+        ex.sendResponseHeaders(200, bytes.length);
+        try (OutputStream os = ex.getResponseBody()) {
+            os.write(bytes);
         }
     }
 

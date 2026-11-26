@@ -27,6 +27,7 @@
             android:layout_weight="1" />
 
         <FrameLayout
+            android:id="@+id/lock_badge"
             android:layout_width="88dp"
             android:layout_height="88dp"
             android:layout_marginTop="40dp"
@@ -34,6 +35,7 @@
             android:backgroundTint="@color/curbox_error_container">
 
             <ImageView
+                android:id="@+id/lock_icon"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_gravity="center"
@@ -98,6 +100,17 @@
             android:layout_marginTop="@dimen/curbox_space_s"
             android:gravity="center"
             android:textColor="@color/curbox_text_secondary"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/iv_message_image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/curbox_space_l"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/admin_message_image"
+            android:maxHeight="360dp"
+            android:scaleType="fitCenter"
             android:visibility="gone" />
 
         <View

@@ -87,6 +87,37 @@ object AdminLinkClient {
         }
     }
 
+    /** Saves a file meant for this device only, like a message picture. False when there is none. */
+    fun download(serverUrl: String, path: String, deviceToken: String, dest: java.io.File, maxBytes: Int = 3_000_000): Boolean {
+        val connection = URL(serverUrl + path).openConnection() as HttpURLConnection
+        try {
+            connection.connectTimeout = TIMEOUT_MS
+            connection.readTimeout = 15_000
+            connection.setRequestProperty("X-Device-Token", deviceToken)
+            if (connection.responseCode != 200) return false
+            val tmp = java.io.File(dest.path + ".part")
+            var total = 0
+            connection.inputStream.use { input ->
+                tmp.outputStream().use { output ->
+                    val buffer = ByteArray(16 * 1024)
+                    while (true) {
+                        val n = input.read(buffer)
+                        if (n < 0) break
+                        total += n
+                        if (total > maxBytes) {
+                            tmp.delete()
+                            return false
+                        }
+                        output.write(buffer, 0, n)
+                    }
+                }
+            }
+            return tmp.renameTo(dest)
+        } finally {
+            connection.disconnect()
+        }
+    }
+
     /** A quick GET, used to check that Curbox for PC answers at an address. */
     fun get(serverUrl: String, path: String, timeoutMs: Int = TIMEOUT_MS): Response {
         val connection = URL(serverUrl + path).openConnection() as HttpURLConnection

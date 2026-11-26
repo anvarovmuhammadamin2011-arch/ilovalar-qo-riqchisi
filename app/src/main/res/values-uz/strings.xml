@@ -242,6 +242,16 @@
     <string name="admin_block_scold_4">Odammisan oʻzi? Aytildiku: kirma!</string>
     <string name="admin_block_scold_5">Bas qil! Har bir urinish faqat vaqtingni yeydi. Borib uy vazifangni qil.</string>
     <string name="admin_block_scold_title">Toʻxta!</string>
+    <string name="admin_message_title">Admindan xabar</string>
+    <string name="admin_focus_title">Fokus vaqti</string>
+    <string name="admin_focus_message">Admin fokus vaqtini yoqdi. U tugaguncha faqat qoʻngʻiroq va soat ishlaydi.</string>
+    <string name="admin_focus_detail">Tugash vaqti: %1$s</string>
+    <string name="protection_item_notif_access">Bloklangan bildirishnomalarni yashirish</string>
+    <string name="protection_item_notif_access_short">Bloklangan ilovalar bildirishnoma yubora olmaydi</string>
+    <string name="protection_item_notif_access_long">Admin ilovani bloklasa, uning bildirishnomalari ham yashiriladi. Fokus vaqtida faqat qoʻngʻiroq va budilnik keladi.</string>
+    <string name="admin_message_sent_at">Yuborilgan vaqti: %1$s</string>
+    <string name="admin_message_ok">Tushunarli</string>
+    <string name="admin_message_image">Admindan rasm</string>
     <string name="admin_block_tries_today">Bugungi urinishlar: %1$d</string>
     <string name="admin_block_limit_message">Bugungi telefon vaqtingizning hammasi ishlatildi. Qoʻngʻiroq va favqulodda chaqiruvlar ishlayveradi.</string>
     <string name="admin_block_schedule_message">Admin bu narsa mavjud boʻlmaydigan vaqtni belgilagan.</string>

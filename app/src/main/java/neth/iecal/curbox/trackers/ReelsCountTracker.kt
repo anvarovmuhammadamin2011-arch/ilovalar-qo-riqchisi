@@ -103,7 +103,8 @@ class ReelsCountTracker {
 
         scope.launch {
             service.dataStoreManager.settings.collectLatest { settings ->
-                isOnDisplayCounter = settings.isReelCounterOn
+                // A phone the admin manages never shows the count on screen; counting goes on for reports.
+                isOnDisplayCounter = settings.isReelCounterOn && !settings.adminLinkConfig.isLinked()
                 overlayConfig = settings.reelCounterOverlayConfig
                 postOverlayUpdate {
                     overlayManager.binding?.reelCounter?.text = todayCount.toString()

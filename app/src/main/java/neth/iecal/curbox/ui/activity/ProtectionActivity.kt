@@ -123,7 +123,7 @@ class ProtectionActivity : AppCompatActivity(), FixedBrandColors {
      * "Permission to manage": one tap that walks through every Android screen Curbox
      * needs, one after another. Android allows no single dialog for all of them.
      */
-    private enum class GrantStep { NOTIFICATIONS, SERVICE, OVERLAY, BATTERY, UNINSTALL }
+    private enum class GrantStep { NOTIFICATIONS, SERVICE, OVERLAY, NOTIFICATION_ACCESS, BATTERY, UNINSTALL }
     private var grantRunning = false
     private val grantTried = mutableSetOf<GrantStep>()
     private var waitingForSettings = false
@@ -191,8 +191,28 @@ class ProtectionActivity : AppCompatActivity(), FixedBrandColors {
         GrantStep.NOTIFICATIONS -> NotificationManagerCompat.from(this).areNotificationsEnabled()
         GrantStep.SERVICE -> PermissionUtils.isAccessibilityServiceEnabled(this, AppBlockerService::class.java)
         GrantStep.OVERLAY -> PermissionUtils.hasOverlayPermission(this)
+        GrantStep.NOTIFICATION_ACCESS -> hasNotificationAccess()
         GrantStep.BATTERY -> ServiceProtectionManager.isIgnoringBatteryOptimizations(this)
         GrantStep.UNINSTALL -> !uninstallStepNeeded()
+    }
+
+    /** The listener that hides notifications of blocked apps and during focus time. */
+    private fun hasNotificationAccess(): Boolean =
+        NotificationManagerCompat.getEnabledListenerPackages(this).contains(packageName)
+
+    private fun openNotificationAccess() {
+        val component = android.content.ComponentName(this, neth.iecal.curbox.services.ScheduledNotificationsService::class.java)
+        val detail = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            Intent(Settings.ACTION_NOTIFICATION_LISTENER_DETAIL_SETTINGS)
+                .putExtra(Settings.EXTRA_NOTIFICATION_LISTENER_COMPONENT_NAME, component.flattenToString())
+        } else {
+            null
+        }
+        try {
+            startActivity(detail ?: Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+        } catch (e: android.content.ActivityNotFoundException) {
+            startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+        }
     }
 
     private fun startGrantAll() {
@@ -237,6 +257,10 @@ class ProtectionActivity : AppCompatActivity(), FixedBrandColors {
                 GrantStep.OVERLAY -> {
                     waitingForSettings = true
                     startActivity(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName")))
+                }
+                GrantStep.NOTIFICATION_ACCESS -> {
+                    waitingForSettings = true
+                    openNotificationAccess()
                 }
                 GrantStep.BATTERY -> {
                     waitingForSettings = true
@@ -293,6 +317,11 @@ class ProtectionActivity : AppCompatActivity(), FixedBrandColors {
                 R.drawable.ic_curbox_apps, getString(R.string.protection_item_apps),
                 getString(R.string.protection_item_apps_short), getString(R.string.protection_item_apps_long),
                 ready = canSeeApps(), required = true
+            ),
+            Item(
+                R.drawable.ic_notifications_outline, getString(R.string.protection_item_notif_access),
+                getString(R.string.protection_item_notif_access_short), getString(R.string.protection_item_notif_access_long),
+                ready = hasNotificationAccess(), required = true, fix = ::openNotificationAccess
             ),
             Item(
                 R.drawable.ic_notifications_outline, getString(R.string.protection_item_notifications),

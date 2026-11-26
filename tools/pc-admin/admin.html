@@ -192,6 +192,10 @@
   .chip span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .ucard .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; }
   tr.click { cursor: pointer; }
+  .msgform textarea { width: 100%; min-height: 110px; resize: vertical; font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 12px; box-sizing: border-box; }
+  .msgform .counter { text-align: right; }
+  .msgform img { max-width: 100%; max-height: 220px; border-radius: 12px; display: block; margin-top: 8px; }
+  .msgrow .text { white-space: pre-wrap; word-break: break-word; }
   tr.click:hover td { background: var(--primary-soft); }
   td.num, th.num { text-align: right; white-space: nowrap; }
   .rank { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 13px; background: var(--primary-soft); color: var(--primary); flex: none; }
@@ -616,7 +620,26 @@ const UZ = {
   "Phone app by QR code": "Telefon ilovasi QR kod orqali",
   "Scan with the phone camera on the same WiFi. The app downloads, then tap it to install.": "Bir xil WiFi da telefon kamerasi bilan skanerlang. Ilova yuklanadi, keyin uni bosib oʻrnating.",
   "Show bigger": "Kattaroq koʻrsatish",
-  "Rename": "Nomini oʻzgartirish", "Name this device": "Qurilmaga nom berish", "Name saved.": "Nom saqlandi.",
+  "Rename": "Nomini oʻzgartirish",
+  "Send message": "Xabar yuborish",
+  "Focus time": "Fokus vaqti", "Start focus time": "Fokus vaqtini boshlash", "Stop focus": "Fokusni toʻxtatish", "Start": "Boshlash",
+  "Focus time works on phones only.": "Fokus vaqti faqat telefonlarda ishlaydi.", "All phones": "Barcha telefonlar",
+  "Until it ends, the phone opens only calls, the clock and emergency screens. Other apps and their notifications stay closed.": "Tugaguncha telefonda faqat qoʻngʻiroq, soat va favqulodda ekranlar ochiladi. Boshqa ilovalar va ularning bildirishnomalari yopiq turadi.",
+  "Focus time started. Phones get it within 10 seconds.": "Fokus vaqti boshlandi. Telefonlar uni 10 soniyada oladi.",
+  "Focus time ended.": "Fokus vaqti tugatildi.", "Focus time for every phone:": "Barcha telefonlar uchun fokus vaqti:",
+  "Ended focus time": "Fokus vaqtini tugatdi", "Send a message": "Xabar yuborish", "Send": "Yuborish", "Messages": "Xabarlar",
+  "What the admin sent to this phone, newest first.": "Admin bu telefonga yuborgan xabarlar, eng yangisi birinchi.",
+  "No messages yet. Use Send message at the top.": "Hali xabar yoʻq. Tepadagi Xabar yuborish tugmasini bosing.",
+  "with a picture": "rasm bilan", "Waiting for the phone": "Telefon kutilmoqda",
+  "Messages work on phones only.": "Xabarlar faqat telefonlarda ishlaydi.",
+  "Get ready for class!": "Darsga tayyorlan!", "Message text": "Xabar matni",
+  "Add a picture": "Rasm qoʻshish", "Remove picture": "Rasmni olib tashlash",
+  "This picture could not be read. Use a JPG or PNG.": "Bu rasmni oʻqib boʻlmadi. JPG yoki PNG ishlating.",
+  "phones": "ta telefon", "It opens on the whole screen of the phone.": "U telefonning butun ekranida ochiladi.",
+  "Type the message.": "Xabar matnini yozing.",
+  "This picture is too big or not a JPG or PNG.": "Bu rasm juda katta yoki JPG/PNG emas.",
+  "Could not send. Try again.": "Yuborib boʻlmadi. Qayta urinib koʻring.",
+  "Sent. The phone shows it within 10 seconds.": "Yuborildi. Telefon uni 10 soniya ichida koʻrsatadi.", "Name this device": "Qurilmaga nom berish", "Name saved.": "Nom saqlandi.",
   "Name": "Ism familiya", "Model": "Model", "Not set": "Qoʻyilmagan",
   "Removed devices": "Olib tashlangan qurilmalar", "No removed devices.": "Olib tashlangan qurilma yoʻq.",
   "A removed device is released the next time it checks in. Link it again to manage it.": "Olib tashlangan qurilma keyingi ulanishida boʻshatiladi. Boshqarish uchun uni qayta ulang.",
@@ -655,6 +678,8 @@ const UZ_PATTERNS = [
   [/^Block (.+) websites\?$/, "$1 saytlari bloklansinmi?"], [/^Added user (.+)$/, "$1 foydalanuvchisi qo‘shildi"], [/^Deleted user (.+)$/, "$1 foydalanuvchisi o‘chirildi"],
   [/^Blocked website on every device: (.+)$/, "Barcha qurilmalarda bloklandi: $1"],
   [/^Named the device (.+)$/, "Qurilmaga nom berildi: $1"],
+  [/^Sent a message: (.+)$/, "Xabar yuborildi: $1"], [/^Focus until (.+)$/, "Fokus: $1 gacha"],
+  [/^Started focus time: (\d+) min$/, "Fokus vaqtini boshladi: $1 daqiqa"], [/^(\d+) min$/, "$1 daqiqa"], [/^Shown (.+)$/, "Koʻrsatildi: $1"], [/^Sent to (\d+) phones\.$/, "$1 ta telefonga yuborildi."],
   [/^Type the first and last name of the person who uses (.+)\. Leave it empty to show the model name again\.$/, "$1 dan foydalanadigan odamning ism familiyasini yozing. Model nomini qaytarish uchun boʻsh qoldiring."],
   [/^(.+) on all (\d+) devices\.$/, "$1, barcha $2 ta qurilmada."], [/^(.+) · Removed (\d.+)$/, "$1 · Olib tashlandi: $2"],
   [/^Unblocked website on every device: (.+)$/, "Barcha qurilmalarda blokdan chiqarildi: $1"],
@@ -1388,6 +1413,12 @@ function limitForAllCard() {
     update();
   }));
   c.appendChild(row);
+  const focusRow = el("div", "inline wrap");
+  focusRow.style.marginTop = "14px";
+  focusRow.append(el("span", "small muted", "Focus time for every phone:"),
+    button("Start focus time", "ghost", "clock", () => focusDialog([], true)),
+    button("Stop focus", "ghost", "clock", () => setFocus([], true, 0)));
+  c.appendChild(focusRow);
   return c;
 }
 
@@ -1447,6 +1478,8 @@ function renderBulk() {
   bar.replaceChildren(
     el("span", "title", selected.size === 1 ? "1 device selected" : selected.size + " devices selected"),
     button("Block websites", "primary", "globe", () => bulkSites([...selected])),
+    button("Send message", "ghost", "bell", () => sendMessageTo(overview.devices.filter((d) => selected.has(d.id)))),
+    button("Focus time", "ghost", "clock", () => focusDialog(overview.devices.filter((d) => selected.has(d.id)), false)),
     button("Remove", "danger", "trash", () => removeDevices([...selected])),
     button("Clear", "ghost", null, () => { selected.clear(); redrawDevices(); })
   );
@@ -1586,7 +1619,7 @@ function updateDevice() {
   }
   setTitle(d.name);
   $("devTabs").querySelector('[data-tab="apps"]').textContent = isPc(d) ? "Programs" : "Apps";
-  if (changed("deviceHead", [d.name, d.model, d.user, d.online, d.appVersion, d.osVersion, tick()])) {
+  if (changed("deviceHead", [d.name, d.model, d.user, d.online, d.appVersion, d.osVersion, d.focusUntil, tick()])) {
     head.replaceChildren();
     const row = el("div", "head");
     const info = el("div", "grow");
@@ -1594,13 +1627,126 @@ function updateDevice() {
       el("div", "title", d.name),
       el("div", "tiny", d.user + " · " + (d.fullName ? d.model + " · " : "") + osText(d) + (d.appVersion ? " · Curbox " + d.appVersion : ""))
     );
-    row.append(typeIcon(d), info, statusBadge(d), button("Rename", "ghost", "edit", () => renameDevice(d)),
+    const extra = isPc(d) ? [] : [
+      button("Send message", "primary", "bell", () => sendMessageTo([d])),
+      focusOn(d) ? button("Stop focus", "danger", "clock", () => setFocus([d], false, 0)) : button("Focus time", "ghost", "clock", () => focusDialog([d], false))
+    ];
+    if (focusOn(d)) info.appendChild(pill("Focus until " + clockTime(d.focusUntil), "warn", "clock"));
+    row.append(typeIcon(d), info, statusBadge(d), ...extra, button("Rename", "ghost", "edit", () => renameDevice(d)),
       button("Remove", "danger", "trash", async () => {
         if (await removeDevices([d.id])) location.hash = "#/devices";
       }));
     head.appendChild(row);
   }
   ({ overview: updateDevOverview, apps: updateDevApps, sites: updateDevSites, protection: updateDevProtection, activity: updateDevActivity })[route.tab](d);
+}
+
+function focusOn(d) { return d.focusUntil && d.focusUntil > Date.now(); }
+function clockTime(ms) { return new Date(ms).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }); }
+
+/** Focus time: until it ends, phones open only calls, the clock and emergency screens. */
+async function focusDialog(targets, all) {
+  const phones = (all ? overview.devices : targets).filter((d) => !isPc(d));
+  if (!phones.length) { toast("Focus time works on phones only."); return; }
+  const who = all ? tr("All phones") + " (" + phones.length + ")" : phones.length === 1 ? phones[0].name : phones.length + " " + tr("phones");
+  const minutes = await modal({
+    title: "Start focus time",
+    message: who + ". " + tr("Until it ends, the phone opens only calls, the clock and emergency screens. Other apps and their notifications stay closed."),
+    choices: [15, 30, 45, 60, 90, 120].map((m) => ({ value: m, label: m < 60 ? m + " min" : limitText(m).replace(" a day", "") })),
+    confirmText: "Start"
+  });
+  if (minutes === null || minutes === undefined) return;
+  await setFocus(phones, all, Number(minutes));
+}
+
+async function setFocus(phones, all, minutes) {
+  const { status } = await api("/api/admin/focus", all ? { all: true, minutes } : { deviceIds: phones.map((d) => d.id), minutes });
+  toast(status !== 200 ? "Could not save. Try again." : minutes ? "Focus time started. Phones get it within 10 seconds." : "Focus time ended.");
+  await refresh();
+  memo = {};
+  update();
+}
+
+/** A picture made smaller (at most 1080 px) so it reaches the phone quickly. */
+function shrinkImage(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("read"));
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error("image"));
+      img.onload = () => {
+        const scale = Math.min(1, 1080 / Math.max(img.width, img.height));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(img.width * scale));
+        canvas.height = Math.max(1, Math.round(img.height * scale));
+        canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL("image/jpeg", 0.82));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+/** Sends a message the phones show on the whole screen within about 10 seconds. */
+async function sendMessageTo(targets) {
+  const phones = targets.filter((d) => !isPc(d));
+  if (!phones.length) { toast("Messages work on phones only."); return; }
+  let image = "";
+  const form = el("div", "msgform stack");
+  const text = el("textarea");
+  text.maxLength = 500;
+  text.placeholder = "Get ready for class!";
+  text.setAttribute("aria-label", "Message text");
+  const counter = el("div", "tiny counter", "0 / 500");
+  text.oninput = () => { counter.textContent = text.value.length + " / 500"; };
+  const file = el("input");
+  file.type = "file";
+  file.accept = "image/jpeg,image/png";
+  file.className = "hidden";
+  const preview = el("div");
+  const pick = button("Add a picture", "ghost", "plus", () => file.click());
+  const clear = button("Remove picture", "ghost", "trash", () => { image = ""; preview.replaceChildren(); clear.classList.add("hidden"); });
+  clear.classList.add("hidden");
+  file.onchange = async () => {
+    const f = file.files && file.files[0];
+    file.value = "";
+    if (!f) return;
+    try {
+      image = await shrinkImage(f);
+    } catch (e) {
+      toast("This picture could not be read. Use a JPG or PNG.");
+      return;
+    }
+    const img = el("img");
+    img.src = image;
+    img.alt = "";
+    preview.replaceChildren(img);
+    clear.classList.remove("hidden");
+  };
+  const tools = el("div", "inline wrap");
+  tools.append(pick, clear, file);
+  form.append(text, counter, tools, preview);
+  setTimeout(() => text.focus(), 50);
+  const names = phones.map((d) => d.name);
+  const ok = await modal({
+    title: "Send a message",
+    message: (phones.length === 1 ? names[0] : phones.length + " " + tr("phones") + ": " + names.slice(0, 5).join(", ") + (names.length > 5 ? "…" : ""))
+      + ". " + tr("It opens on the whole screen of the phone."),
+    body: form, confirmText: "Send", wide: true,
+    onConfirm: async () => {
+      if (!text.value.trim()) return tr("Type the message.");
+      const { status, data } = await api("/api/admin/message", { deviceIds: phones.map((d) => d.id), text: text.value.trim(), image });
+      if (status === 200) return "";
+      return tr(data.error === "bad_image" ? "This picture is too big or not a JPG or PNG." : "Could not send. Try again.");
+    }
+  });
+  if (!ok) return;
+  toast(phones.length === 1 ? "Sent. The phone shows it within 10 seconds." : "Sent to " + phones.length + " phones.");
+  await refresh();
+  memo = {};
+  update();
 }
 
 /** The admin names a device after the person who uses it, like "Anvarov Muhammadamin". */
@@ -1650,6 +1796,12 @@ function mountDevOverview(panel) {
   fresh.appendChild(seg);
   right.append(can, fresh);
   grid.append(about, right);
+  const msgs = card("Messages", "bell", "What the admin sent to this phone, newest first.");
+  msgs.id = "devMsgsCard";
+  const msgsBox = el("div");
+  msgsBox.id = "devMsgs";
+  msgs.appendChild(msgsBox);
+  right.append(msgs);
   const rules = card("Rules on this device", "shield", "Everything this device follows, and where each rule comes from.");
   const rulesBox = el("div");
   rulesBox.id = "devRules";
@@ -1675,6 +1827,20 @@ const CAPABILITIES = {
 
 function updateDevOverview(d) {
   if (changed("devRules", [d.effective, d.pending, overview.groups])) renderRuleSources(d);
+  $("devMsgsCard").classList.toggle("hidden", isPc(d));
+  if (changed("devMsgs", [d.messageLog, tick()])) {
+    const box = $("devMsgs");
+    box.replaceChildren();
+    const log = [...(d.messageLog || [])].reverse();
+    if (!log.length) box.appendChild(emptyState("bell", "No messages yet. Use Send message at the top."));
+    for (const m of log) {
+      const row = el("div", "row msgrow");
+      const info = el("div", "grow");
+      info.append(el("div", "text", m.text), el("div", "tiny", new Date(m.sentAt).toLocaleString() + (m.image ? " · " + tr("with a picture") : "")));
+      row.append(info, m.deliveredAt ? pill("Shown " + timeAgo(m.deliveredAt).toLowerCase(), "ok", "check") : pill("Waiting for the phone", "warn"));
+      box.appendChild(row);
+    }
+  }
   if (!changed("devOverview", [d.name, d.user, d.osVersion, d.appVersion, d.online, d.linkedAt, d.apps.length,
     d.blockedApps.length, d.blockedSites.length, d.newAppPolicy, tick()])) return;
   const facts = $("devFacts");
@@ -1975,6 +2141,8 @@ const LOG_TEXT = {
   new_app_policy: (e) => e.target === "block" ? "New apps are now blocked" : "New apps are now allowed",
   device_pending: () => "Signed in and is waiting for approval",
   device_renamed: (e) => "Named the device " + e.target,
+  message_sent: (e) => "Sent a message: " + e.target,
+  focus_set: (e) => e.target === "off" ? "Ended focus time" : "Started focus time: " + e.target,
   became_user: (e) => "Turned this computer into a user computer: " + e.target,
   device_login: (e) => (e.result === "no_user" ? "Tried to sign in with a login that does not exist" : "Typed a wrong password")
     + (e.target ? " on " + e.target : ""),
@@ -2002,7 +2170,7 @@ const LOG_ICON = {
   app_block: "ban", app_unblock: "check", site_add: "globe", site_remove: "globe", device_linked: "link",
   device_removed: "trash", device_released: "check", device_released_by_code: "shield", release_attempt: "shield",
   release_code_set: "shield", release_code_clear: "shield", new_app: "sparkle", new_app_policy: "sparkle",
-  device_pending: "devices", device_login: "key", device_renamed: "edit", device_approved: "check", approval_setting: "shield", limit_set: "clock",
+  device_pending: "devices", device_login: "key", device_renamed: "edit", message_sent: "bell", focus_set: "clock", device_approved: "check", approval_setting: "shield", limit_set: "clock",
   schedule_add: "calendar", schedule_edit: "calendar", schedule_remove: "calendar", schedule_on: "calendar", schedule_off: "calendar",
   group_add: "users", group_edit: "users", group_remove: "users", profile_add: "shield", profile_edit: "shield", profile_remove: "shield",
   backup: "download", restore: "history", global_site_add: "globe", global_site_remove: "globe"
@@ -2091,7 +2259,7 @@ function daysBack(n) { const d = new Date(); d.setDate(d.getDate() - n); return 
 
 function fmtDur(ms) {
   if (!ms) return "0m";
-  if (ms < 60000) return "<1m";
+  if (ms < 60000) return "1m";
   const m = Math.round(ms / 60000);
   const h = Math.floor(m / 60);
   return h ? h + "h " + (m % 60) + "m" : m + "m";

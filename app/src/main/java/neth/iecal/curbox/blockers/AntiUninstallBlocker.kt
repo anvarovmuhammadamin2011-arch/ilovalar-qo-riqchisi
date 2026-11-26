@@ -36,10 +36,19 @@ class AntiUninstallBlocker : BaseBlocker() {
         const val ACCESSIBILITY_SHORTCUT_TITLE = "accessibility_shortcut_title"
         const val SCREEN_SCAN_INTERVAL_MS = 300L
         const val CODE_SCREEN_COOLDOWN_MS = 3000L
+        // Screens where an uninstall can be confirmed: the system installers, Xiaomi's security app.
+        val UNINSTALL_PACKAGES = setOf(
+            "com.android.packageinstaller", "com.google.android.packageinstaller", "com.miui.packageinstaller",
+            "com.miui.securitycenter", "com.samsung.android.packageinstaller"
+        )
+        // Words of an uninstall button or question, in English, Russian and Uzbek.
+        val UNINSTALL_WORDS = listOf("uninstall", "удал", "chirish", "chirilsin")
         val SERVICE_LABELS = listOf("App Blocker")
     }
 
     @Volatile private var config: AntiUninstallConfig = AntiUninstallConfig()
+    // A phone the admin manages, with a release code set: removing Curbox always needs that code.
+    @Volatile private var adminCodeRequired = false
     private var lastScreenScan = 0L
     private var lastCodeScreen = 0L
     private lateinit var service: AppBlockerService
@@ -54,7 +63,10 @@ class AntiUninstallBlocker : BaseBlocker() {
         this.service = service
         settingsJob?.cancel()
         settingsJob = CoroutineScope(Dispatchers.IO).launch {
-            service.dataStoreManager.settings.collectLatest { config = it.antiUninstallConfig2 }
+            service.dataStoreManager.settings.collectLatest {
+                config = it.antiUninstallConfig2
+                adminCodeRequired = it.adminLinkConfig.isLinked() && it.adminLinkConfig.releaseVerifier.isNotEmpty()
+            }
         }
     }
 
@@ -65,22 +77,32 @@ class AntiUninstallBlocker : BaseBlocker() {
     fun doAntiUninstallCheck(event: AccessibilityEvent?) {
         event ?: return
         val current = config
-        if (!current.isEnabled) return
+        val managed = adminCodeRequired
+        if (!current.isEnabled && !managed) return
 
         // A finished timed or cooldown unlock lifts protection for good.
-        if (AntiUninstallManager.isUnlockComplete(current)) {
+        if (current.isEnabled && AntiUninstallManager.isUnlockComplete(current)) {
             finishUnlock()
+            return
+        }
+
+        val pkg = event.packageName?.toString().orEmpty()
+        if (managed && isUninstallScreen(event, pkg)) {
+            bounce()
             return
         }
 
         // isAdminActive is a binder call, so only pay for it on the screens we may bounce from.
         val onAdminScreen = event.className?.toString()?.contains(DEVICE_ADMIN_SCREEN_CLASS) == true
-        val inSettings = event.packageName?.toString() == SETTINGS_PACKAGE
+        val inSettings = pkg == SETTINGS_PACKAGE
         if (!onAdminScreen && !inSettings) return
-        if (!AntiUninstallManager.isAdminActive(service)) return
+        val adminActive = AntiUninstallManager.isAdminActive(service)
+        // Without device admin, a managed phone still guards its accessibility service.
+        if (!adminActive && !managed) return
 
         if (onAdminScreen) {
-            bounce()
+            // The same screen also turns device admin on during setup; only guard turning it off.
+            if (adminActive) bounce()
             return
         }
 
@@ -123,7 +145,43 @@ class AntiUninstallBlocker : BaseBlocker() {
     private fun bounce() {
         service.pressBack()
         service.pressHome()
-        if (config.adminManaged) askForAdminCode()
+        if (config.adminManaged || adminCodeRequired) askForAdminCode()
+    }
+
+    /**
+     * An uninstall question or button for Curbox: in a system installer, Settings, Xiaomi's security
+     * app or the home screen's long press menu. Checked only when a window opens, so it stays cheap.
+     */
+    private fun isUninstallScreen(event: AccessibilityEvent, pkg: String): Boolean {
+        if (event.eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return false
+        val watched = pkg in UNINSTALL_PACKAGES || pkg == SETTINGS_PACKAGE ||
+            pkg == service.getDefaultLauncherPackageNameSafe()
+        if (!watched) return false
+        val root = service.rootInActiveWindow ?: return false
+        val label = root.findAccessibilityNodeInfosByText(service.getString(R.string.app_name))
+        if (label.isNullOrEmpty()) return false
+        label.forEach { NodeFinder.recycle(it) }
+        for (word in UNINSTALL_WORDS) {
+            val hits = root.findAccessibilityNodeInfosByText(word)
+            if (!hits.isNullOrEmpty()) {
+                hits.forEach { NodeFinder.recycle(it) }
+                return true
+            }
+        }
+        return false
+    }
+
+    private var launcherPackage: String? = null
+
+    private fun AppBlockerService.getDefaultLauncherPackageNameSafe(): String {
+        launcherPackage?.let { return it }
+        val found = runCatching {
+            packageManager.resolveActivity(
+                android.content.Intent(android.content.Intent.ACTION_MAIN).addCategory(android.content.Intent.CATEGORY_HOME), 0
+            )?.activityInfo?.packageName
+        }.getOrNull().orEmpty()
+        launcherPackage = found
+        return found
     }
 
     /** Opens the code screen; after the right code, Curbox can be removed like any app. */

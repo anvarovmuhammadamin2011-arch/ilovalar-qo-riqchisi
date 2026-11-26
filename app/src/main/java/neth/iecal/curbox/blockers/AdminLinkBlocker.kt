@@ -86,9 +86,20 @@ class AdminLinkBlocker : BaseBlocker() {
             "com.google.android.permissioncontroller", "com.google.android.deskclock",
             "com.android.deskclock", "com.sec.android.app.clockpackage"
         )
+
+        /** Focus time is stricter: only calls, emergency screens and the clock. */
+        val OPEN_DURING_FOCUS = setOf(
+            "android", "com.android.phone", "com.android.server.telecom", "com.android.incallui",
+            "com.samsung.android.incallui", "com.google.android.dialer", "com.android.dialer",
+            "com.samsung.android.dialer", "com.android.emergency", "com.google.android.apps.safetyhub",
+            "com.android.permissioncontroller", "com.google.android.permissioncontroller",
+            "com.google.android.deskclock", "com.android.deskclock", "com.sec.android.app.clockpackage",
+            "com.android.contacts", "com.google.android.contacts", "com.samsung.android.contacts",
+            "com.miui.contacts", "com.android.mms"
+        )
     }
 
-    private enum class Kind(val extra: String) { APP("app"), SITE("site"), SCHEDULE("schedule"), LIMIT("limit") }
+    private enum class Kind(val extra: String) { APP("app"), SITE("site"), SCHEDULE("schedule"), LIMIT("limit"), FOCUS("focus") }
 
     private lateinit var service: AppBlockerService
     private lateinit var crashLogger: CrashLogger
@@ -119,6 +130,8 @@ class AdminLinkBlocker : BaseBlocker() {
     @Volatile private var ownerChecked = false
     // Sync tries that failed in a row; the admin is told when there were many.
     @Volatile private var failedSyncs = 0
+    // Message ids already shown (so each opens once) and ids to confirm to the server.
+    private val messagePrefs by lazy { service.getSharedPreferences("admin_messages", Context.MODE_PRIVATE) }
     @Volatile private var lastPackage = ""
 
     fun setup(service: BaseBlockingService) {
@@ -171,6 +184,10 @@ class AdminLinkBlocker : BaseBlocker() {
     /** Shows the admin block screen when [packageName] is blocked right now. */
     private fun checkPackage(packageName: String) {
         if (packageName in essentialPackages) return
+        if (config.focusActive() && packageName !in OPEN_DURING_FOCUS && !isDialerApp(packageName)) {
+            showBlock(Kind.FOCUS, packageName)
+            return
+        }
         val open = packageName in openDuringBlockAll
         val allSchedule = scheduleBlockAll
         val schedule = scheduleApps[packageName]
@@ -195,6 +212,7 @@ class AdminLinkBlocker : BaseBlocker() {
                 putExtra("admin_schedule_name", schedule.name)
                 putExtra("admin_schedule_end", schedule.end)
             }
+            if (kind == Kind.FOCUS) putExtra("admin_focus_until", config.focusUntilMs)
         }
         mainHandler.postDelayed({
             try {
@@ -203,6 +221,15 @@ class AdminLinkBlocker : BaseBlocker() {
                 crashLogger.logNonFatalError(e)
             }
         }, 100)
+    }
+
+    private var dialerPackage: String? = null
+
+    private fun isDialerApp(packageName: String): Boolean {
+        val dialer = dialerPackage ?: runCatching {
+            (service.getSystemService(Context.TELECOM_SERVICE) as TelecomManager).defaultDialerPackage
+        }.getOrNull().orEmpty().also { dialerPackage = it }
+        return dialer.isNotEmpty() && packageName == dialer
     }
 
     /** Runs on the website observation worker, never on the main thread. */
@@ -276,6 +303,8 @@ class AdminLinkBlocker : BaseBlocker() {
             .put("osVersion", AdminLinkClient.osVersion())
             .put("policyVersion", current.policyVersion)
         if (failedSyncs > 0) body.put("failedSyncs", failedSyncs)
+        val acks = messagePrefs.getStringSet("ack", emptySet()).orEmpty().toSet()
+        if (acks.isNotEmpty()) body.put("seenMessages", JSONArray(acks.toList()))
         if (includeApps) {
             body.put("apps", AdminLinkClient.installedApps(service))
             body.put("protection", protectionReport())
@@ -302,13 +331,18 @@ class AdminLinkBlocker : BaseBlocker() {
                 val pending = json.optBoolean("pending", false)
                 val verifier = json.optString("releaseVerifier", "")
                 val allow = json.optJSONArray("allowSites").toStringList()
+                // The server sends time left; small differences between syncs are not a change.
+                val focusLeft = json.optLong("focusLeftMs", 0L)
+                val focusUntil = if (focusLeft > 0) now + focusLeft else 0L
+                val focusChanged = (focusUntil == 0L) != (current.focusUntilMs == 0L) ||
+                    kotlin.math.abs(focusUntil - current.focusUntilMs) > 60_000L
                 // The sync time is only for the Protection screen, so it is not saved every 10 seconds.
                 val saveTime = now - current.lastSyncMs >= SYNC_TIME_SAVE_MS
                 val rulesChanged = apps != current.blockedApps || sites != current.blockedSites ||
                     limit != current.dailyLimitMinutes || warnings != current.warningMinutes ||
                     schedules != current.schedules || version != current.policyVersion ||
                     pending != current.pendingApproval || allow != current.allowSites ||
-                    verifier != current.releaseVerifier
+                    verifier != current.releaseVerifier || focusChanged
                 if (rulesChanged || codeSet != current.releaseCodeSet || saveTime) {
                     service.dataStoreManager.updateAdminLinkConfig {
                         if (it.deviceToken == current.deviceToken) {
@@ -317,6 +351,7 @@ class AdminLinkBlocker : BaseBlocker() {
                                 dailyLimitMinutes = limit, warningMinutes = warnings, schedules = schedules,
                                 policyVersion = version, pendingApproval = pending, allowSites = allow,
                                 releaseVerifier = verifier,
+                                focusUntilMs = if (focusChanged) focusUntil else it.focusUntilMs,
                                 lastRulesChangeMs = if (rulesChanged) now else it.lastRulesChangeMs
                             )
                         } else {
@@ -330,6 +365,11 @@ class AdminLinkBlocker : BaseBlocker() {
                         if (it.adminManaged && it.passwordHash != verifier) it.copy(passwordHash = verifier) else it
                     }
                 }
+                if (acks.isNotEmpty()) {
+                    val left = messagePrefs.getStringSet("ack", emptySet()).orEmpty() - acks
+                    messagePrefs.edit().putStringSet("ack", left).apply()
+                }
+                handleMessages(current, json.optJSONArray("messages"))
                 if (!ownerChecked) {
                     // Only a device owner can stop uninstalls; on a normal phone this does nothing.
                     ownerChecked = true
@@ -346,6 +386,51 @@ class AdminLinkBlocker : BaseBlocker() {
                 ownerChecked = false
             }
             else -> Log.w(TAG, "Admin answered ${response.code}")
+        }
+    }
+
+    /**
+     * Shows the newest message from the admin on the whole screen, once. Every message in the
+     * list is confirmed on the next sync, so the admin sees it was shown.
+     */
+    private fun handleMessages(current: AdminLinkConfig, array: JSONArray?) {
+        if (array == null || array.length() == 0) return
+        val messages = (0 until array.length()).mapNotNull { array.optJSONObject(it) }.filter { it.optString("id").isNotEmpty() }
+        val ids = messages.map { it.optString("id") }.toSet()
+        val shown = messagePrefs.getStringSet("shown", emptySet()).orEmpty()
+        val newest = messages.filter { it.optString("id") !in shown }.maxByOrNull { it.optLong("sentAt") }
+        val acks = messagePrefs.getStringSet("ack", emptySet()).orEmpty()
+        var keep = (shown + ids).toSet()
+        if (keep.size > 100) keep = ids
+        messagePrefs.edit().putStringSet("shown", keep).putStringSet("ack", acks + ids).apply()
+        newest ?: return
+
+        val id = newest.optString("id")
+        var imagePath = ""
+        if (newest.optBoolean("image")) {
+            val file = java.io.File(service.filesDir, "admin_message_$id.img")
+            val saved = runCatching {
+                AdminLinkClient.download(current.serverUrl, "/api/device/message-image?id=$id", current.deviceToken, file)
+            }.getOrDefault(false)
+            if (saved) imagePath = file.absolutePath
+        }
+        // Only the picture on screen now is kept.
+        service.filesDir.listFiles { f -> f.name.startsWith("admin_message_") && f.absolutePath != imagePath }?.forEach { it.delete() }
+
+        val intent = Intent(service, WarningActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra("mode", Constants.WARNING_SCREEN_MODE_ADMIN_BLOCK)
+            putExtra("admin_kind", "message")
+            putExtra("message_text", newest.optString("text"))
+            putExtra("message_image", imagePath)
+            putExtra("message_sent_at", newest.optLong("sentAt"))
+        }
+        mainHandler.post {
+            try {
+                service.startActivity(intent)
+            } catch (e: Exception) {
+                crashLogger.logNonFatalError(e)
+            }
         }
     }
 

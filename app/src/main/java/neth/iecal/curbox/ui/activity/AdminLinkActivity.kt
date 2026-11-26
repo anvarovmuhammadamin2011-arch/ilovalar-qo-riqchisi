@@ -87,6 +87,14 @@ class AdminLinkActivity : AppCompatActivity(), FixedBrandColors {
         }
 
         binding.btnConnect.setOnClickListener { onSignInClicked() }
+        if (savedInstanceState == null) {
+            // The logo and the form ease in, so the screen does not just pop up.
+            for ((i, v) in listOf(binding.logoCard, binding.formCard).withIndex()) {
+                v.alpha = 0f
+                v.translationY = 24f * resources.displayMetrics.density
+                v.animate().alpha(1f).translationY(0f).setStartDelay(80L * i).setDuration(320L).start()
+            }
+        }
         binding.btnOtherServer.setOnClickListener { showAddressField() }
         binding.inputPassword.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {

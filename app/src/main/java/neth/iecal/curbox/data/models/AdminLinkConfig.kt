@@ -38,7 +38,11 @@ data class AdminLinkConfig(
     /** PBKDF2 of the admin's six digit code ("pbkdf2$iterations$salt$hash"), never the code. */
     val releaseVerifier: String = "",
     /** When new rules from the admin last arrived. Never set unless they really changed. */
-    val lastRulesChangeMs: Long = 0L
+    val lastRulesChangeMs: Long = 0L,
+    /** Focus time from the admin: until then only calls, the clock and emergency screens open. */
+    val focusUntilMs: Long = 0L
 ) {
     fun isLinked(): Boolean = serverUrl.isNotEmpty() && deviceToken.isNotEmpty()
+
+    fun focusActive(now: Long = System.currentTimeMillis()): Boolean = isLinked() && !pendingApproval && now < focusUntilMs
 }

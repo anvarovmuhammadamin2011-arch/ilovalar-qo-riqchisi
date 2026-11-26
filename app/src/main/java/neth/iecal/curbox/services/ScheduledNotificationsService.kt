@@ -46,6 +46,7 @@ class ScheduledNotificationsService : NotificationListenerService() {
     private val handler = Handler(Looper.getMainLooper())
 
     private var config = ScheduledNotificationsConfig()
+    private var adminLink = neth.iecal.curbox.data.models.AdminLinkConfig()
     private var heldCount = 0
     private var pingAtMs = 0L
 
@@ -59,6 +60,10 @@ class ScheduledNotificationsService : NotificationListenerService() {
             try {
                 DataStoreManager(applicationContext).settings.collectLatest { settings ->
                     config = settings.scheduledNotificationsConfig
+                    val changed = settings.adminLinkConfig.blockedApps != adminLink.blockedApps ||
+                        settings.adminLinkConfig.focusUntilMs != adminLink.focusUntilMs
+                    adminLink = settings.adminLinkConfig
+                    if (changed) runSafely { clearAdminBlocked() }
                 }
             } catch (e: CancellationException) {
                 throw e
@@ -69,6 +74,7 @@ class ScheduledNotificationsService : NotificationListenerService() {
     }
 
     override fun onListenerConnected() {
+        runSafely { clearAdminBlocked() }
         runSafely {
             // After a restart the count is gone, but the held notifications are still snoozed.
             if (heldCount > 0) return
@@ -85,6 +91,10 @@ class ScheduledNotificationsService : NotificationListenerService() {
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
         runSafely {
             sbn ?: return
+            if (adminBlocks(sbn)) {
+                cancelNotification(sbn.key)
+                return
+            }
             val now = System.currentTimeMillis()
             pingIfDue(now)
             if (!config.isActive || !shouldHold(sbn)) return
@@ -97,6 +107,28 @@ class ScheduledNotificationsService : NotificationListenerService() {
             if (!sbn.isGroupSummary()) heldCount++
             schedulePing(next, now)
         }
+    }
+
+    /**
+     * Notifications of apps the admin blocked never show, and during focus time only calls and
+     * alarms do. Calls ring even from a blocked app, so nobody misses one.
+     */
+    private fun adminBlocks(sbn: StatusBarNotification): Boolean {
+        val link = adminLink
+        if (!link.isLinked() || link.pendingApproval || sbn.packageName == packageName) return false
+        val notification = sbn.notification ?: return false
+        if (notification.category == Notification.CATEGORY_CALL || notification.category == Notification.CATEGORY_ALARM) return false
+        if (sbn.packageName in link.blockedApps) return true
+        return link.focusActive() && sbn.packageName !in neth.iecal.curbox.blockers.AdminLinkBlocker.OPEN_DURING_FOCUS
+    }
+
+    private fun clearAdminBlocked() {
+        val active = try {
+            activeNotifications
+        } catch (e: SecurityException) {
+            return // not connected yet
+        } ?: return
+        for (sbn in active) if (adminBlocks(sbn)) cancelNotification(sbn.key)
     }
 
     private fun shouldHold(sbn: StatusBarNotification): Boolean {

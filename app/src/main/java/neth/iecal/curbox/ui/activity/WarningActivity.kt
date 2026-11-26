@@ -931,6 +931,10 @@ class WarningActivity : AppCompatActivity() {
         val view = ActivityAdminBlockBinding.inflate(layoutInflater)
         setContentView(view.root)
         val kind = intent.getStringExtra("admin_kind") ?: "app"
+        if (kind == "message") {
+            showAdminMessage(view)
+            return
+        }
         if (kind == "uninstall") {
             showUninstallCode(view)
             return
@@ -943,6 +947,7 @@ class WarningActivity : AppCompatActivity() {
                 "site" -> R.string.admin_block_site_title
                 "limit" -> R.string.admin_block_limit_title
                 "schedule" -> R.string.admin_block_schedule_title
+                "focus" -> R.string.admin_focus_title
                 else -> R.string.admin_block_app_title
             }
         )
@@ -951,6 +956,7 @@ class WarningActivity : AppCompatActivity() {
                 "site" -> R.string.admin_block_site_message
                 "limit" -> R.string.admin_block_limit_message
                 "schedule" -> R.string.admin_block_schedule_message
+                "focus" -> R.string.admin_focus_message
                 else -> R.string.admin_block_app_message
             }
         )
@@ -973,6 +979,10 @@ class WarningActivity : AppCompatActivity() {
                 intent.getStringExtra("admin_schedule_name").orEmpty(),
                 intent.getStringExtra("admin_schedule_end").orEmpty()
             )
+            "focus" -> {
+                val until = intent.getLongExtra("admin_focus_until", 0L)
+                if (until > 0) getString(R.string.admin_focus_detail, android.text.format.DateFormat.getTimeFormat(this).format(java.util.Date(until))) else ""
+            }
             "limit" -> {
                 val now = java.time.LocalDateTime.now()
                 val minutes = java.time.Duration.between(now, now.toLocalDate().plusDays(1).atStartOfDay()).toMinutes()
@@ -981,7 +991,7 @@ class WarningActivity : AppCompatActivity() {
             else -> ""
         }
         // Each new try today gets a firmer message, so repeated tries feel pointless.
-        val tries = recordTry(site.ifEmpty { pkg }, countTry)
+        val tries = if (kind == "focus") 1 else recordTry(site.ifEmpty { pkg }, countTry)
         if (tries >= 2) {
             view.tvMessage.setText(
                 when (tries) {
@@ -1021,6 +1031,44 @@ class WarningActivity : AppCompatActivity() {
      * The six digit code is checked here against the admin's PBKDF2 verifier, so it works
      * offline too. Five wrong tries lock this screen for 15 minutes.
      */
+    /** A message the admin sent from the panel, with an optional picture. */
+    private fun showAdminMessage(view: ActivityAdminBlockBinding) {
+        view.tvTitle.setText(R.string.admin_message_title)
+        view.tvMessage.text = intent.getStringExtra("message_text").orEmpty()
+        view.tvMessage.textSize = 20f
+        view.targetRow.visibility = View.GONE
+        view.btnDetails.visibility = View.GONE
+        view.lockIcon.setImageResource(R.drawable.ic_notifications_outline)
+        view.lockIcon.imageTintList = android.content.res.ColorStateList.valueOf(getColor(R.color.curbox_primary))
+        view.lockBadge.backgroundTintList = android.content.res.ColorStateList.valueOf(getColor(R.color.curbox_primary_container))
+        val sentAt = intent.getLongExtra("message_sent_at", 0L)
+        if (sentAt > 0) {
+            val time = android.text.format.DateFormat.getTimeFormat(this).format(java.util.Date(sentAt))
+            view.tvDetail.text = getString(R.string.admin_message_sent_at, time)
+            view.tvDetail.visibility = View.VISIBLE
+        }
+        val path = intent.getStringExtra("message_image").orEmpty()
+        val picture = if (path.isEmpty()) null else runCatching { decodePicture(path) }.getOrNull()
+        if (picture != null) {
+            view.ivMessageImage.setImageBitmap(picture)
+            view.ivMessageImage.visibility = View.VISIBLE
+        }
+        view.btnHome.setText(R.string.admin_message_ok)
+        view.btnHome.setOnClickListener { finish() }
+        onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() = finish()
+        })
+    }
+
+    /** Loads a picture no larger than the screen needs, so a big photo cannot run out of memory. */
+    private fun decodePicture(path: String): android.graphics.Bitmap? {
+        val bounds = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        android.graphics.BitmapFactory.decodeFile(path, bounds)
+        var sample = 1
+        while (bounds.outWidth / sample > 1600 || bounds.outHeight / sample > 1600) sample *= 2
+        return android.graphics.BitmapFactory.decodeFile(path, android.graphics.BitmapFactory.Options().apply { inSampleSize = sample })
+    }
+
     /** Tries to open the same blocked app or site today, counting one try once. */
     private fun recordTry(target: String, count: Boolean): Int {
         val prefs = getSharedPreferences("admin_block_tries", Context.MODE_PRIVATE)
@@ -1102,7 +1150,8 @@ class WarningActivity : AppCompatActivity() {
         view.btnRemove.isEnabled = false
         lifecycleScope.launch {
             val settings = DataStoreManager(this@WarningActivity).settings.first()
-            val stored = settings.antiUninstallConfig2.passwordHash
+            // The admin's code: from uninstall protection, or straight from the admin's server.
+            val stored = settings.antiUninstallConfig2.passwordHash.ifEmpty { settings.adminLinkConfig.releaseVerifier }
             val ok = stored.isNotEmpty() &&
                 withContext(Dispatchers.Default) { neth.iecal.curbox.utils.AntiUninstallManager.verifyPassword(code, stored) }
             view.btnRemove.isEnabled = true

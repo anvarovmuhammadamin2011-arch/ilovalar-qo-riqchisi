@@ -1382,6 +1382,16 @@
     <string name="admin_block_scold_4">Are you even human? You were told: do not enter!</string>
     <string name="admin_block_scold_5">Enough! Every try only eats your time. Go do your homework.</string>
     <string name="admin_block_scold_title">Stop!</string>
+    <string name="admin_message_title">Message from your admin</string>
+    <string name="admin_focus_title">Focus time</string>
+    <string name="admin_focus_message">Your admin turned on focus time. Only calls and the clock work until it ends.</string>
+    <string name="admin_focus_detail">Ends at %1$s</string>
+    <string name="protection_item_notif_access">Hide blocked notifications</string>
+    <string name="protection_item_notif_access_short">Blocked apps cannot send notifications</string>
+    <string name="protection_item_notif_access_long">When your admin blocks an app, its notifications are hidden too. During focus time only calls and alarms come through.</string>
+    <string name="admin_message_sent_at">Sent at %1$s</string>
+    <string name="admin_message_ok">OK, got it</string>
+    <string name="admin_message_image">Picture from your admin</string>
     <string name="admin_block_tries_today">Tries today: %1$d</string>
     <string name="admin_block_limit_message">You used all of today\'s phone time. Calls and emergency calls still work.</string>
     <string name="admin_block_schedule_message">Your admin set a time when this is not available.</string>
