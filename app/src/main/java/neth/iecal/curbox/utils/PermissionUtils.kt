@@ -44,6 +44,7 @@ object PermissionUtils {
     }
 
     fun isAccessibilityServiceEnabled(context: Context, serviceClass: Class<*>): Boolean {
+        if (DemoMode.isGranted(context, "SERVICE")) return true
         val expectedComponentName = ComponentName(context, serviceClass)
         val enabledServicesSetting = Settings.Secure.getString(
             context.contentResolver,

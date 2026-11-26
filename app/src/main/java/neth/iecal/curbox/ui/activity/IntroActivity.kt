@@ -13,7 +13,12 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
-import com.google.android.material.tabs.TabLayoutMediator
+import android.animation.ArgbEvaluator
+import android.graphics.drawable.GradientDrawable
+import android.view.View
+import android.widget.LinearLayout
+import androidx.core.content.ContextCompat
+import kotlin.math.abs
 import neth.iecal.curbox.R
 import neth.iecal.curbox.databinding.ActivityIntroBinding
 import neth.iecal.curbox.databinding.ItemIntroPageBinding
@@ -52,14 +57,31 @@ class IntroActivity : AppCompatActivity(), FixedBrandColors {
         }
 
         binding.pager.adapter = PageAdapter()
-        TabLayoutMediator(binding.dots, binding.pager) { tab, position ->
-            tab.contentDescription = getString(R.string.intro_page, position + 1, pages.size)
-        }.attach()
+        buildDots()
+        // Pages slide in with a gentle fade, and the picture moves a little slower than the text.
+        binding.pager.setPageTransformer { page, position ->
+            val away = abs(position).coerceAtMost(1f)
+            page.alpha = 1f - 0.65f * away
+            page.findViewById<View>(R.id.illustration)?.apply {
+                translationX = -position * page.width * 0.18f
+                val scale = 1f - 0.12f * away
+                scaleX = scale
+                scaleY = scale
+            }
+        }
         binding.pager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageScrolled(position: Int, offset: Float, offsetPixels: Int) {
+                updateDots(position, offset)
+            }
+
             override fun onPageSelected(position: Int) {
                 val last = position == pages.lastIndex
                 binding.btnNext.setText(if (last) R.string.intro_start else R.string.intro_next)
-                binding.btnSkip.visibility = if (last) android.view.View.INVISIBLE else android.view.View.VISIBLE
+                binding.btnSkip.animate().alpha(if (last) 0f else 1f).setDuration(180L).withEndAction {
+                    binding.btnSkip.visibility = if (last) View.INVISIBLE else View.VISIBLE
+                }.start()
+                if (!last) binding.btnSkip.visibility = View.VISIBLE
+                binding.dots.contentDescription = getString(R.string.intro_page, position + 1, pages.size)
             }
         })
         binding.btnNext.setOnClickListener {
@@ -67,6 +89,39 @@ class IntroActivity : AppCompatActivity(), FixedBrandColors {
             if (position < pages.lastIndex) binding.pager.currentItem = position + 1 else finishIntro()
         }
         binding.btnSkip.setOnClickListener { finishIntro() }
+    }
+
+    private val dotSize by lazy { resources.displayMetrics.density * 8f }
+
+    private fun buildDots() {
+        binding.dots.removeAllViews()
+        for (i in pages.indices) {
+            val dot = View(this)
+            dot.background = GradientDrawable().apply { cornerRadius = dotSize / 2f }
+            val params = LinearLayout.LayoutParams(dotSize.toInt(), dotSize.toInt())
+            if (i > 0) params.marginStart = dotSize.toInt()
+            binding.dots.addView(dot, params)
+        }
+        updateDots(0, 0f)
+    }
+
+    /** The current page's dot is a pill three dots long; it grows and shrinks with the swipe. */
+    private fun updateDots(position: Int, offset: Float) {
+        val active = ContextCompat.getColor(this, R.color.curbox_primary)
+        val idle = ContextCompat.getColor(this, R.color.curbox_outline)
+        val evaluator = ArgbEvaluator()
+        for (i in 0 until binding.dots.childCount) {
+            val amount = when (i) {
+                position -> 1f - offset
+                position + 1 -> offset
+                else -> 0f
+            }
+            val dot = binding.dots.getChildAt(i)
+            val params = dot.layoutParams
+            params.width = (dotSize + dotSize * 2f * amount).toInt()
+            dot.layoutParams = params
+            (dot.background as GradientDrawable).setColor(evaluator.evaluate(amount, idle, active) as Int)
+        }
     }
 
     private fun finishIntro() {

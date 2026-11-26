@@ -135,8 +135,9 @@ class ProtectionActivity : AppCompatActivity(), FixedBrandColors {
         setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(binding.protectionRoot) { v, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.updatePadding(left = bars.left, top = bars.top, right = bars.right)
-            binding.scroll.updatePadding(bottom = bars.bottom)
+            // In setup the Continue button sits at the bottom, so it keeps clear of the gesture bar.
+            v.updatePadding(left = bars.left, top = bars.top, right = bars.right, bottom = if (setupMode) bars.bottom else 0)
+            binding.scroll.updatePadding(bottom = if (setupMode) 0 else bars.bottom)
             insets
         }
         dataStore = DataStoreManager(this)
@@ -150,6 +151,9 @@ class ProtectionActivity : AppCompatActivity(), FixedBrandColors {
         }
         binding.btnCheck.setOnClickListener { checkAdmin() }
         binding.btnGrantAll.setOnClickListener { startGrantAll() }
+        if (neth.iecal.curbox.utils.DemoMode.isOn() && savedInstanceState == null) {
+            Toast.makeText(this, R.string.protection_demo_notice, Toast.LENGTH_LONG).show()
+        }
         binding.btnModeHelp.setOnClickListener {
             MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.protection_mode_full_title)
@@ -187,7 +191,11 @@ class ProtectionActivity : AppCompatActivity(), FixedBrandColors {
         BuildConfig.SUPPORTS_ANTI_UNINSTALL && config.isLinked() && config.releaseVerifier.isNotEmpty() &&
             !(AntiUninstallManager.isAdminActive(this) && antiUninstall.isEnabled)
 
-    private fun isDone(step: GrantStep): Boolean = when (step) {
+    /** Real state, or granted by the emulator demo (see DemoMode). */
+    private fun isDone(step: GrantStep): Boolean =
+        neth.iecal.curbox.utils.DemoMode.isGranted(this, step.name) || realDone(step)
+
+    private fun realDone(step: GrantStep): Boolean = when (step) {
         GrantStep.NOTIFICATIONS -> NotificationManagerCompat.from(this).areNotificationsEnabled()
         GrantStep.SERVICE -> PermissionUtils.isAccessibilityServiceEnabled(this, AppBlockerService::class.java)
         GrantStep.OVERLAY -> PermissionUtils.hasOverlayPermission(this)
@@ -240,6 +248,13 @@ class ProtectionActivity : AppCompatActivity(), FixedBrandColors {
             return
         }
         grantTried += next
+        if (neth.iecal.curbox.utils.DemoMode.isOn()) {
+            // Emulator demo: each step turns ready in turn, without Android's screens.
+            neth.iecal.curbox.utils.DemoMode.grant(this, next.name)
+            render()
+            binding.root.postDelayed({ continueGrantAll() }, 450L)
+            return
+        }
         runCatching {
             when (next) {
                 GrantStep.NOTIFICATIONS -> {
@@ -283,7 +298,7 @@ class ProtectionActivity : AppCompatActivity(), FixedBrandColors {
     // ------------------------------------------------------------ status
 
     private fun items(): List<Item> {
-        val serviceOn = PermissionUtils.isAccessibilityServiceEnabled(this, AppBlockerService::class.java)
+        val serviceOn = isDone(GrantStep.SERVICE)
         val openService = { PermissionUtils.openAccessibilityServiceScreen(this, AppBlockerService::class.java) }
         val server = config.serverUrl.removePrefix("http://").removePrefix("https://")
         val adminSummary = when (reachable) {
@@ -300,7 +315,7 @@ class ProtectionActivity : AppCompatActivity(), FixedBrandColors {
             Item(
                 R.drawable.ic_curbox_layers, getString(R.string.protection_item_overlay),
                 getString(R.string.protection_item_overlay_short), getString(R.string.protection_item_overlay_long),
-                ready = PermissionUtils.hasOverlayPermission(this), required = true,
+                ready = isDone(GrantStep.OVERLAY), required = true,
                 fix = { startActivity(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))) }
             ),
             Item(
@@ -321,18 +336,18 @@ class ProtectionActivity : AppCompatActivity(), FixedBrandColors {
             Item(
                 R.drawable.ic_notifications_outline, getString(R.string.protection_item_notif_access),
                 getString(R.string.protection_item_notif_access_short), getString(R.string.protection_item_notif_access_long),
-                ready = hasNotificationAccess(), required = true, fix = ::openNotificationAccess
+                ready = isDone(GrantStep.NOTIFICATION_ACCESS), required = true, fix = ::openNotificationAccess
             ),
             Item(
                 R.drawable.ic_notifications_outline, getString(R.string.protection_item_notifications),
                 getString(R.string.protection_item_notifications_short), getString(R.string.protection_item_notifications_long),
-                ready = NotificationManagerCompat.from(this).areNotificationsEnabled(), required = false,
+                ready = isDone(GrantStep.NOTIFICATIONS), required = false,
                 fix = ::askForNotifications
             ),
             Item(
                 R.drawable.ic_curbox_battery, getString(R.string.protection_item_battery),
                 getString(R.string.protection_item_battery_short), getString(R.string.protection_item_battery_long),
-                ready = ServiceProtectionManager.isIgnoringBatteryOptimizations(this), required = false,
+                ready = isDone(GrantStep.BATTERY), required = false,
                 fix = { startActivity(ServiceProtectionManager.ignoreBatteryOptimizationsIntent(this)) }
             ),
             Item(

@@ -13,7 +13,8 @@
         android:layout_height="?attr/actionBarSize"
         app:navigationContentDescription="@string/protection_back"
         app:navigationIcon="@drawable/ic_back_arrow"
-        app:title="@string/protection_title" />
+        app:title="@string/protection_title"
+        app:titleTextAppearance="@style/TextAppearance.Curbox.Title" />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scroll"
@@ -295,7 +296,9 @@
         android:layout_height="56dp"
         android:layout_marginHorizontal="@dimen/curbox_screen_padding"
         android:layout_marginVertical="@dimen/curbox_space_m"
+        android:stateListAnimator="@animator/curbox_button_press"
         android:text="@string/protection_setup_continue"
+        android:textSize="16sp"
         android:visibility="gone"
-        app:cornerRadius="16dp" />
+        app:cornerRadius="18dp" />
 </LinearLayout>

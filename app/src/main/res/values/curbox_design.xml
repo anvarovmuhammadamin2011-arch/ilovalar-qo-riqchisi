@@ -72,6 +72,17 @@
         <item name="android:fontFamily">@font/inter</item>
     </style>
 
+    <!-- Page headings, like onboarding: large but calm, between Display and Title. -->
+    <style name="TextAppearance.Curbox.Headline" parent="TextAppearance.Material3.HeadlineSmall">
+        <item name="android:textSize">28sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/curbox_text</item>
+        <item name="android:letterSpacing">-0.015</item>
+        <item name="android:lineSpacingMultiplier">1.1</item>
+        <item name="fontFamily">@font/inter</item>
+        <item name="android:fontFamily">@font/inter</item>
+    </style>
+
     <style name="TextAppearance.Curbox.Title" parent="TextAppearance.Material3.TitleLarge">
         <item name="android:textSize">22sp</item>
         <item name="android:textStyle">bold</item>

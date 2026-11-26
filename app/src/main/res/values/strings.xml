@@ -113,7 +113,7 @@
     <string name="user_profile_protection">Protection</string>
 
     <!-- Admin link: role choice, pairing with Curbox Admin, admin panel -->
-    <string name="role_title">Who is using Curbox?</string>
+    <string name="role_title">Who is using MBSI?</string>
     <string name="role_subtitle">Pick one to continue</string>
     <string name="role_admin_title">Admin</string>
     <string name="role_admin_desc">Manage phones and choose what to block</string>
@@ -135,7 +135,7 @@
     <string name="admin_link_need_password">Type your password</string>
     <string name="splash_tagline">Your digital balance</string>
     <string name="role_admin_sheet_title">The admin panel is on the computer</string>
-    <string name="role_admin_sheet_message">Open Curbox for PC on the computer to manage phones. You can also open it here, but you still need the admin login.</string>
+    <string name="role_admin_sheet_message">Open MBSI PC on the computer to manage phones. You can also open it here, but you still need the admin login.</string>
     <string name="role_admin_sheet_open">Open here</string>
     <string name="role_admin_sheet_cancel">Not now</string>
     <string name="admin_link_address_hint">Computer address, like 192.168.1.5:8787</string>
@@ -145,26 +145,26 @@
     <string name="admin_link_wrong_login">Wrong login or password.</string>
     <string name="admin_link_locked">Too many wrong tries. Wait 5 minutes and try again.</string>
     <string name="admin_link_consent_title">Allow admin access?</string>
-    <string name="admin_link_consent_message">If you say yes:\n\n• Your admin can see which apps are on this phone.\n• Your admin can block apps and websites here.\n• Only your admin can remove this link.\n\nNext, Curbox asks you to turn on its permissions so the blocks can work.</string>
+    <string name="admin_link_consent_message">If you say yes:\n\n• Your admin can see which apps are on this phone.\n• Your admin can block apps and websites here.\n• Only your admin can remove this link.\n\nNext, MBSI asks you to turn on its permissions so the blocks can work.</string>
     <string name="admin_link_consent_yes">Yes, allow</string>
     <string name="admin_link_consent_no">No</string>
     <string name="admin_link_bad_address">Type the computer address, like 192.168.1.5:8787</string>
     <string name="admin_link_unreachable">Could not reach the server. Check that the internet is on and try again.</string>
     <string name="admin_link_connected">Connected to your admin</string>
     <string name="admin_panel_address_title">Admin computer address</string>
-    <string name="admin_panel_address_message">Open Curbox for PC on the computer. Type the address it shows.</string>
+    <string name="admin_panel_address_message">Open MBSI PC on the computer. Type the address it shows.</string>
     <string name="admin_panel_open">Open</string>
-    <string name="admin_panel_unreachable">Could not open Curbox for PC. Make sure it is running on the computer.</string>
+    <string name="admin_panel_unreachable">Could not open MBSI PC. Make sure it is running on the computer.</string>
     <string name="write_down_a_keyword">Write down a keyword</string>
     <string name="app_icon">app_icon</string>
     <string name="accessibility_permission_app_blocker">
         This feature needs the Display over other apps permission to work. Please turn that on first, then turn this on. If something stops working, restart the app.\n\n
-        Turning this on lets Curbox do these things for you:\n1. Block apps\n2. Block short form content\n3. Block websites and keywords\n4. Focus Mode\n5. Hide parts of an app\'s screen that distract you\n6. See how long you spend in each app\n7. Count how much short form content you scroll, and show the count in a floating overlay\n8. See which websites you visit and for how long\n\n
-        Curbox needs accessibility access to see which app, website, or screen you are on, so it can block it the way you set and keep your usage stats. Without this, none of it can work.\n\n
-        Curbox never shares anything without your permission.
+        Turning this on lets MBSI do these things for you:\n1. Block apps\n2. Block short form content\n3. Block websites and keywords\n4. Focus Mode\n5. Hide parts of an app\'s screen that distract you\n6. See how long you spend in each app\n7. Count how much short form content you scroll, and show the count in a floating overlay\n8. See which websites you visit and for how long\n\n
+        MBSI needs accessibility access to see which app, website, or screen you are on, so it can block it the way you set and keep your usage stats. Without this, none of it can work.\n\n
+        MBSI never shares anything without your permission.
         \n\n
     </string>
-    <string name="admin_permission_desc">Curbox Tamper Protection</string>
+    <string name="admin_permission_desc">MBSI Tamper Protection</string>
     <string name="close">Close</string>
     <string name="proceed">Proceed</string>
     <string name="cancel">Cancel</string>
@@ -227,11 +227,11 @@
         <item quantity="other">Pomodoro, %1$d rounds</item>
     </plurals>
     <string name="quick_setup_guide">Quick Setup Guide</string>
-    <string name="curbox_needs_accessibility_permissions_to_help">Curbox needs Accessibility permissions to help you track your screen time. The setup process varies based on how you installed the app.</string>
+    <string name="curbox_needs_accessibility_permissions_to_help">MBSI needs Accessibility permissions to help you track your screen time. The setup process varies based on how you installed the app.</string>
     <string name="fdroid_installation">F-Droid Installation</string>
     <string name="installed_via_fdroid_appnyoure_all_set">✅ Installed via F-Droid app?\nYou\'re all set! Just follow the accessibility setup in the next step.\n\n⚠️ Downloaded from F-Droid website?\nPlease install through the F-Droid app instead to avoid permission issues.</string>
     <string name="apk_installation">APK Installation</string>
-    <string name="if_you_installed_from_an_apk">If you installed from an APK, follow these steps:\n\n1️⃣ Open Settings → Apps → Curbox\n\n2️⃣ Tap Permissions → Special App Access → Accessibility → Enable Curbox\n\n3️⃣ Return to Curbox App Info → Scroll down → Tap Restricted Settings → Allow\n\n💡 Pro tip: Install via F-Droid app for a smoother setup! 🚀</string>
+    <string name="if_you_installed_from_an_apk">If you installed from an APK, follow these steps:\n\n1️⃣ Open Settings → Apps → MBSI\n\n2️⃣ Tap Permissions → Special App Access → Accessibility → Enable MBSI\n\n3️⃣ Return to MBSI App Info → Scroll down → Tap Restricted Settings → Allow\n\n💡 Pro tip: Install via F-Droid app for a smoother setup! 🚀</string>
     <string name="usage_timeline">Usage Timeline</string>
     <string name="screentime">Screentime</string>
     <string name="app_opens">App Opens</string>
@@ -259,47 +259,47 @@
     <string name="track_the_number_of_reels_consumed">Track and analyze the number of short-form content consumed</string>
     <string name="grayscale_filter">Grayscale Filter</string>
     <string name="reduce_visual_stimulation">Reduce visual stimulation</string>
-    <string name="hello_this_is_nethical_the_creator">Hey, I\'m Nethical, the person behind Curbox. I\'m 18, fresh out of high school, and a little obsessed with tech, art, and building cool things from scratch. A while back I went looking for a free app blocker that actually did what I wanted. Nothing came close, so I built my own. Curbox is that app, and I\'ve been pouring into it almost every day for over two years now. So happy you\'re here. I hope it helps you take your time back.</string>
+    <string name="hello_this_is_nethical_the_creator">Hey, I\'m Nethical, the person behind MBSI. I\'m 18, fresh out of high school, and a little obsessed with tech, art, and building cool things from scratch. A while back I went looking for a free app blocker that actually did what I wanted. Nothing came close, so I built my own. MBSI is that app, and I\'ve been pouring into it almost every day for over two years now. So happy you\'re here. I hope it helps you take your time back.</string>
     <string name="join_the_focus_pack">Join the Focus Pack</string>
     <string name="dont_fix_your_screen_time_alone">Don\'t fix your screen time alone. Join our Discord of like-minded people holding each other accountable and sharing focus strategies to improve themselves.</string>
     <string name="join_the_discord">Join the Discord</string>
     <string name="curboxapp">\@curb.me</string>
-    <string name="follow_curbox">Follow Curbox</string>
+    <string name="follow_curbox">Follow MBSI</string>
     <string name="label_instagram">Instagram</string>
     <string name="label_github">GitHub</string>
     <string name="curbox_github_repo">curbox-android</string>
-    <string name="curbox_also_on">Curbox Also On</string>
+    <string name="curbox_also_on">MBSI Also On</string>
     <string name="label_browser_extension">Browser Extension</string>
     <string name="curbox_extension_repo">curbox-extension</string>
     <string name="about_the_developer">About the Developer</string>
     <string name="contributors_title">Contributors</string>
-    <string name="contributors_row_hint">Meet the people who build Curbox</string>
-    <string name="contributors_intro">These people help build Curbox. Bigger names made more changes.</string>
-    <string name="contributors_cloud_description">Names of the people who help build Curbox: %1$s</string>
+    <string name="contributors_row_hint">Meet the people who build MBSI</string>
+    <string name="contributors_intro">These people help build MBSI. Bigger names made more changes.</string>
+    <string name="contributors_cloud_description">Names of the people who help build MBSI: %1$s</string>
     <string name="view_on_github">View on GitHub ↗</string>
     <string name="donate_title">Donate</string>
-    <string name="donate_pitch">I\'ve put 1500+ hours into Curbox, building it alongside school, exams and study, to save millions of minutes worldwide. Donate to help me keep it free and growing for everyone.</string>
+    <string name="donate_pitch">I\'ve put 1500+ hours into MBSI, building it alongside school, exams and study, to save millions of minutes worldwide. Donate to help me keep it free and growing for everyone.</string>
     <string name="btn_donate">Donate ❤</string>
     <string name="cannot_donate_share">Cannot donate? Sharing the project is helpful too!</string>
     <string name="donate_prompt_title">Can I ask you a favor?</string>
-    <string name="donate_prompt_value">You\'ve been with Curbox for a while now, and that means a lot to me.</string>
-    <string name="donate_prompt_footer">No pressure at all. Curbox stays free for you either way.</string>
+    <string name="donate_prompt_value">You\'ve been with MBSI for a while now, and that means a lot to me.</string>
+    <string name="donate_prompt_footer">No pressure at all. MBSI stays free for you either way.</string>
     <string name="donate_prompt_give">I\'ll chip in ❤</string>
     <string name="donate_prompt_share">I\'ll share it instead</string>
     <string name="donate_prompt_later">Maybe later</string>
-    <string name="share_curbox_message">I\'ve been using Curbox to take back control of my screen time. It\'s free, give it a try: https://curbox.app</string>
+    <string name="share_curbox_message">I\'ve been using MBSI to take back control of my screen time. It\'s free, give it a try: https://curbox.app</string>
     <string name="extension_promo_label">New</string>
-    <string name="extension_promo_title">Curbox is on your computer too</string>
-    <string name="extension_promo_body">The Curbox browser extension works in Chrome and Firefox. It shows how long you spend on each website, blocks the ones that distract you, and helps you focus.</string>
+    <string name="extension_promo_title">MBSI is on your computer too</string>
+    <string name="extension_promo_body">The MBSI browser extension works in Chrome and Firefox. It shows how long you spend on each website, blocks the ones that distract you, and helps you focus.</string>
     <string name="extension_promo_footer">It is free and open source, just like this app.</string>
     <string name="extension_promo_get">Get the extension</string>
     <string name="extension_promo_share">Share link</string>
     <string name="extension_promo_later">Maybe later</string>
-    <string name="extension_promo_share_message">Curbox browser extension for Chrome and Firefox: %1$s</string>
+    <string name="extension_promo_share_message">MBSI browser extension for Chrome and Firefox: %1$s</string>
     <string name="onboarding_extension_title">Scroll on your computer too?</string>
-    <string name="onboarding_extension_desc">Curbox also has a free browser extension for Chrome and Firefox. Tap to learn more.</string>
+    <string name="onboarding_extension_desc">MBSI also has a free browser extension for Chrome and Firefox. Tap to learn more.</string>
     <string name="system_diagnostics">System Diagnostics</string>
-    <string name="view_and_share_application_crash_logs">View and share application crash logs to help improve Curbox.</string>
+    <string name="view_and_share_application_crash_logs">View and share application crash logs to help improve MBSI.</string>
     <string name="view_crash_logs">View Crash Logs</string>
     <string name="group_name">Name</string>
     <string name="group_name_required">Please enter a group name</string>
@@ -372,7 +372,7 @@
     <string name="usage_weekly_chart_description">Weekly app usage chart</string>
     <string name="crunching_numbers">Crunching numbers...</string>
     <string name="usage_welcome_title">Hello dear user</string>
-    <string name="usage_welcome_message">Your app stats will show up right here. I started keeping track the moment you installed me. Please read the docs so you can use Curbox to its fullest.</string>
+    <string name="usage_welcome_message">Your app stats will show up right here. I started keeping track the moment you installed me. Please read the docs so you can use MBSI to its fullest.</string>
     <string name="usage_welcome_read_docs">Read documentation</string>
     <string name="usage_welcome_star_repo">Star our repository</string>
     <string name="whats_new_title">What\'s new</string>
@@ -496,7 +496,7 @@
     <!-- Extracted Strings -->
     <string name="blocking_service_channel_name">Blocking Service</string>
     <string name="blocking_service_channel_description">Running in the background to protect you</string>
-    <string name="blocking_service_notification_title">Curbox %1$s is active</string>
+    <string name="blocking_service_notification_title">MBSI %1$s is active</string>
     <string name="blocking_service_notification_text">Protecting your digital wellbeing</string>
     <string name="dialog_title_select_date_range">Select Date Range</string>
     <string name="dialog_title_select_export_range">Select Export Range</string>
@@ -509,14 +509,14 @@
     <string name="nfc_focus_stopped">Focus stopped</string>
     <string name="nfc_focus_no_group">No focus group found to start</string>
     <string name="nfc_focus_not_exitable">This focus session can\'t be ended early</string>
-    <string name="nfc_tag_unrecognized">Unrecognized Curbox NFC tag</string>
+    <string name="nfc_tag_unrecognized">Unrecognized MBSI NFC tag</string>
 
     <string name="onboarding_non_session_title">Non-session based installation detected</string>
-    <string name="onboarding_restricted_settings_desc">Android 13+ restricts Accessibility services for apps installed outside of app stores (like F-Droid or Play Store). To enable permissions, you\'ll need to manually allow \'Restricted settings\' for Curbox. Alternatively, install via the F-Droid app(not website) to avoid this.</string>
+    <string name="onboarding_restricted_settings_desc">Android 13+ restricts Accessibility services for apps installed outside of app stores (like F-Droid or Play Store). To enable permissions, you\'ll need to manually allow \'Restricted settings\' for MBSI. Alternatively, install via the F-Droid app(not website) to avoid this.</string>
     <string name="onboarding_show_tutorial">Show tutorial to enable permissions</string>
     <string name="onboarding_shizuku_grant">Grant all permissions with Shizuku</string>
     <string name="dnd_access_dialog_title">Do Not Disturb</string>
-    <string name="dnd_access_dialog_message">Curbox needs this to turn on Do Not Disturb for you, so it can mute calls and alerts while you focus. Without it, Curbox cannot silence distractions on its own.\n\n🔒 Curbox does not collect, send, or store any of your data on a server without your permission.\n\n🛡️ Curbox respects your peace: It uses this only to mute distractions when you ask it to.</string>
+    <string name="dnd_access_dialog_message">MBSI needs this to turn on Do Not Disturb for you, so it can mute calls and alerts while you focus. Without it, MBSI cannot silence distractions on its own.\n\n🔒 MBSI does not collect, send, or store any of your data on a server without your permission.\n\n🛡️ MBSI respects your peace: It uses this only to mute distractions when you ask it to.</string>
     <string name="dialog_add_websites">Add Websites</string>
     <string name="dialog_selected_count">Selected: %1$d</string>
     <string name="dialog_turn_on_dnd">Turn on do not disturb</string>
@@ -531,7 +531,7 @@
     <string name="empty_intents_desc">Try adjusting your filters or unlocking an app.</string>
     <string name="grayscale_shizuku_title">Shizuku Permission Required</string>
     <string name="grayscale_shizuku_desc">This feature needs Shizuku permission to apply the grayscale filter correctly.</string>
-    <string name="grayscale_secure_settings_desc">Curbox needs a one time permission to change your screen colors. Grant it once with Shizuku. After that grayscale works on its own, even after you restart your phone.</string>
+    <string name="grayscale_secure_settings_desc">MBSI needs a one time permission to change your screen colors. Grant it once with Shizuku. After that grayscale works on its own, even after you restart your phone.</string>
     <string name="btn_grant_permission">Grant Permission</string>
     <string name="label_group_name">Group Name</string>
     <string name="label_app_blocker">App Blocker</string>
@@ -566,7 +566,7 @@
     <string name="label_app_pause">App Pause</string>
     <string name="label_rather_spend_time">I would rather spend this time ...</string>
     <string name="label_recommended">Recommended</string>
-    <string name="crash_title">Oops! Curbox has crashed</string>
+    <string name="crash_title">Oops! MBSI has crashed</string>
     <string name="crash_desc">Something went wrong. Please share these logs with the developer to help fix the issue.</string>
     <string name="btn_clear">Clear</string>
     <string name="btn_restart">Restart</string>
@@ -655,73 +655,73 @@
     <string name="privacy_url" translatable="false">https://curbox.app/privacy.html</string>
 
     <!-- Curbox API -->
-    <string name="api_screen_title">Curbox API</string>
-    <string name="api_card_subtitle">Let other apps control Curbox</string>
+    <string name="api_screen_title">MBSI API</string>
+    <string name="api_card_subtitle">Let other apps control MBSI</string>
     <string name="api_screen_subtitle">Other apps can ask to start focus mode, flip blockers, and read your stats. You decide who gets in.</string>
     <string name="api_enable_title">Allow other apps</string>
-    <string name="api_enable_subtitle">When this is off, no app can control Curbox, even ones you allowed before.</string>
+    <string name="api_enable_subtitle">When this is off, no app can control MBSI, even ones you allowed before.</string>
     <string name="api_connected_title">Connected apps</string>
-    <string name="api_no_apps">No apps are connected. Curbox will ask for your approval when an app requests access, then list approved apps here.</string>
+    <string name="api_no_apps">No apps are connected. MBSI will ask for your approval when an app requests access, then list approved apps here.</string>
     <string name="api_revoke">Remove</string>
     <string name="api_how_title">How it works</string>
-    <string name="api_how_body">When another app requests access, Curbox shows its name and asks for your approval. An approved app can run commands until you remove it. Removing an app ends its access immediately.</string>
-    <string name="api_help_popup">Other apps can ask to control Curbox. You allow or deny each one, and you can remove access any time.</string>
+    <string name="api_how_body">When another app requests access, MBSI shows its name and asks for your approval. An approved app can run commands until you remove it. Removing an app ends its access immediately.</string>
+    <string name="api_help_popup">Other apps can ask to control MBSI. You allow or deny each one, and you can remove access any time.</string>
 
     <!-- Service protection (keep alive) -->
-    <string name="service_protection_title">Keep Curbox running</string>
-    <string name="service_protection_card_subtitle">Help Curbox blockers keep working</string>
-    <string name="service_protection_subtitle">Some phones stop Curbox in the background to save battery. These options help keep its blockers running and restart them if they stop. No option can guarantee that Curbox will always run.</string>
+    <string name="service_protection_title">Keep MBSI running</string>
+    <string name="service_protection_card_subtitle">Help MBSI blockers keep working</string>
+    <string name="service_protection_subtitle">Some phones stop MBSI in the background to save battery. These options help keep its blockers running and restart them if they stop. No option can guarantee that MBSI will always run.</string>
     <string name="service_protection_master_title">Protection</string>
     <string name="service_protection_master_desc">Turn on all the layers below</string>
     <string name="service_protection_status_header">What is working now</string>
-    <string name="service_protection_row_services_title">Curbox blockers</string>
+    <string name="service_protection_row_services_title">MBSI blockers</string>
     <string name="service_protection_services_on">Blockers are running</string>
     <string name="service_protection_services_off">Blockers are not running</string>
     <string name="service_protection_row_battery_title">Battery freedom</string>
-    <string name="service_protection_battery_ok">Battery settings allow Curbox to stay active</string>
-    <string name="service_protection_battery_bad">Battery settings may stop Curbox to save power</string>
+    <string name="service_protection_battery_ok">Battery settings allow MBSI to stay active</string>
+    <string name="service_protection_battery_bad">Battery settings may stop MBSI to save power</string>
     <string name="service_protection_row_autostart_title">Auto start</string>
-    <string name="service_protection_row_autostart_desc">Some phones require a separate setting to let Curbox start automatically. Please allow auto start.</string>
+    <string name="service_protection_row_autostart_desc">Some phones require a separate setting to let MBSI start automatically. Please allow auto start.</string>
     <string name="service_protection_row_shizuku_title">Auto repair</string>
-    <string name="service_protection_shizuku_on">Curbox can restart its blockers automatically</string>
-    <string name="service_protection_shizuku_off">Set up Shizuku so Curbox can restart its blockers</string>
+    <string name="service_protection_shizuku_on">MBSI can restart its blockers automatically</string>
+    <string name="service_protection_shizuku_off">Set up Shizuku so MBSI can restart its blockers</string>
     <string name="service_protection_fix">Fix</string>
     <string name="service_protection_open">Open</string>
     <string name="service_protection_setup">Set up</string>
     <string name="service_protection_shizuku_not_installed">Shizuku is not running. Opening its website.</string>
     <string name="service_protection_repair_now">Repair now</string>
-    <string name="service_protection_repair_started">Trying to restart Curbox blockers</string>
+    <string name="service_protection_repair_started">Trying to restart MBSI blockers</string>
     <string name="service_protection_no_screen">This settings screen is not available on this phone</string>
-    <string name="service_protection_autostart_manual">Please open your phone settings and allow Curbox to auto start.</string>
+    <string name="service_protection_autostart_manual">Please open your phone settings and allow MBSI to auto start.</string>
     <string name="service_protection_advanced_header">Advanced</string>
-    <string name="service_protection_device_owner">Make Curbox a device owner</string>
+    <string name="service_protection_device_owner">Make MBSI a device owner</string>
     <string name="service_protection_device_owner_warning">This is the strongest option. It stays on even after a force stop and blocks uninstall fully. It only works on a phone with no accounts added, and it is hard to undo later. Only do this if you are sure.</string>
     <string name="service_protection_remove_device_admin">Turn off device admin</string>
-    <string name="service_protection_remove_device_admin_warning">Curbox will no longer be a device owner or device admin. Your phone may be able to stop or remove Curbox more easily.</string>
+    <string name="service_protection_remove_device_admin_warning">MBSI will no longer be a device owner or device admin. Your phone may be able to stop or remove MBSI more easily.</string>
     <string name="service_protection_remove">Turn off</string>
     <string name="service_protection_admin_locked">Turn off tamper protection first.</string>
     <string name="service_protection_admin_removal_started">Turning off device admin</string>
     <string name="service_protection_admin_removal_failed">Could not turn off device admin. Please try again.</string>
     <string name="service_protection_cancel">Cancel</string>
     <string name="service_protection_continue">Continue</string>
-    <string name="service_protection_help_popup">Phones often stop background apps to save battery. This screen helps Curbox stay active with battery access, auto start, regular checks, and optional recovery through Shizuku. These options make Curbox harder to stop, but cannot guarantee that it will always run.</string>
+    <string name="service_protection_help_popup">Phones often stop background apps to save battery. This screen helps MBSI stay active with battery access, auto start, regular checks, and optional recovery through Shizuku. These options make MBSI harder to stop, but cannot guarantee that it will always run.</string>
     <string name="service_protection_channel_name">Service protection</string>
-    <string name="service_protection_down_title">Curbox blockers stopped</string>
+    <string name="service_protection_down_title">MBSI blockers stopped</string>
     <string name="service_protection_down_text">Tap to turn them back on so your blocks keep working.</string>
 
     <!-- Tamper protection -->
     <string name="anti_uninstall_title">Tamper protection</string>
-    <string name="anti_uninstall_card_subtitle">Make it harder to remove Curbox</string>
-    <string name="anti_uninstall_subtitle">When this is on, Curbox cannot be uninstalled until you turn it off the way you chose. Think of it like a seatbelt for your willpower.</string>
-    <string name="anti_uninstall_limits_warning">This does not make it impossible to uninstall Curbox. It only makes uninstalling more difficult.</string>
-    <string name="anti_uninstall_disable_warning">Curbox keeps itself installed to protect your focus. Turn off tamper protection inside the app first.</string>
+    <string name="anti_uninstall_card_subtitle">Make it harder to remove MBSI</string>
+    <string name="anti_uninstall_subtitle">When this is on, MBSI cannot be uninstalled until you turn it off the way you chose. Think of it like a seatbelt for your willpower.</string>
+    <string name="anti_uninstall_limits_warning">This does not make it impossible to uninstall MBSI. It only makes uninstalling more difficult.</string>
+    <string name="anti_uninstall_disable_warning">MBSI keeps itself installed to protect your focus. Turn off tamper protection inside the app first.</string>
     <string name="anti_uninstall_setup_again">Something went wrong. Please choose your unlock method again.</string>
-    <string name="anti_uninstall_admin_explanation">Curbox uses this to stop itself from being uninstalled while protection is on.</string>
-    <string name="anti_uninstall_admin_needed">This permission is required to keep Curbox installed.</string>
-    <string name="anti_uninstall_help_popup">When this is on, Curbox cannot be uninstalled and its services cannot be switched off until you turn it off using the method you picked: a password, a wait of a few days, or a one day cooldown you can stop anytime.</string>
+    <string name="anti_uninstall_admin_explanation">MBSI uses this to stop itself from being uninstalled while protection is on.</string>
+    <string name="anti_uninstall_admin_needed">This permission is required to keep MBSI installed.</string>
+    <string name="anti_uninstall_help_popup">When this is on, MBSI cannot be uninstalled and its services cannot be switched off until you turn it off using the method you picked: a password, a wait of a few days, or a one day cooldown you can stop anytime.</string>
 
     <string name="anti_uninstall_status_off_title">Protection is off</string>
-    <string name="anti_uninstall_status_off_body">Curbox can be uninstalled right now.</string>
+    <string name="anti_uninstall_status_off_body">MBSI can be uninstalled right now.</string>
     <string name="anti_uninstall_status_on_title">Protection is on</string>
     <string name="anti_uninstall_status_unlocking_title">Turning off soon</string>
     <string name="anti_uninstall_status_unlocking_body">Protection turns off in %1$s.</string>
@@ -824,7 +824,7 @@
 
     <!-- Curbox API permission screen -->
     <string name="api_permission_title">Allow access?</string>
-    <string name="api_permission_message">%1$s (%2$s) wants to control Curbox. It can start focus sessions, edit focus groups, turn blockers on or off, read your screen time and usage history, and provide unlock requirements. You can remove this any time.</string>
+    <string name="api_permission_message">%1$s (%2$s) wants to control MBSI. It can start focus sessions, edit focus groups, turn blockers on or off, read your screen time and usage history, and provide unlock requirements. You can remove this any time.</string>
     <string name="api_permission_allow">Allow</string>
     <string name="api_permission_deny">Deny</string>
 
@@ -861,16 +861,16 @@
     <!-- Onboarding permissions -->
     <string name="onboarding_app_limit_group_name">%1$s Limits</string>
     <string name="onboarding_perm_overlay_title">Screen Overlay</string>
-    <string name="onboarding_perm_overlay_rationale">Curbox needs this to show a calm pause screen on top of distracting apps when you open them. Without it, Curbox cannot place anything over those apps to help you stop and think.</string>
-    <string name="onboarding_perm_overlay_opensource">🛡️ Open Source: Think of Curbox like a restaurant with an open kitchen. The whole codebase is public, so anyone can check that Curbox is not doing anything sneaky. There are no closed doors here.</string>
+    <string name="onboarding_perm_overlay_rationale">MBSI needs this to show a calm pause screen on top of distracting apps when you open them. Without it, MBSI cannot place anything over those apps to help you stop and think.</string>
+    <string name="onboarding_perm_overlay_opensource">🛡️ Open Source: Think of MBSI like a restaurant with an open kitchen. The whole codebase is public, so anyone can check that MBSI is not doing anything sneaky. There are no closed doors here.</string>
     <string name="onboarding_perm_notif_title">Notifications</string>
-    <string name="onboarding_perm_notif_rationale">Curbox needs this to stay running in the background so your blocks keep working, and to gently remind you of your goals. Without it, Android can stop Curbox and your blocks may fail.</string>
-    <string name="onboarding_perm_notif_opensource">🛡️ Not a Data Broker: Many apps hide their code because they make money by harvesting your data. Curbox keeps all its code public, so you can check yourself that nothing is quietly sending your information away.</string>
+    <string name="onboarding_perm_notif_rationale">MBSI needs this to stay running in the background so your blocks keep working, and to gently remind you of your goals. Without it, Android can stop MBSI and your blocks may fail.</string>
+    <string name="onboarding_perm_notif_opensource">🛡️ Not a Data Broker: Many apps hide their code because they make money by harvesting your data. MBSI keeps all its code public, so you can check yourself that nothing is quietly sending your information away.</string>
     <string name="onboarding_perm_accessibility_title">App Blocker (Accessibility API)</string>
-    <string name="onboarding_perm_accessibility_rationale">Curbox needs this to notice when you open a blocked app and show the blocker screen. It also uses it to count your screen time and how many reels you scroll. Without it, Curbox cannot work at all.</string>
-    <string name="onboarding_perm_accessibility_opensource">🛡️ Transparency for Deep Access: This is a powerful permission, which is why being open source matters so much. You do not have to take Curbox at its word. The global community has reviewed its public code and confirmed it only blocks apps and tracks usage.</string>
+    <string name="onboarding_perm_accessibility_rationale">MBSI needs this to notice when you open a blocked app and show the blocker screen. It also uses it to count your screen time and how many reels you scroll. Without it, MBSI cannot work at all.</string>
+    <string name="onboarding_perm_accessibility_opensource">🛡️ Transparency for Deep Access: This is a powerful permission, which is why being open source matters so much. You do not have to take MBSI at its word. The global community has reviewed its public code and confirmed it only blocks apps and tracks usage.</string>
     <string name="onboarding_read_documentation">Read Documentation</string>
-    <string name="onboarding_privacy_note">"\n\n🔒 Curbox does not collect, send, or store any of your data on a server without your permission. Everything stays on your phone.\n\n"</string>
+    <string name="onboarding_privacy_note">"\n\n🔒 MBSI does not collect, send, or store any of your data on a server without your permission. Everything stays on your phone.\n\n"</string>
     <string name="onboarding_granting_permissions">Granting Permissions…</string>
     <string name="onboarding_permissions_granted">Permissions Granted!</string>
     <string name="onboarding_error_tap_retry">Error, Tap to Retry</string>
@@ -986,7 +986,7 @@
     <string name="focus_nfc_load_button">Load from tag</string>
     <string name="focus_nfc_load_title">Tap a tag to load</string>
     <string name="focus_nfc_loaded">Loaded values from tag</string>
-    <string name="focus_nfc_load_invalid">That tag is not a Curbox focus tag</string>
+    <string name="focus_nfc_load_invalid">That tag is not a MBSI focus tag</string>
 
     <!-- Group edit titles -->
     <string name="app_group_edit_title">Edit App Group</string>
@@ -1073,17 +1073,17 @@
     <string name="backup_restore_intro">Restore your settings and rules before you finish setup. You cannot restore later.</string>
     <string name="backup_restore_confirmation">This will replace your settings and rules. Usage history is not included. You will need to turn on uninstall protection again.</string>
     <string name="backup_restored">Settings and rules restored.</string>
-    <string name="backup_restore_failed">Could not restore this file. Choose a valid Curbox settings backup and try again.</string>
+    <string name="backup_restore_failed">Could not restore this file. Choose a valid MBSI settings backup and try again.</string>
     <string name="onboarding_finish_failed">Could not finish setup. Please try again.</string>
     <string name="usage_select_background_art">Select background art</string>
     <string name="usage_background_art_random">Random</string>
     <string name="warning_option_external">Require another app</string>
     <string name="warning_option_external_desc">Let another app check a goal before you continue</string>
     <string name="warning_external_condition">Requirement</string>
-    <string name="warning_external_help">Connect a supported app through Curbox API. That app checks your goal, such as reaching a place or finishing your cards. Access lasts for the unlock time you choose.</string>
+    <string name="warning_external_help">Connect a supported app through MBSI API. That app checks your goal, such as reaching a place or finishing your cards. Access lasts for the unlock time you choose.</string>
     <string name="warning_external_select">Choose a requirement. Connect a supported app if this list is empty.</string>
     <string name="warning_external_check">Check requirement</string>
-    <string name="warning_external_unavailable">This requirement is unavailable. Check that the app is installed and has Curbox API access.</string>
+    <string name="warning_external_unavailable">This requirement is unavailable. Check that the app is installed and has MBSI API access.</string>
     <string name="warning_external_denied">The requirement was not approved. You can try again.</string>
     <!-- Advanced analytics -->
     <string name="advanced_analytics">Advanced analytics</string>
@@ -1281,14 +1281,14 @@
     <string name="scheduled_notifications">Scheduled Notifications</string>
     <string name="scheduled_notifications_card_desc">Get your notifications together at set times, not all day long.</string>
     <string name="enable_scheduled_notifications">Enable Scheduled Notifications</string>
-    <string name="scheduled_notifications_intro">Notifications pull you back to your phone all day. With this on, Curbox holds them when they come in and gives them back together at the times you pick. For example, at 9 in the morning, 1 in the afternoon, and 6 in the evening.</string>
+    <string name="scheduled_notifications_intro">Notifications pull you back to your phone all day. With this on, MBSI holds them when they come in and gives them back together at the times you pick. For example, at 9 in the morning, 1 in the afternoon, and 6 in the evening.</string>
     <string name="scheduled_notifications_delivery_times">DELIVERY TIMES</string>
     <string name="scheduled_notifications_add_time">Add a time</string>
     <string name="scheduled_notifications_pick_time">Pick a delivery time</string>
     <string name="scheduled_notifications_allowed_apps">APPS THAT CAN ALWAYS NOTIFY</string>
-    <string name="scheduled_notifications_note">Calls, alarms, and ongoing notifications like music or maps always come through. A notification may make a short sound before Curbox holds it. If you turn this off, notifications that are already held still come back at the next delivery time.</string>
+    <string name="scheduled_notifications_note">Calls, alarms, and ongoing notifications like music or maps always come through. A notification may make a short sound before MBSI holds it. If you turn this off, notifications that are already held still come back at the next delivery time.</string>
     <string name="scheduled_notifications_access_title">Allow notification access</string>
-    <string name="scheduled_notifications_access_message">Curbox needs notification access to hold your notifications until the times you pick. Curbox does not read, save, or send them anywhere.</string>
+    <string name="scheduled_notifications_access_message">MBSI needs notification access to hold your notifications until the times you pick. MBSI does not read, save, or send them anywhere.</string>
     <string name="scheduled_notifications_access_missing">Notification access is off, so nothing is being held.</string>
     <string name="scheduled_notifications_allow_access">Allow access</string>
     <string name="scheduled_notifications_ping_title">Your notifications are here</string>
@@ -1304,17 +1304,17 @@
     <string name="protection_last_sync">Last sync with your admin: %1$s</string>
     <string name="protection_last_sync_never">Not synced with your admin yet</string>
     <string name="protection_state_full_title">Fully managed</string>
-    <string name="protection_state_full_body">Android confirms that Curbox manages this phone. Your admin\'s blocks are working, and Curbox cannot be uninstalled until your admin releases the phone.</string>
+    <string name="protection_state_full_body">Android confirms that MBSI manages this phone. Your admin\'s blocks are working, and MBSI cannot be uninstalled until your admin releases the phone.</string>
     <string name="protection_state_standard_title">Standard protection</string>
-    <string name="protection_state_standard_body">Your admin\'s blocks are working. On a normal phone the owner can still turn Curbox off in Android settings. If that happens, your admin sees the phone go offline.</string>
+    <string name="protection_state_standard_body">Your admin\'s blocks are working. On a normal phone the owner can still turn MBSI off in Android settings. If that happens, your admin sees the phone go offline.</string>
     <string name="protection_state_partial_title">Partly set up</string>
     <string name="protection_state_partial_body">Some blocks may not work yet. Tap an item marked Needed to fix it.</string>
     <string name="protection_state_off_title">Protection is off</string>
-    <string name="protection_state_off_body">Blocks do not work because the Curbox service is off. Tap Curbox service below to turn it on.</string>
+    <string name="protection_state_off_body">Blocks do not work because the MBSI service is off. Tap MBSI service below to turn it on.</string>
     <string name="protection_state_offline_title">Offline</string>
     <string name="protection_state_offline_body">Your admin\'s server cannot be reached. Your last rules keep working. New changes arrive when this phone is online again.</string>
-    <string name="protection_section_permissions">What Curbox needs</string>
-    <string name="protection_section_permissions_hint">Tap an item to see why Curbox needs it.</string>
+    <string name="protection_section_permissions">What MBSI needs</string>
+    <string name="protection_section_permissions_hint">Tap an item to see why MBSI needs it.</string>
     <string name="protection_section_mode">Protection mode</string>
     <string name="protection_section_release">Leave management</string>
     <string name="protection_pill_ready">Ready</string>
@@ -1323,42 +1323,42 @@
     <string name="protection_pill_checking">Checking</string>
     <string name="protection_open_settings">Open settings</string>
     <string name="protection_close">Close</string>
-    <string name="protection_item_service">Curbox service</string>
+    <string name="protection_item_service">MBSI service</string>
     <string name="protection_item_service_short">Sees which app is open so it can block it</string>
-    <string name="protection_item_service_long">Curbox uses Android Accessibility to see which app or website is on the screen. When it is blocked, Curbox sends you back to the home screen. Curbox does not read your passwords or what you type.</string>
+    <string name="protection_item_service_long">MBSI uses Android Accessibility to see which app or website is on the screen. When it is blocked, MBSI sends you back to the home screen. MBSI does not read your passwords or what you type.</string>
     <string name="protection_item_overlay">Block messages</string>
     <string name="protection_item_overlay_short">Shows a message on top of a blocked app</string>
-    <string name="protection_item_overlay_long">This lets Curbox show a short message on top of other apps, for example when a blocked app opens.</string>
+    <string name="protection_item_overlay_long">This lets MBSI show a short message on top of other apps, for example when a blocked app opens.</string>
     <string name="protection_item_usage">Screen time</string>
     <string name="protection_item_usage_short">Counts how long you use each app</string>
-    <string name="protection_item_usage_long">Curbox counts your screen time itself through the Curbox service, so it does not need Android Usage Access. It works when the Curbox service is on.</string>
+    <string name="protection_item_usage_long">MBSI counts your screen time itself through the MBSI service, so it does not need Android Usage Access. It works when the MBSI service is on.</string>
     <string name="protection_item_sites">Website blocking</string>
     <string name="protection_item_sites_short">Works in supported browsers, no VPN</string>
-    <string name="protection_item_sites_long">Curbox reads the address bar of supported browsers through the Curbox service. It does not use a VPN, so your internet traffic never goes through Curbox.</string>
+    <string name="protection_item_sites_long">MBSI reads the address bar of supported browsers through the MBSI service. It does not use a VPN, so your internet traffic never goes through MBSI.</string>
     <string name="protection_item_apps">App list</string>
     <string name="protection_item_apps_short">Shows your admin which apps are installed</string>
-    <string name="protection_item_apps_long">Curbox sends your admin the names of the apps you can open, so they can choose what to block. It does not send what you do inside apps.</string>
+    <string name="protection_item_apps_long">MBSI sends your admin the names of the apps you can open, so they can choose what to block. It does not send what you do inside apps.</string>
     <string name="protection_item_notifications">Notifications</string>
-    <string name="protection_item_notifications_short">Shows that Curbox is running</string>
-    <string name="protection_item_notifications_long">Curbox shows a small notification while it runs and uses notifications for warnings. You can turn this off, but you may miss messages.</string>
+    <string name="protection_item_notifications_short">Shows that MBSI is running</string>
+    <string name="protection_item_notifications_long">MBSI shows a small notification while it runs and uses notifications for warnings. You can turn this off, but you may miss messages.</string>
     <string name="protection_item_battery">Background running</string>
-    <string name="protection_item_battery_short">Helps Curbox keep running and syncing</string>
-    <string name="protection_item_battery_long">Turning off battery saving for Curbox helps it keep running and syncing. Some phones may still stop apps now and then.</string>
+    <string name="protection_item_battery_short">Helps MBSI keep running and syncing</string>
+    <string name="protection_item_battery_long">Turning off battery saving for MBSI helps it keep running and syncing. Some phones may still stop apps now and then.</string>
     <string name="protection_item_admin">Admin computer</string>
     <string name="protection_item_admin_connected">Connected to %1$s</string>
     <string name="protection_item_admin_offline">Cannot reach %1$s</string>
     <string name="protection_item_admin_checking">Checking %1$s</string>
     <string name="protection_item_admin_long">Your admin\'s server sends the rules over the internet. Without internet, your last rules keep working.</string>
     <string name="protection_mode_standard_title">Standard mode</string>
-    <string name="protection_mode_standard_body">This is a normal phone. Curbox follows your admin\'s rules, but Android still lets the owner turn Curbox off or uninstall it.</string>
+    <string name="protection_mode_standard_body">This is a normal phone. MBSI follows your admin\'s rules, but Android still lets the owner turn MBSI off or uninstall it.</string>
     <string name="protection_mode_full_title">Fully managed mode</string>
-    <string name="protection_mode_full_body">Android confirms that Curbox is the device owner. Curbox cannot be uninstalled until your admin releases this phone.</string>
+    <string name="protection_mode_full_body">Android confirms that MBSI is the device owner. MBSI cannot be uninstalled until your admin releases this phone.</string>
     <string name="protection_mode_help">How fully managed mode works</string>
-    <string name="protection_mode_help_body">Fully managed mode is for school or family phones. It can only be set up on a phone that was just reset, before any account is added. An adult or IT person connects the phone to a computer and runs this command:\n\n%1$s\n\nCurbox never turns this on by itself.</string>
+    <string name="protection_mode_help_body">Fully managed mode is for school or family phones. It can only be set up on a phone that was just reset, before any account is added. An adult or IT person connects the phone to a computer and runs this command:\n\n%1$s\n\nMBSI never turns this on by itself.</string>
     <string name="protection_release_body">This phone is managed by an administrator. To stop that, you need the six digit code from your admin.</string>
     <string name="protection_release_button">Request device release</string>
     <string name="protection_release_title">Release this phone</string>
-    <string name="protection_release_dialog_body">Type the six digit code from your admin. Your admin\'s computer checks it. Curbox never saves the code on this phone.</string>
+    <string name="protection_release_dialog_body">Type the six digit code from your admin. Your admin\'s computer checks it. MBSI never saves the code on this phone.</string>
     <string name="protection_release_hint">Six digit code</string>
     <string name="protection_release_confirm">Release</string>
     <string name="protection_release_need_six">Type all six digits.</string>
@@ -1369,7 +1369,7 @@
     <string name="protection_release_failed">Could not release this phone. Try again.</string>
     <string name="protection_release_done_title">This phone is released</string>
     <string name="protection_release_done_body">Your admin no longer manages this phone. The app and website blocks from your admin are lifted.</string>
-    <string name="protection_release_done_owner">Curbox is no longer the device owner, so you can uninstall it like any other app.</string>
+    <string name="protection_release_done_owner">MBSI is no longer the device owner, so you can uninstall it like any other app.</string>
     <!-- Admin block screen, daily limit warnings -->
     <string name="admin_block_app_title">App restricted</string>
     <string name="admin_block_site_title">Website restricted</string>
@@ -1384,6 +1384,7 @@
     <string name="admin_block_scold_title">Stop!</string>
     <string name="admin_message_title">Message from your admin</string>
     <string name="admin_focus_title">Focus time</string>
+    <string name="protection_demo_notice">Demo on the emulator: permissions are only shown as granted, Android is not asked.</string>
     <string name="admin_focus_message">Your admin turned on focus time. Only calls and the clock work until it ends.</string>
     <string name="admin_focus_detail">Ends at %1$s</string>
     <string name="protection_item_notif_access">Hide blocked notifications</string>
@@ -1410,10 +1411,10 @@
     <string name="admin_link_pending">Signed in. Your admin needs to approve this phone first.</string>
     <string name="protection_section_uninstall">Uninstall protection</string>
     <string name="protection_uninstall_button">Protect with my admin\'s code</string>
-    <string name="protection_uninstall_explain">Curbox asks Android to stop anyone from removing it without your admin\'s six digit code.</string>
-    <string name="protection_uninstall_on">On. Removing Curbox needs your admin\'s six digit code. Your admin can also release this phone.</string>
-    <string name="protection_uninstall_own">On, with your own Curbox setting.</string>
-    <string name="protection_uninstall_off">Off. Turn it on so Curbox can only be removed with your admin\'s code.</string>
+    <string name="protection_uninstall_explain">MBSI asks Android to stop anyone from removing it without your admin\'s six digit code.</string>
+    <string name="protection_uninstall_on">On. Removing MBSI needs your admin\'s six digit code. Your admin can also release this phone.</string>
+    <string name="protection_uninstall_own">On, with your own MBSI setting.</string>
+    <string name="protection_uninstall_off">Off. Turn it on so MBSI can only be removed with your admin\'s code.</string>
     <string name="protection_uninstall_no_code">Your admin has not set a six digit code yet, so this cannot be turned on.</string>
     <string name="user_rules_every_day">Every day</string>
     <string name="user_rules_day_range">%1$s to %2$s</string>
@@ -1439,19 +1440,19 @@
     <string name="connection_offline_never">Not synced yet. Your last rules still apply.</string>
     <string name="user_profile_privacy">What your admin can see</string>
     <string name="user_profile_privacy_short">App list and blocks only</string>
-    <string name="user_profile_privacy_body">Your admin can see:\n\n• the names of the apps you can open\n• how long you use each app each day\n• the blocks, limits and schedules they set\n• whether Curbox\'s protection is on\n\nYour admin cannot see your messages, photos, passwords, or what you type or watch inside apps.</string>
+    <string name="user_profile_privacy_body">Your admin can see:\n\n• the names of the apps you can open\n• how long you use each app each day\n• the blocks, limits and schedules they set\n• whether MBSI\'s protection is on\n\nYour admin cannot see your messages, photos, passwords, or what you type or watch inside apps.</string>
     <string name="user_profile_sign_out">Sign out</string>
     <string name="user_profile_sign_out_short">Only on this phone</string>
     <string name="user_profile_sign_out_body">You leave the user screens on this phone. The link with your admin and all blocks stay. Only your admin can remove this phone.</string>
-    <string name="user_profile_sign_out_protection">Uninstall protection is on. It stops Curbox from being removed, and only your admin can turn it off.</string>
-    <string name="intro_welcome_title">Welcome to Curbox</string>
-    <string name="intro_welcome_body">Curbox helps you use your phone in a healthy way. Your admin sets the rules, and you can always see them.</string>
+    <string name="user_profile_sign_out_protection">Uninstall protection is on. It stops MBSI from being removed, and only your admin can turn it off.</string>
+    <string name="intro_welcome_title">Welcome to MBSI</string>
+    <string name="intro_welcome_body">MBSI helps you use your phone in a healthy way. Your admin sets the rules, and you can always see them.</string>
     <string name="intro_time_title">See your daily screen time</string>
-    <string name="intro_time_body">Curbox counts how long you use each app, so you can see your day at a glance.</string>
+    <string name="intro_time_body">MBSI counts how long you use each app, so you can see your day at a glance.</string>
     <string name="intro_rules_title">See your admin\'s rules</string>
     <string name="intro_rules_body">Blocked apps, websites, schedules and your daily limit are all on the Restrictions tab. Nothing is hidden.</string>
-    <string name="intro_permission_title">Connect with permission</string>
-    <string name="intro_permission_body">Next, Curbox explains each Android permission before it asks. You turn on each one yourself.</string>
+    <string name="intro_permission_title">Almost ready</string>
+    <string name="intro_permission_body">Next, MBSI explains each permission it needs before Android asks. You turn each one on yourself. It takes about a minute.</string>
     <string name="intro_next">Next</string>
     <string name="intro_start">Get started</string>
     <string name="intro_skip">Skip</string>
@@ -1462,13 +1463,13 @@
     <string name="protection_setup_missing_body">These are still needed: %1$s. Until they are on, your admin\'s blocks may not work. You can turn them on later in Profile, Protection.</string>
     <string name="protection_setup_fix">Turn them on</string>
     <string name="protection_setup_continue_anyway">Continue anyway</string>
-    <string name="uninstall_code_title">Remove Curbox</string>
-    <string name="uninstall_code_message">This phone is managed by your admin. To remove or turn off Curbox, type the six digit code from your admin.</string>
+    <string name="uninstall_code_title">Remove MBSI</string>
+    <string name="uninstall_code_message">This phone is managed by your admin. To remove or turn off MBSI, type the six digit code from your admin.</string>
     <string name="uninstall_code_button">Unlock removal</string>
-    <string name="uninstall_code_done">Done. Tap Uninstall to remove Curbox.</string>
+    <string name="uninstall_code_done">Done. Tap Uninstall to remove MBSI.</string>
     <string name="protection_grant_all">Give permission to manage</string>
     <string name="protection_grant_all_title">Permission to manage this phone</string>
-    <string name="protection_grant_all_body">So your admin can manage this phone, Curbox needs:\n\n• notifications\n• the Curbox service (Accessibility)\n• showing block messages\n• running in the background\n• uninstall protection with your admin\'s code\n\nAndroid asks for each one on its own screen. Curbox opens them one after another. Turn each one on, then come back.</string>
+    <string name="protection_grant_all_body">So your admin can manage this phone, MBSI needs:\n\n• notifications\n• the MBSI service (Accessibility)\n• showing block messages\n• running in the background\n• uninstall protection with your admin\'s code\n\nAndroid asks for each one on its own screen. MBSI opens them one after another. Turn each one on, then come back.</string>
     <string name="protection_grant_all_yes">Allow</string>
     <string name="protection_grant_all_done">Everything is on. Your admin can manage this phone.</string>
     <string name="protection_grant_all_partly">Some permissions are still off. Tap Give permission to manage to try again.</string>
