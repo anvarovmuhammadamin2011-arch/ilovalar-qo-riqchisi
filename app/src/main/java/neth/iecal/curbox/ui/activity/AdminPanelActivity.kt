@@ -68,8 +68,7 @@ class AdminPanelActivity : AppCompatActivity() {
             }
         })
 
-        val savedUrl = savedUrl()
-        if (savedUrl.isEmpty()) askForAddress(showError = false) else binding.webView.loadUrl(savedUrl)
+        binding.webView.loadUrl(savedUrl().ifEmpty { AdminLinkClient.DEFAULT_SERVER_URL })
     }
 
     private fun savedUrl(): String =

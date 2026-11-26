@@ -49,7 +49,7 @@
   .pw { position: relative; }
   .pw button { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: none; color: var(--muted); padding: 6px; }
   #login button.primary { width: 100%; justify-content: center; margin-top: 16px; padding: 13px; }
-  #userModeBtn, #userLinkBtn, #userBackBtn { width: 100%; justify-content: center; margin-top: 10px; padding: 11px; }
+  #userModeBtn, #userLinkBtn, #userOtherBtn, #userBackBtn { width: 100%; justify-content: center; margin-top: 10px; padding: 11px; }
 
   /* Shell */
   #app { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
@@ -263,14 +263,17 @@
       <h1>Link this computer</h1>
       <div class="muted">Sign in with the login your admin gave you. Then the admin can block programs and websites on this computer.</div>
     </div>
-    <label class="field" for="userAddress">Admin address</label>
-    <input id="userAddress" placeholder="192.168.1.5:8787" autocomplete="off">
+    <div id="userAddressBox" class="hidden">
+      <label class="field" for="userAddress">Server address</label>
+      <input id="userAddress" placeholder="192.168.1.5:8787" autocomplete="off">
+    </div>
     <label class="field" for="userLogin">Login</label>
     <input id="userLogin" autocomplete="username">
     <label class="field" for="userPass">Password</label>
     <input id="userPass" type="password" autocomplete="current-password">
     <div id="userError" class="error"></div>
     <button class="primary" id="userLinkBtn">Link this computer</button>
+    <button class="ghost" id="userOtherBtn" type="button">Use another server address</button>
     <button class="ghost" id="userBackBtn" type="button">Back to admin sign in</button>
   </div>
 </section>
@@ -539,7 +542,10 @@ const UZ = {
   "Closing the window keeps Curbox for PC running in the tray, so devices stay managed. Use Quit in the tray menu to stop it.": "Oynani yopsangiz ham Curbox for PC trayda ishlayveradi, qurilmalar boshqaruvda qoladi. To‘xtatish uchun tray menyusidagi Quit ni bosing.",
   "People who sign in on phones and computers.": "Telefon va kompyuterlarga kiradigan odamlar.", "Add a user": "Foydalanuvchi qo‘shish",
   "They use this login on their device.": "Ular shu loginni o‘z qurilmasida ishlatadi.", "Like anvarov": "Masalan anvarov", "Login": "Login", "Password": "Parol",
-  "Add user": "Qo‘shish", "No users yet. Add one on the right.": "Hali foydalanuvchi yo‘q. O‘ngda qo‘shing.", "1 device": "1 ta qurilma", "New password": "Yangi parol",
+  "Add user": "Qo‘shish",
+  "Moving from another computer? Download a backup there (Settings), then import its users here. Everyone keeps their password.": "Boshqa kompyuterdan koʻchyapsizmi? U yerda zaxira nusxani yuklab oling (Sozlamalar), keyin foydalanuvchilarini shu yerga import qiling. Hamma oʻz parolini saqlab qoladi.",
+  "Import users from a backup": "Zaxiradan foydalanuvchilarni import qilish",
+  "Users added:": "Qoʻshilgan foydalanuvchilar:", "No new users in this file.": "Bu faylda yangi foydalanuvchi yoʻq.", "No users yet. Add one on the right.": "Hali foydalanuvchi yo‘q. O‘ngda qo‘shing.", "1 device": "1 ta qurilma", "New password": "Yangi parol",
   "User added.": "Foydalanuvchi qo‘shildi.", "Use 3 to 32 letters, numbers, dots or underscores.": "3 dan 32 gacha harf, raqam, nuqta yoki pastki chiziq ishlating.",
   "Use at least 4 characters for the password.": "Parol uchun kamida 4 ta belgi ishlating.", "This login is already taken.": "Bu login band.",
   "Could not add the user.": "Foydalanuvchini qo‘shib bo‘lmadi.", "Use at least 4 characters. Their devices ask for it at the next sign in.": "Kamida 4 ta belgi ishlating. Qurilmalari keyingi kirishda uni so‘raydi.",
@@ -564,7 +570,9 @@ const UZ = {
   "I am a user: link this computer": "Men foydalanuvchiman: bu kompyuterni ulash",
   "Link this computer": "Bu kompyuterni ulash",
   "Sign in with the login your admin gave you. Then the admin can block programs and websites on this computer.": "Admin bergan login bilan kiring. Shunda admin bu kompyuterdagi dasturlar va saytlarni bloklay oladi.",
-  "Admin address": "Admin manzili",
+  "Server address": "Server manzili", "Use another server address": "Boshqa server manzilini yozish",
+  "Check the server address.": "Server manzilini tekshiring.",
+  "Could not reach the server. Check that the internet is on and try again.": "Serverga ulanib boʻlmadi. Internet yoqilganini tekshirib, qayta urinib koʻring.",
   "Back to admin sign in": "Admin kirishiga qaytish",
   "Type the admin address, for example 192.168.1.5:8787.": "Admin manzilini yozing, masalan 192.168.1.5:8787.",
   "Type your login and password.": "Login va parolni yozing.",
@@ -863,8 +871,13 @@ $("loginBtn").onclick = doLogin;
 function showUserCard(show) {
   $("login").querySelector(".card").classList.toggle("hidden", show);
   $("userCard").classList.toggle("hidden", !show);
-  (show ? $("userAddress") : $("loginUser")).focus();
+  (show ? $("userLogin") : $("loginUser")).focus();
 }
+$("userOtherBtn").onclick = () => {
+  $("userAddressBox").classList.remove("hidden");
+  $("userOtherBtn").classList.add("hidden");
+  $("userAddress").focus();
+};
 $("userModeBtn").onclick = () => showUserCard(true);
 $("userBackBtn").onclick = () => showUserCard(false);
 async function doUserLink() {
@@ -878,9 +891,9 @@ async function doUserLink() {
     return;
   }
   const messages = {
-    bad_address: "Type the admin address, for example 192.168.1.5:8787.",
+    bad_address: "Check the server address.",
     missing: "Type your login and password.",
-    unreachable: "Cannot reach the admin. Check the address and that both computers use the same network.",
+    unreachable: "Could not reach the server. Check that the internet is on and try again.",
     wrong_login: "Wrong login or password.",
     locked: "Too many wrong tries. Wait a few minutes and try again.",
     has_devices: "This computer is the admin and already manages devices, so it cannot become a user.",
@@ -3398,6 +3411,14 @@ function mountUsers(content) {
     el("label", "field", "Password"), pass,
     err, button("Add user", "primary", "plus", addUser)
   );
+  // Moving to a new server: bring the logins from a backup of the old one.
+  const file = el("input");
+  file.type = "file";
+  file.accept = "application/json,.json";
+  file.className = "hidden";
+  file.onchange = () => importUsers(file);
+  add.append(el("p", "small muted", "Moving from another computer? Download a backup there (Settings), then import its users here. Everyone keeps their password."),
+    button("Import users from a backup", "ghost", "users", () => file.click()), file);
   grid.append(list, add);
   content.appendChild(grid);
 }
@@ -3418,6 +3439,21 @@ function updateUsers() {
     row.append(badge, info, button("New password", "ghost", "key", () => newPassword(u)), del);
     body.appendChild(row);
   }
+}
+
+async function importUsers(input) {
+  const f = input.files && input.files[0];
+  input.value = "";
+  if (!f) return;
+  let data;
+  try { data = JSON.parse(await f.text()); } catch (e) { toast(tr("This file is not a Curbox backup.")); return; }
+  if (!data || !Array.isArray(data.users)) { toast(tr("This file is not a Curbox backup.")); return; }
+  const { status, data: res } = await api("/api/admin/users/import", { users: data.users });
+  if (status !== 200) { toast(tr("This file is not a Curbox backup.")); return; }
+  const added = (res.added || []).length;
+  toast(added ? tr("Users added:") + " " + res.added.join(", ") : tr("No new users in this file."));
+  await refresh();
+  update();
 }
 
 async function addUser() {

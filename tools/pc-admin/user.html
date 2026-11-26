@@ -85,13 +85,16 @@
     <div id="notInstalled" class="note err hidden">Open the installed Curbox for PC to protect this computer.</div>
     <div class="card">
       <h2>Sign in as a user</h2>
-      <div class="muted">Ask your admin for your login and password. Both computers must use the same WiFi.</div>
-      <label for="address">Admin computer address</label>
-      <input id="address" placeholder="Like 192.168.1.94:8787" autocomplete="off">
+      <div class="muted">Ask your admin for your login and password. It works on any WiFi or internet.</div>
+      <div id="addressBox" class="hidden">
+        <label for="address">Server address</label>
+        <input id="address" placeholder="Like 192.168.1.94:8787" autocomplete="off">
+      </div>
       <label for="username">Login</label>
       <input id="username" autocomplete="username">
       <label for="password">Password</label>
       <input id="password" type="password" autocomplete="current-password">
+      <button class="link" id="otherServerBtn" type="button">Use another server address</button>
     </div>
     <div class="card">
       <h2>If you continue</h2>
@@ -198,7 +201,10 @@ const UZ = {
   "Your digital balance": "Raqamli muvozanatingiz", "Who uses this computer?": "Bu kompyuterdan kim foydalanadi?",
   "This computer manages phones and computers.": "Bu kompyuter telefon va kompyuterlarni boshqaradi.",
   "An admin manages this computer.": "Bu kompyuterni admin boshqaradi.", "Sign in as a user": "Foydalanuvchi sifatida kirish",
-  "Ask your admin for your login and password. Both computers must use the same WiFi.": "Login va parolni admindan so‘rang. Ikkala kompyuter bir xil WiFi da bo‘lishi kerak.",
+  "Ask your admin for your login and password. It works on any WiFi or internet.": "Login va parolni admindan so‘rang. Istalgan WiFi yoki internetda ishlaydi.",
+  "Server address": "Server manzili", "Use another server address": "Boshqa server manzilini yozish",
+  "Check the server address.": "Server manzilini tekshiring.",
+  "Could not reach the server. Check that the internet is on and try again.": "Serverga ulanib bo‘lmadi. Internet yoqilganini tekshirib, qayta urinib ko‘ring.",
   "Admin computer address": "Admin kompyuter manzili", "Login": "Login", "Password": "Parol", "If you continue": "Davom etsangiz",
   "Your admin can see the programs installed on this computer.": "Admin bu kompyuterga o‘rnatilgan dasturlarni ko‘ra oladi.",
   "Your admin can block programs and websites here.": "Admin bu yerda dastur va saytlarni bloklay oladi.",
@@ -311,6 +317,9 @@ async function refresh() {
     case "install":
       if (current !== "signin") {
         $("address").value = $("address").value || state.address || "";
+        // The internet server is used unless another address was typed before.
+        $("addressBox").classList.toggle("hidden", !$("address").value);
+        $("otherServerBtn").classList.toggle("hidden", !!$("address").value);
         $("setupNote").textContent = state.note || "";
         $("setupNote").classList.toggle("hidden", !state.note);
         $("notInstalled").classList.toggle("hidden", !!state.installed);
@@ -374,11 +383,11 @@ async function signIn() {
     }
   } else {
     const messages = {
-      bad_address: "Type the admin computer address, like 192.168.1.94:8787.",
+      bad_address: "Check the server address.",
       missing: "Type your login and password.",
       wrong_login: "Wrong login or password.",
       locked: "Too many wrong tries. Wait 5 minutes and try again.",
-      unreachable: "Could not reach the admin computer. Check the address and make sure both use the same WiFi."
+      unreachable: "Could not reach the server. Check that the internet is on and try again."
     };
     $("signinError").textContent = messages[data.error] || "Something went wrong. Try again.";
   }
@@ -387,6 +396,11 @@ async function signIn() {
   refresh();
 }
 $("signinBtn").onclick = signIn;
+$("otherServerBtn").onclick = () => {
+  $("addressBox").classList.remove("hidden");
+  $("otherServerBtn").classList.add("hidden");
+  $("address").focus();
+};
 $("password").onkeydown = (e) => { if (e.key === "Enter") signIn(); };
 $("retryBtn").onclick = async () => { await call("/local/install", {}); refresh(); };
 

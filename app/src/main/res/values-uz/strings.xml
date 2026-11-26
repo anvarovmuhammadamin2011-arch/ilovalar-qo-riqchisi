@@ -115,14 +115,15 @@
     <string name="role_user_desc">Bu telefondan admin bilan foydalanish uchun kiring</string>
     <string name="role_user_linked">%1$s sifatida kirilgan</string>
     <string name="admin_link_title">Foydalanuvchi sifatida kirish</string>
-    <string name="admin_link_desc">Login va parolni admindan soʻrang. Telefon va kompyuter bir xil WiFi da boʻlishi kerak.</string>
+    <string name="admin_link_desc">Login va parolni admindan soʻrang. Istalgan WiFi yoki mobil internetda ishlaydi.</string>
+    <string name="admin_link_other_server">Boshqa server manzilini yozish</string>
     <string name="admin_link_welcome_back">Xush kelibsiz, %1$s</string>
     <string name="admin_link_desc_again">Davom etish uchun parolingizni yozing.</string>
     <string name="admin_link_remember">Loginni eslab qolish</string>
     <string name="admin_link_checking">Kompyuter qidirilmoqda</string>
-    <string name="admin_link_found">Kompyuter topildi</string>
-    <string name="admin_link_not_found">Kompyuter topilmadi</string>
-    <string name="admin_link_not_found_help">Manzilni tekshiring va ikkalasi bir xil WiFi da ekanini aniqlang.</string>
+    <string name="admin_link_found">Server topildi</string>
+    <string name="admin_link_not_found">Server topilmadi</string>
+    <string name="admin_link_not_found_help">Manzilni va internet yoqilganini tekshiring.</string>
     <string name="admin_link_signing_in">Kirilmoqda</string>
     <string name="admin_link_need_username">Loginingizni yozing</string>
     <string name="admin_link_need_password">Parolingizni yozing</string>
@@ -142,7 +143,7 @@
     <string name="admin_link_consent_yes">Ha, ruxsat beraman</string>
     <string name="admin_link_consent_no">Yoʻq</string>
     <string name="admin_link_bad_address">Kompyuter manzilini yozing, masalan 192.168.1.5:8787</string>
-    <string name="admin_link_unreachable">Kompyuterga ulanib boʻlmadi. Manzilni tekshiring va ikkalasi bir xil WiFi da ekanini aniqlang.</string>
+    <string name="admin_link_unreachable">Serverga ulanib boʻlmadi. Internet yoqilganini tekshirib, qayta urinib koʻring.</string>
     <string name="admin_link_connected">Adminga ulandi</string>
     <string name="admin_panel_address_title">Admin kompyuter manzili</string>
     <string name="admin_panel_address_message">Kompyuterda Curbox for PC ni oching. U koʻrsatgan manzilni yozing.</string>
@@ -164,7 +165,7 @@
     <string name="protection_state_off_title">Himoya oʻchiq</string>
     <string name="protection_state_off_body">Curbox xizmati oʻchiq, shuning uchun bloklar ishlamaydi. Uni yoqish uchun pastdagi Curbox xizmati bandini bosing.</string>
     <string name="protection_state_offline_title">Oflayn</string>
-    <string name="protection_state_offline_body">Admin kompyuteriga ulanib boʻlmayapti. Oxirgi qoidalaringiz ishlayveradi. Telefon yana bir xil WiFi ga ulanganda yangi oʻzgarishlar keladi.</string>
+    <string name="protection_state_offline_body">Admin serveriga ulanib boʻlmayapti. Oxirgi qoidalaringiz ishlayveradi. Telefon internetga ulanganda yangi oʻzgarishlar keladi.</string>
     <string name="protection_section_permissions">Curbox ga nima kerak</string>
     <string name="protection_section_permissions_hint">Curbox ga nega kerakligini koʻrish uchun bandni bosing.</string>
     <string name="protection_section_mode">Himoya rejimi</string>
@@ -200,7 +201,7 @@
     <string name="protection_item_admin_connected">%1$s ga ulangan</string>
     <string name="protection_item_admin_offline">%1$s ga ulanib boʻlmayapti</string>
     <string name="protection_item_admin_checking">%1$s tekshirilmoqda</string>
-    <string name="protection_item_admin_long">Qoidalarni admin kompyuteri yuboradi. Bu telefon bir xil WiFi da boʻlishi kerak. Kompyuter oʻchiq boʻlsa, oxirgi qoidalaringiz ishlayveradi.</string>
+    <string name="protection_item_admin_long">Qoidalarni admin serveri internet orqali yuboradi. Internet boʻlmasa, oxirgi qoidalaringiz ishlayveradi.</string>
     <string name="protection_mode_standard_title">Oddiy rejim</string>
     <string name="protection_mode_standard_body">Bu oddiy telefon. Curbox admin qoidalariga amal qiladi, lekin Android egasiga Curbox ni oʻchirish yoki olib tashlashga baribir ruxsat beradi.</string>
     <string name="protection_mode_full_title">Toʻliq boshqaruv rejimi</string>
@@ -217,7 +218,7 @@
     <string name="protection_release_wrong">Kod notoʻgʻri. Qolgan urinishlar: %1$d.</string>
     <string name="protection_release_locked">Juda koʻp notoʻgʻri urinish. %1$d daqiqa kutib qayta urinib koʻring.</string>
     <string name="protection_release_no_code">Admin hali boʻshatish kodini oʻrnatmagan. Undan bu telefonni admin panelda olib tashlashni soʻrang.</string>
-    <string name="protection_release_pending">Admin kompyuteri kutilmoqda. Hali hech narsa oʻzgarmadi. Admin bilan bir xil WiFi ga ulanib qayta urinib koʻring.</string>
+    <string name="protection_release_pending">Admin serveri kutilmoqda. Hali hech narsa oʻzgarmadi. Internet yoqilganini tekshirib, qayta urinib koʻring.</string>
     <string name="protection_release_failed">Telefonni boʻshatib boʻlmadi. Qayta urinib koʻring.</string>
     <string name="protection_release_done_title">Bu telefon boʻshatildi</string>
     <string name="protection_release_done_body">Admin endi bu telefonni boshqarmaydi. Admin qoʻygan ilova va sayt bloklari olib tashlandi.</string>

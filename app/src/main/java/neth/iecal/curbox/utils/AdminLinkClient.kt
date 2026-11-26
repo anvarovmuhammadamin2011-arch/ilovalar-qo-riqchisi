@@ -17,6 +17,9 @@ import java.util.Locale
 object AdminLinkClient {
 
     const val DEFAULT_PORT = 8787
+
+    /** The MBSI server on the internet. Phones use it unless someone types another address. */
+    const val DEFAULT_SERVER_URL = "https://mbsi-server.onrender.com"
     private const val TIMEOUT_MS = 6000
 
     data class Response(val code: Int, val body: String)

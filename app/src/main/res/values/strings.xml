@@ -121,14 +121,15 @@
     <string name="role_user_desc">Sign in to use this phone with your admin</string>
     <string name="role_user_linked">Signed in as %1$s</string>
     <string name="admin_link_title">Sign in as a user</string>
-    <string name="admin_link_desc">Ask your admin for your login and password. The phone and the computer must use the same WiFi.</string>
+    <string name="admin_link_desc">Ask your admin for your login and password. It works on any WiFi or mobile internet.</string>
+    <string name="admin_link_other_server">Use another server address</string>
     <string name="admin_link_welcome_back">Welcome back, %1$s</string>
     <string name="admin_link_desc_again">Type your password to continue.</string>
     <string name="admin_link_remember">Remember username</string>
     <string name="admin_link_checking">Looking for the computer</string>
-    <string name="admin_link_found">Computer found</string>
-    <string name="admin_link_not_found">Computer not found</string>
-    <string name="admin_link_not_found_help">Check the address and make sure both use the same WiFi.</string>
+    <string name="admin_link_found">Server found</string>
+    <string name="admin_link_not_found">Server not found</string>
+    <string name="admin_link_not_found_help">Check the address and that the internet is on.</string>
     <string name="admin_link_signing_in">Signing in</string>
     <string name="admin_link_need_username">Type your login</string>
     <string name="admin_link_need_password">Type your password</string>
@@ -148,7 +149,7 @@
     <string name="admin_link_consent_yes">Yes, allow</string>
     <string name="admin_link_consent_no">No</string>
     <string name="admin_link_bad_address">Type the computer address, like 192.168.1.5:8787</string>
-    <string name="admin_link_unreachable">Could not reach the computer. Check the address and make sure both use the same WiFi.</string>
+    <string name="admin_link_unreachable">Could not reach the server. Check that the internet is on and try again.</string>
     <string name="admin_link_connected">Connected to your admin</string>
     <string name="admin_panel_address_title">Admin computer address</string>
     <string name="admin_panel_address_message">Open Curbox for PC on the computer. Type the address it shows.</string>
@@ -1311,7 +1312,7 @@
     <string name="protection_state_off_title">Protection is off</string>
     <string name="protection_state_off_body">Blocks do not work because the Curbox service is off. Tap Curbox service below to turn it on.</string>
     <string name="protection_state_offline_title">Offline</string>
-    <string name="protection_state_offline_body">Your admin\'s computer cannot be reached. Your last rules keep working. New changes arrive when this phone is on the same WiFi again.</string>
+    <string name="protection_state_offline_body">Your admin\'s server cannot be reached. Your last rules keep working. New changes arrive when this phone is online again.</string>
     <string name="protection_section_permissions">What Curbox needs</string>
     <string name="protection_section_permissions_hint">Tap an item to see why Curbox needs it.</string>
     <string name="protection_section_mode">Protection mode</string>
@@ -1347,7 +1348,7 @@
     <string name="protection_item_admin_connected">Connected to %1$s</string>
     <string name="protection_item_admin_offline">Cannot reach %1$s</string>
     <string name="protection_item_admin_checking">Checking %1$s</string>
-    <string name="protection_item_admin_long">Your admin\'s computer sends the rules. This phone must be on the same WiFi. While the computer is off, your last rules keep working.</string>
+    <string name="protection_item_admin_long">Your admin\'s server sends the rules over the internet. Without internet, your last rules keep working.</string>
     <string name="protection_mode_standard_title">Standard mode</string>
     <string name="protection_mode_standard_body">This is a normal phone. Curbox follows your admin\'s rules, but Android still lets the owner turn Curbox off or uninstall it.</string>
     <string name="protection_mode_full_title">Fully managed mode</string>
@@ -1364,7 +1365,7 @@
     <string name="protection_release_wrong">That code is not right. Tries left: %1$d.</string>
     <string name="protection_release_locked">Too many wrong tries. Wait %1$d minutes and try again.</string>
     <string name="protection_release_no_code">Your admin has not set a release code yet. Ask them to remove this phone in the admin panel.</string>
-    <string name="protection_release_pending">Waiting for your admin\'s computer. Nothing has changed yet. Join the same WiFi as your admin and try again.</string>
+    <string name="protection_release_pending">Waiting for your admin\'s server. Nothing has changed yet. Check that the internet is on and try again.</string>
     <string name="protection_release_failed">Could not release this phone. Try again.</string>
     <string name="protection_release_done_title">This phone is released</string>
     <string name="protection_release_done_body">Your admin no longer manages this phone. The app and website blocks from your admin are lifted.</string>

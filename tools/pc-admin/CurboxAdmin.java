@@ -619,6 +619,9 @@ public class CurboxAdmin {
                     case "/api/admin/users/add":
                         if (requireAdmin(ex)) adminAddUser(ex);
                         return;
+                    case "/api/admin/users/import":
+                        if (requireAdmin(ex)) adminImportUsers(ex);
+                        return;
                     case "/api/admin/users/delete":
                         if (requireAdmin(ex)) adminDeleteUser(ex);
                         return;
@@ -1052,6 +1055,41 @@ public class CurboxAdmin {
         }
         logActivity(actor(), "user_add", username, "ok", null);
         sendJson(ex, 200, ok());
+    }
+
+    /**
+     * Copies user accounts from a backup of another Curbox for PC, for example the school
+     * computer moving to the internet server. Only the password hashes move, so everyone
+     * keeps their password and nobody ever sees it. Existing logins are left alone.
+     */
+    static void adminImportUsers(HttpExchange ex) throws IOException {
+        Map<String, Object> body = readJsonObject(ex);
+        if (!(body.get("users") instanceof List)) throw new IllegalArgumentException();
+        List<String> added = new ArrayList<>();
+        List<String> skipped = new ArrayList<>();
+        synchronized (LOCK) {
+            for (Map<String, Object> u : mapsOf(body.get("users"))) {
+                String username = normalizeUsername(str(u, "username"));
+                String hash = str(u, "passwordHash");
+                if (!isValidUsername(username) || !hash.startsWith("pbkdf2$") || hash.length() > 300
+                    || findIn(users, "username", username) != null || username.equals(adminUser)) {
+                    if (!username.isEmpty()) skipped.add(limit(username, 40));
+                    continue;
+                }
+                Map<String, Object> user = new LinkedHashMap<>();
+                user.put("username", username);
+                user.put("passwordHash", hash);
+                user.put("createdAt", System.currentTimeMillis());
+                users.add(user);
+                added.add(username);
+            }
+            if (!added.isEmpty()) save();
+        }
+        for (String username : added) logActivity(actor(), "user_add", username, "ok", null);
+        Map<String, Object> out = ok();
+        out.put("added", added);
+        out.put("skipped", skipped);
+        sendJson(ex, 200, out);
     }
 
     static void adminDeleteUser(HttpExchange ex) throws IOException {
@@ -3494,6 +3532,13 @@ final class PcUser {
     static final int AGENT_PORT = CurboxAdmin.envInt("CURBOX_AGENT_PORT", 8788);
     static final int SETUP_PORT = CurboxAdmin.envInt("CURBOX_SETUP_PORT", 8789);
     static final int DEFAULT_ADMIN_PORT = 8787;
+    /** The MBSI server on the internet, used when nobody types another address. */
+    static final String DEFAULT_SERVER_URL = defaultServerUrl();
+
+    static String defaultServerUrl() {
+        String url = System.getenv("CURBOX_DEFAULT_SERVER");
+        return url == null || url.trim().isEmpty() ? "https://mbsi-server.onrender.com" : url.trim();
+    }
     static final long SYNC_MS = 10_000L;
     static final long ENFORCE_MS = 2_000L;
     static final long PROGRAMS_MS = 10 * 60_000L;
@@ -3787,7 +3832,9 @@ final class PcUser {
                     out.put("note", setupNote);
                     out.put("installed", CurboxAdmin.PACKAGED);
                     out.put("computerName", computerName());
-                    out.put("address", lastAddress().replaceFirst("^http://", ""));
+                    String last = lastAddress();
+                    // The internet server needs no typing; only another address is shown.
+                    out.put("address", last.equals(normalizeServerUrl(DEFAULT_SERVER_URL)) ? "" : last.replaceFirst("^http://", ""));
                     out.put("agentUrl", localUrl(AGENT_PORT));
                     CurboxAdmin.sendJson(ex, 200, out);
                     return;
@@ -3879,7 +3926,7 @@ final class PcUser {
      * Returns "" on success, or the problem: bad_address, missing, unreachable, wrong_login, locked.
      */
     static String linkWithAdmin(String address, String usernameInput, String password) throws IOException {
-        String url = normalizeServerUrl(address);
+        String url = normalizeServerUrl(address == null || address.trim().isEmpty() ? DEFAULT_SERVER_URL : address);
         String username = CurboxAdmin.normalizeUsername(usernameInput);
         if (url.isEmpty()) return "bad_address";
         if (username.isEmpty() || password.isEmpty()) return "missing";

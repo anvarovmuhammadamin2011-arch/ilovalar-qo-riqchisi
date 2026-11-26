@@ -87,6 +87,7 @@ class AdminLinkActivity : AppCompatActivity(), FixedBrandColors {
         }
 
         binding.btnConnect.setOnClickListener { onSignInClicked() }
+        binding.btnOtherServer.setOnClickListener { showAddressField() }
         binding.inputPassword.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 onSignInClicked()
@@ -108,8 +109,14 @@ class AdminLinkActivity : AppCompatActivity(), FixedBrandColors {
             if (returningUser) {
                 showReturningUser()
             } else if (savedInstanceState == null) {
+                // Everyone uses the internet server; an address is typed only for another one.
                 val savedUrl = prefs.getString(AdminPanelActivity.PREF_ADMIN_URL, "").orEmpty()
-                binding.inputAddress.setText(savedUrl.removePrefix("http://"))
+                if (savedUrl.isNotEmpty() && savedUrl != AdminLinkClient.DEFAULT_SERVER_URL) {
+                    binding.inputAddress.setText(savedUrl.removePrefix("http://"))
+                    showAddressField()
+                } else {
+                    checkComputer(0L)
+                }
                 if (prefs.getBoolean(PREF_REMEMBER_USERNAME, false)) {
                     binding.checkRemember.isChecked = true
                     binding.inputUsername.setText(prefs.getString(PREF_REMEMBERED_USERNAME, "").orEmpty())
@@ -123,15 +130,24 @@ class AdminLinkActivity : AppCompatActivity(), FixedBrandColors {
         binding.tvTitle.text = getString(R.string.admin_link_welcome_back, current.username)
         binding.tvDesc.setText(R.string.admin_link_desc_again)
         binding.inputLayoutAddress.visibility = View.GONE
+        binding.btnOtherServer.visibility = View.GONE
         binding.inputLayoutUsername.visibility = View.GONE
         binding.checkRemember.visibility = View.GONE
         binding.inputPassword.requestFocus()
         checkComputer(0L)
     }
 
-    private fun serverUrl(): String =
-        if (returningUser) current.serverUrl
-        else AdminLinkClient.normalizeServerUrl(binding.inputAddress.text?.toString().orEmpty())
+    private fun showAddressField() {
+        binding.inputLayoutAddress.visibility = View.VISIBLE
+        binding.btnOtherServer.visibility = View.GONE
+    }
+
+    private fun serverUrl(): String {
+        if (returningUser) return current.serverUrl
+        val typed = binding.inputAddress.text?.toString().orEmpty()
+        if (binding.inputLayoutAddress.visibility != View.VISIBLE || typed.isBlank()) return AdminLinkClient.DEFAULT_SERVER_URL
+        return AdminLinkClient.normalizeServerUrl(typed)
+    }
 
     /** Shows whether Curbox for PC answers at the address, checked a moment after typing stops. */
     private fun checkComputer(delayMs: Long) {
@@ -228,8 +244,9 @@ class AdminLinkActivity : AppCompatActivity(), FixedBrandColors {
                 } else if (response?.code == 429) {
                     binding.inputLayoutPassword.error = getString(R.string.admin_link_locked)
                 } else {
-                    // A returning user has no address field, so the message goes under the password.
-                    val field = if (returningUser) binding.inputLayoutPassword else binding.inputLayoutAddress
+                    // Without an address field on screen, the message goes under the password.
+                    val addressShown = binding.inputLayoutAddress.visibility == View.VISIBLE
+                    val field = if (returningUser || !addressShown) binding.inputLayoutPassword else binding.inputLayoutAddress
                     field.error = getString(R.string.admin_link_unreachable)
                 }
                 return@launch

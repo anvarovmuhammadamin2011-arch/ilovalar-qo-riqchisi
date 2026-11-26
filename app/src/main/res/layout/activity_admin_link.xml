@@ -68,6 +68,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/curbox_space_m"
                     android:hint="@string/admin_link_address_hint"
+                    android:visibility="gone"
                     app:startIconDrawable="@drawable/ic_computer">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -131,6 +132,15 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/curbox_space_s"
                     android:text="@string/admin_link_connect" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_other_server"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:minHeight="@dimen/curbox_min_touch"
+                    android:text="@string/admin_link_other_server" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
