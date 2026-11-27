@@ -28,6 +28,8 @@ class AdminPanelActivity : AppCompatActivity() {
     companion object {
         const val PREFS = "AppPreferences"
         const val PREF_ADMIN_URL = "adminServerUrl"
+        /** Open the panel already signed in at this exact server (http allowed for a local computer). */
+        const val EXTRA_URL = "adminPanelUrl"
     }
 
     private lateinit var binding: ActivityAdminPanelBinding
@@ -68,8 +70,15 @@ class AdminPanelActivity : AppCompatActivity() {
             }
         })
 
-        // An old school computer address (plain http) gives way to the internet server.
-        binding.webView.loadUrl(savedUrl().takeIf { it.startsWith("https://") } ?: AdminLinkClient.DEFAULT_SERVER_URL)
+        // Opened from the unified login: the exact server the admin just signed in to
+        // (http for a local computer is fine), with the session cookie already set.
+        val directUrl = intent.getStringExtra(EXTRA_URL).orEmpty()
+        val startUrl = when {
+            directUrl.isNotEmpty() -> directUrl
+            // An old school computer address (plain http) gives way to the internet server.
+            else -> savedUrl().takeIf { it.startsWith("https://") } ?: AdminLinkClient.DEFAULT_SERVER_URL
+        }
+        binding.webView.loadUrl(startUrl)
     }
 
     private fun savedUrl(): String =

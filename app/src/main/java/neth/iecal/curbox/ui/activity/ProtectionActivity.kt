@@ -628,7 +628,7 @@ class ProtectionActivity : AppCompatActivity(), FixedBrandColors {
                 .setCancelable(false)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     startActivity(
-                        Intent(this@ProtectionActivity, RoleSelectActivity::class.java)
+                        Intent(this@ProtectionActivity, AdminLinkActivity::class.java)
                             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                     )
                     finish()

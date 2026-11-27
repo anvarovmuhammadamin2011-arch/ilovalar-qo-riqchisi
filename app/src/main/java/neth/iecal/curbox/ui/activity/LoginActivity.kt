@@ -96,7 +96,8 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun proceed() {
-        val next = if (BuildConfig.SUPPORTS_ADMIN_LINK) RoleSelectActivity::class.java else FragmentActivity::class.java
+        // Full flavor: one login for everyone (admin or user), no role to pick first.
+        val next = if (BuildConfig.SUPPORTS_ADMIN_LINK) AdminLinkActivity::class.java else FragmentActivity::class.java
         startActivity(Intent(this, next))
         finish()
     }

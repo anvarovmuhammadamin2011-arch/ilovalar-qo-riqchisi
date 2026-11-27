@@ -106,7 +106,7 @@ class UserProfileFragment : Fragment() {
                 .setNegativeButton(android.R.string.cancel, null)
                 .setPositiveButton(R.string.user_profile_sign_out) { _, _ ->
                     startActivity(
-                        Intent(requireContext(), neth.iecal.curbox.ui.activity.RoleSelectActivity::class.java)
+                        Intent(requireContext(), neth.iecal.curbox.ui.activity.AdminLinkActivity::class.java)
                             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                     )
                 }

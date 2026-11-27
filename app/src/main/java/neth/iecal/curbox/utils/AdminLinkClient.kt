@@ -22,7 +22,17 @@ object AdminLinkClient {
     const val DEFAULT_SERVER_URL = "https://mbsi-server.onrender.com"
     private const val TIMEOUT_MS = 6000
 
-    data class Response(val code: Int, val body: String)
+    data class Response(val code: Int, val body: String, val setCookies: List<String> = emptyList()) {
+        /** The value of a Set-Cookie by name, e.g. "cbx_admin" -> the session token, or null. */
+        fun cookie(name: String): String? {
+            val prefix = "$name="
+            for (raw in setCookies) {
+                val first = raw.substringBefore(';').trim()
+                if (first.startsWith(prefix)) return first.substring(prefix.length)
+            }
+            return null
+        }
+    }
 
     /** Shown in the admin's device list, like "Android 14". */
     fun osVersion(): String = "Android ${Build.VERSION.RELEASE}"
@@ -81,7 +91,8 @@ object AdminLinkClient {
             val code = connection.responseCode
             val stream = if (code in 200..299) connection.inputStream else connection.errorStream
             val text = stream?.bufferedReader(Charsets.UTF_8)?.use { it.readText() }.orEmpty()
-            return Response(code, text)
+            val cookies = connection.headerFields["Set-Cookie"].orEmpty()
+            return Response(code, text, cookies)
         } finally {
             connection.disconnect()
         }

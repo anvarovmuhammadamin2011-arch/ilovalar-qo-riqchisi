@@ -230,3 +230,27 @@ androidComponents {
         }
     }
 }
+
+// Windows build fix. The AIDL compiler writes its full command line — including the
+// user's home path — into a comment at the top of every generated .java file. When
+// that path contains "\u" (e.g. C:\Users\user\...), javac reads it as an illegal
+// unicode escape and the build fails. After AIDL runs and before javac compiles,
+// turn the backslashes in that header comment into forward slashes.
+tasks.withType<JavaCompile>().configureEach {
+    doFirst {
+        val aidlOut = layout.buildDirectory.dir("generated/aidl_source_output_dir").orNull?.asFile
+        if (aidlOut != null && aidlOut.exists()) {
+            aidlOut.walkTopDown().filter { it.isFile && it.extension == "java" }.forEach { f ->
+                val lines = f.readText().split("\n").toMutableList()
+                var changed = false
+                for (i in 0 until minOf(6, lines.size)) {
+                    if (lines[i].contains('\\')) {
+                        lines[i] = lines[i].replace('\\', '/')
+                        changed = true
+                    }
+                }
+                if (changed) f.writeText(lines.joinToString("\n"))
+            }
+        }
+    }
+}

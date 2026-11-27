@@ -224,12 +224,74 @@ class AdminLinkActivity : AppCompatActivity(), FixedBrandColors {
             return
         }
 
-        MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.admin_link_consent_title)
-            .setMessage(R.string.admin_link_consent_message)
-            .setPositiveButton(R.string.admin_link_consent_yes) { _, _ -> signInOnServer(url, username, password) }
-            .setNegativeButton(R.string.admin_link_consent_no, null)
-            .show()
+        // One login for everyone: the server decides whether these are admin or user
+        // credentials, so no one has to pick a role first.
+        detectAndSignIn(url, username, password)
+    }
+
+    /**
+     * Tries the admin login first. The server tells them apart: admin credentials log
+     * straight in to the panel, correct user credentials come back as "user_account" and
+     * go through the user sign in (with consent) instead.
+     */
+    private fun detectAndSignIn(url: String, username: String, password: String) {
+        setBusy(true)
+        lifecycleScope.launch {
+            val body = JSONObject().put("username", username).put("password", password)
+            val response = withContext(Dispatchers.IO) {
+                runCatching { AdminLinkClient.post(url, "/api/admin/login", body) }.getOrNull()
+            }
+            when {
+                response?.code == 200 -> {
+                    // Carry the admin session into the panel's WebView so it opens signed in.
+                    response.cookie("cbx_admin")?.let { token ->
+                        val cookies = android.webkit.CookieManager.getInstance()
+                        cookies.setCookie(url, "cbx_admin=$token; Path=/")
+                        cookies.flush()
+                    }
+                    setBusy(false)
+                    openAdminPanel(url)
+                }
+                response?.code == 403 && errorCode(response.body) == "user_account" -> {
+                    // A real user account: ask for consent, then sign the phone in as that user.
+                    setBusy(false)
+                    MaterialAlertDialogBuilder(this@AdminLinkActivity)
+                        .setTitle(R.string.admin_link_consent_title)
+                        .setMessage(R.string.admin_link_consent_message)
+                        .setPositiveButton(R.string.admin_link_consent_yes) { _, _ -> signInOnServer(url, username, password) }
+                        .setNegativeButton(R.string.admin_link_consent_no, null)
+                        .show()
+                }
+                response?.code == 403 -> {
+                    setBusy(false)
+                    binding.inputLayoutPassword.error = getString(R.string.admin_link_wrong_login)
+                    shakeForm()
+                }
+                response?.code == 429 -> {
+                    setBusy(false)
+                    binding.inputLayoutPassword.error = getString(R.string.admin_link_locked)
+                }
+                else -> {
+                    setBusy(false)
+                    val addressShown = binding.inputLayoutAddress.visibility == View.VISIBLE
+                    val field = if (addressShown) binding.inputLayoutAddress else binding.inputLayoutPassword
+                    field.error = getString(R.string.admin_link_unreachable)
+                }
+            }
+        }
+    }
+
+    private fun errorCode(body: String): String =
+        runCatching { JSONObject(body).optString("error") }.getOrDefault("")
+
+    private fun openAdminPanel(url: String) {
+        prefs.edit().putString(AdminPanelActivity.PREF_ADMIN_URL, url).apply()
+        startActivity(
+            Intent(this, AdminPanelActivity::class.java)
+                .putExtra(AdminPanelActivity.EXTRA_URL, url)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        )
+        finish()
     }
 
     private fun TextInputLayout.withError(message: Int): TextInputLayout {

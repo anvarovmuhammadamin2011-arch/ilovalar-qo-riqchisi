@@ -114,8 +114,8 @@
     <string name="role_user_title">Foydalanuvchi</string>
     <string name="role_user_desc">Bu telefondan admin bilan foydalanish uchun kiring</string>
     <string name="role_user_linked">%1$s sifatida kirilgan</string>
-    <string name="admin_link_title">Foydalanuvchi sifatida kirish</string>
-    <string name="admin_link_desc">Login va parolni admindan soʻrang. Istalgan WiFi yoki mobil internetda ishlaydi.</string>
+    <string name="admin_link_title">Kirish</string>
+    <string name="admin_link_desc">Login va parolni kiriting. Admin ham, foydalanuvchi ham shu yerdan kiradi.</string>
     <string name="admin_link_other_server">Boshqa server manzilini yozish</string>
     <string name="admin_link_welcome_back">Xush kelibsiz, %1$s</string>
     <string name="admin_link_desc_again">Davom etish uchun parolingizni yozing.</string>
