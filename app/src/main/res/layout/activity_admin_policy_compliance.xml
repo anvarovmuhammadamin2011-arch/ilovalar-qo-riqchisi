@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/compliance_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:colorBackground"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:paddingHorizontal="@dimen/curbox_screen_padding"
+        android:paddingVertical="@dimen/curbox_space_xl">
+
+        <ImageView
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_admin_shield" />
+
+        <TextView
+            android:id="@+id/tv_title"
+            style="@style/TextAppearance.Curbox.Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/curbox_space_l"
+            android:gravity="center"
+            android:text="@string/provisioning_compliance_title" />
+
+        <TextView
+            android:id="@+id/tv_body"
+            style="@style/TextAppearance.Curbox.Body"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/curbox_space_m"
+            android:gravity="center"
+            android:text="@string/provisioning_compliance_body"
+            android:textColor="@color/curbox_text_secondary" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_continue"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="@dimen/curbox_space_xl"
+            android:stateListAnimator="@animator/curbox_button_press"
+            app:cornerRadius="18dp"
+            android:text="@string/provisioning_compliance_continue" />
+    </LinearLayout>
+</ScrollView>

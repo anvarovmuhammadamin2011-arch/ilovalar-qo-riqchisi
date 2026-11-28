@@ -148,6 +148,9 @@
     <string name="admin_link_consent_message">If you say yes:\n\n• Your admin can see which apps are on this phone.\n• Your admin can block apps and websites here.\n• Only your admin can remove this link.\n\nNext, MBSI asks you to turn on its permissions so the blocks can work.</string>
     <string name="admin_link_consent_yes">Yes, allow</string>
     <string name="admin_link_consent_no">No</string>
+    <string name="provisioning_compliance_title">Managed by MBSI</string>
+    <string name="provisioning_compliance_body">Your admin manages this phone with MBSI. They can see installed apps and block apps or websites here. Once setup finishes, you can sign in to your admin’s account from MBSI’s User screen.</string>
+    <string name="provisioning_compliance_continue">Continue</string>
     <string name="admin_link_bad_address">Type the computer address, like 192.168.1.5:8787</string>
     <string name="admin_link_unreachable">Could not reach the server. Check that the internet is on and try again.</string>
     <string name="admin_link_connected">Connected to your admin</string>

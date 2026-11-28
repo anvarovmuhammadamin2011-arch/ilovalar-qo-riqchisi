@@ -22,6 +22,15 @@
             android:name=".receivers.AdminReceiver"
             tools:node="remove" />
 
+        <!-- Device-owner QR provisioning relies on the same AdminReceiver, dropped above. -->
+        <activity
+            android:name=".ui.activity.GetProvisioningModeActivity"
+            tools:node="remove" />
+
+        <activity
+            android:name=".ui.activity.AdminPolicyComplianceActivity"
+            tools:node="remove" />
+
         <!-- The UI hider's node inspection service is dropped as well. -->
         <service
             android:name=".services.NodePickerService"

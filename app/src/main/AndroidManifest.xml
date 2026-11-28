@@ -186,6 +186,30 @@
                 android:resource="@xml/device_admin_receiver_info" />
         </receiver>
 
+        <!-- Android 12+ requires these two during QR/NFC device-owner provisioning,
+             or setup fails with "Couldn't set up device". -->
+        <activity
+            android:name=".ui.activity.GetProvisioningModeActivity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:theme="@style/Theme.Curbox.TransparentDialog">
+            <intent-filter>
+                <action android:name="android.app.action.GET_PROVISIONING_MODE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".ui.activity.AdminPolicyComplianceActivity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:theme="@style/Theme.Curbox">
+            <intent-filter>
+                <action android:name="android.app.action.ADMIN_POLICY_COMPLIANCE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"
